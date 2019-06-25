@@ -5,15 +5,18 @@ v2.11
 ---
 ###### Upcoming
 * The first out of Snapshot version after a long long time.
-* Update for Spigot v1.14.3-SNAPSHOT
-* Clean up code
-* Update Changelog file
-* Update plugin.yml so can support soft dependencies
-* Update metric dependency to v1.5
-* ! Multiple users per vault
+* Update for Spigot v1.14.3-SNAPSHOT.
+* Clean up code.
+* Update Changelog file.
+* Update plugin.yml so can support soft dependencies.
+* Update bstats dependency to v1.5
+* Track how many vault exists for bstats. https://bstats.org/plugin/bukkit/Gringotts
+* Track the overall economy of the server for bstats. https://bstats.org/plugin/bukkit/Gringotts
+* ! Multiple users per vault.
 * ! Support metadata identification for items. Idea by [killrrkillrr](https://www.spigotmc.org/members/killrrkillrr.633320/) on spigot.org
 * ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
 * ! Configurable tag name for the vault signs. Example: [\<name\>]. Idea by [mc_tech](https://www.spigotmc.org/members/mc_tech.587361/) on spigot.org
+* Better support of UUID system.
 > Yes, version 2.10 got skipped, like Apple skipped iPhone 9.
 
 v2.11.1-SNAPSHOT

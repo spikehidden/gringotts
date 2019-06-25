@@ -4,6 +4,7 @@ import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.*;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,6 +13,8 @@ import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.event.PlayerVaultCreationEvent;
+
+import java.util.UUID;
 
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.Permissions.*;
@@ -174,6 +177,28 @@ class ValidTownyHandler extends TownyHandler implements AccountHolderProvider {
     @Override
     public TownyAccountHolder getAccountHolder(String id) {
         return getAccountHolderByAccountName(id);
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param uuid
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(UUID uuid) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param player the target player
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(OfflinePlayer player) {
+        return null;
     }
 }
 

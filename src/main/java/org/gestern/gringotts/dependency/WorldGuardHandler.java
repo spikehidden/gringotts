@@ -8,6 +8,7 @@ import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,6 +39,28 @@ public abstract class WorldGuardHandler implements DependencyHandler, AccountHol
 class InvalidWorldGuardHandler extends WorldGuardHandler {
     @Override
     public AccountHolder getAccountHolder(String id) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param uuid
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(UUID uuid) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param player the target player
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(OfflinePlayer player) {
         return null;
     }
 
@@ -104,6 +127,28 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
             }
         }
 
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param uuid id of account holder
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(UUID uuid) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param player the target player
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(OfflinePlayer player) {
         return null;
     }
 

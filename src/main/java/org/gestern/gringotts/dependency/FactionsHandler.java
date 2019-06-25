@@ -5,6 +5,7 @@ import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.factions.entity.MPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +15,8 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.event.PlayerVaultCreationEvent;
 import org.gestern.gringotts.event.VaultCreationEvent.Type;
+
+import java.util.UUID;
 
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.Permissions.CREATEVAULT_ADMIN;
@@ -60,6 +63,27 @@ class InvalidFactionsHandler extends FactionsHandler {
 
     @Override
     public AccountHolder getAccountHolder(String id) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param uuid@return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(UUID uuid) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param player the target player
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(OfflinePlayer player) {
         return null;
     }
 
@@ -155,6 +179,28 @@ class ValidFactionsHandler extends FactionsHandler {
             return new FactionAccountHolder(faction);
         }
 
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param uuid
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(UUID uuid) {
+        return null;
+    }
+
+    /**
+     * Get the AccountHolder object mapped to the given id for this provider.
+     *
+     * @param player the target player
+     * @return account holder for id
+     */
+    @Override
+    public AccountHolder getAccountHolder(OfflinePlayer player) {
         return null;
     }
 }

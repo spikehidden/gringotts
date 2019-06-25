@@ -33,49 +33,49 @@ public enum Configuration {
      * of the vault.
      */
     // TODO make this actually configurable(?)
-    public final  String vaultPattern = "[^\\[]*\\[(\\w*) ?vault\\]";
-    private final Logger log          = Gringotts.getInstance().getLogger();
+    public final String vaultPattern = "[^\\[]*\\[(\\w*) ?vault\\]";
+    private final Logger log = Gringotts.getInstance().getLogger();
     /**
      * Language to be used for messages. Should be an ISO 639-1 (alpha-2) code.
      * If a language is not supported by Gringotts, use user-configured or default (English) messages.
      */
-    public        String language     = "custom";
-    /**
-     * Currency configuration.
-     */
-    private GringottsCurrency currency;
+    public String language = "custom";
     /**
      * Flat tax on every player-to-player transaction. This is a value in currency units.
      */
-    public double  transactionTaxFlat   = 0;
+    public double transactionTaxFlat = 0;
     /**
      * Rate tax on every player-to-player transaction. This is a fraction, e.g. 0.1 means 10% tax.
      */
-    public double  transactionTaxRate   = 0;
+    public double transactionTaxRate = 0;
     /**
      * Amount of non-physical money to give to new players
      */
     // An alternative to flooding new players' inventories with currency items
-    public long    startBalancePlayer   = 0;
-    public long    startBalanceFaction  = 0;
-    public long    startBalanceTown     = 0;
-    public long    startBalanceNation   = 0;
+    public long startBalancePlayer = 0;
+    public long startBalanceFaction = 0;
+    public long startBalanceTown = 0;
+    public long startBalanceNation = 0;
     /**
      * Use container vaults (chest, dispenser, furnace).
      */
-    public boolean usevaultContainer    = true;
+    public boolean usevaultContainer = true;
     /**
      * Use ender chests as player vaults.
      */
-    public boolean usevaultEnderchest   = true;
+    public boolean usevaultEnderchest = true;
     /**
      * Balance command shows vault balance.
      */
-    public boolean balanceShowVault     = true;
+    public boolean balanceShowVault = true;
     /**
      * Balance command shows inventory balance.
      */
     public boolean balanceShowInventory = true;
+    /**
+     * Currency configuration.
+     */
+    private GringottsCurrency currency;
 
     /**
      * Attempt to identify an item by name. Prefers to use built-in Minecraft names,
@@ -103,10 +103,12 @@ public enum Configuration {
         if (type.hasItemMeta()) {
             ItemMeta meta = type.getItemMeta();
 
-            if (meta.hasDisplayName()) {
-                return meta.getDisplayName();
-            } else if (meta.hasLocalizedName()) {
-                return meta.getLocalizedName();
+            if (meta != null) {
+                if (meta.hasDisplayName()) {
+                    return meta.getDisplayName();
+                } else if (meta.hasLocalizedName()) {
+                    return meta.getLocalizedName();
+                }
             }
         }
 
@@ -119,7 +121,6 @@ public enum Configuration {
      * @param savedConfig config to read and set values with
      */
     public void readConfig(FileConfiguration savedConfig) {
-
         String version = Bukkit.getBukkitVersion();
 
         if (Util.versionAtLeast(version, "1.3.1")) {
@@ -267,7 +268,7 @@ public enum Configuration {
         }
 
         for (String denomStr : denoms) {
-            String[] keyParts   = denomStr.split(";");
+            String[] keyParts = denomStr.split(";");
             String[] valueParts = denomSection.getString(denomStr).split(";");
 
             String name = "";
@@ -298,7 +299,7 @@ public enum Configuration {
 
                 double value = Double.parseDouble(valueParts[0]);
 
-                String unitName       = unitName(denomType);
+                String unitName = unitName(denomType);
                 String unitNamePlural = unitName + "s";
 
                 currency.addDenomination(
@@ -321,4 +322,5 @@ public enum Configuration {
      */
     public GringottsCurrency getCurrency() {
         return currency;
-    }}
+    }
+}

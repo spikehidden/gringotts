@@ -12,12 +12,14 @@ import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderFactory;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Eco;
@@ -26,6 +28,7 @@ import org.gestern.gringotts.api.impl.VaultConnector;
 import org.gestern.gringotts.commands.GringottsExecutor;
 import org.gestern.gringotts.commands.MoneyExecutor;
 import org.gestern.gringotts.commands.MoneyadminExecutor;
+import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.data.DAO;
 import org.gestern.gringotts.data.DerbyDAO;
 import org.gestern.gringotts.data.EBeanDAO;
@@ -39,7 +42,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.gestern.gringotts.Configuration.CONF;
 import static org.gestern.gringotts.Language.LANG;
@@ -55,7 +60,6 @@ public class Gringotts extends JavaPlugin {
     private Accounting accounting;
     private DAO dao;
     private EbeanServer ebean;
-    private Metrics metrics;
     private Eco eco;
 
     public Gringotts() {
@@ -86,14 +90,8 @@ public class Gringotts extends JavaPlugin {
         return instance;
     }
 
-    public Metrics getMetrics() {
-        return metrics;
-    }
-
     @Override
     public void onEnable() {
-
-
         instance = this;
 
         try {
@@ -111,8 +109,57 @@ public class Gringotts extends JavaPlugin {
             registerEvents();
             registerEconomy();
 
-            metrics = new Metrics(this);
+            // Setup Metrics support.
+            Metrics metrics = new Metrics(this);
 
+            // Tracking how many vaults exists.
+            metrics.addCustomChart(new Metrics.SingleLineChart("vaultsChart", () -> {
+                int returned = 0;
+
+                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                    AccountHolder holder = accountHolderFactory.get(player);
+                    GringottsAccount account = accounting.getAccount(holder);
+
+                    returned += Gringotts.getInstance().getDao().getChests(account).size();
+                }
+
+                return returned;
+            }));
+
+            // Tracking the balance of the users exists.
+            metrics.addCustomChart(new Metrics.SingleLineChart("economyChart", () -> {
+                int returned = 0;
+
+                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                    if (player.isOp()) {
+                        continue;
+                    }
+
+                    AccountHolder holder = accountHolderFactory.get(player);
+                    GringottsAccount account = accounting.getAccount(holder);
+
+                    returned += account.getBalance();
+                }
+
+                return returned;
+            }));
+
+            // Tracking the exists denominations.
+            metrics.addCustomChart(new Metrics.AdvancedPie("denominationsChart", () -> {
+                Map<String, Integer> returned = new HashMap<>();
+
+                for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+                    String name = denomination.getKey().type.getType().name();
+
+                    if (!returned.containsKey(name)) {
+                        returned.put(name, 0);
+                    }
+
+                    returned.put(name, returned.get(name) + 1);
+                }
+
+                return returned;
+            }));
         } catch (GringottsStorageException | GringottsConfigurationException e) {
             getLogger().severe(e.getMessage());
             this.disable();
