@@ -17,7 +17,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.gestern.gringotts.accountholder.AccountHolderFactory;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
@@ -59,7 +58,6 @@ public class Gringotts extends JavaPlugin {
     private Metrics metrics;
     private Eco eco;
 
-
     public Gringotts() {
         ServerConfig dbConfig = new ServerConfig();
 
@@ -86,6 +84,10 @@ public class Gringotts extends JavaPlugin {
      */
     public static Gringotts getInstance() {
         return instance;
+    }
+
+    public Metrics getMetrics() {
+        return metrics;
     }
 
     @Override

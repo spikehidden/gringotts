@@ -1,32 +1,15 @@
 Gringotts
 =========
 
-[![Join the chat at https://gitter.im/MinecraftWars/Gringotts](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/MinecraftWars/Gringotts?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/MinecraftWars/Gringotts.svg?branch=master)](https://travis-ci.org/MinecraftWars/Gringotts)
-[![](https://jitpack.io/v/MinecraftWars/Gringotts.svg)](https://jitpack.io/#MinecraftWars/Gringotts)
+[![Join the chat at https://gitter.im/MinecraftWars/Gringotts](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nikosgram/Gringotts?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/nikosgram/Gringotts.svg?branch=master)](https://travis-ci.org/nikosgram/Gringotts)
+[![](https://jitpack.io/v/nikosgram/Gringotts.svg)](https://jitpack.io/#nikosgram/Gringotts)
 
 Gringotts is an item-based economy plugin for the Bukkit Minecraft server platform. Unlike earlier economy plugins, all currency value and money transactions are based on actual items in Minecraft, per default emeralds. The goals are to add a greater level of immersion, a generally more Minecraft-like feeling, and in the case of a PvP environment, making the currency itself vulnerable to raiding.
 
 
 [Get Gringotts from BukkitDev](https://dev.bukkit.org/projects/gringotts) or
 [get Gringotts from Spigot](https://www.spigotmc.org/resources/gringotts.42071/)!
-
-Looking for maintainers!
-------------------------
-
-I initially created Gringotts a long time ago for a server that no longer exists, and I don't play Minecraft much anymore,
-and have many other interesting things to do. Thus, I can't devote much time to the project. I would like to hand the 
-project off to somebody interested in its continued existence.
-
-### How to become a maintainer? ###
-
-1. Open a pull request with some kind of update for Gringotts: 
-      * update for a new version of Bukkit
-      * add a feature
-      * fix a bug
-      * update documentation
-2. Say that you would like to be a maintainer.
-3. If the PR is reasonable, I will give you commit access to the GitHub repository and the bukkitdev project. 
 
 Features
 --------

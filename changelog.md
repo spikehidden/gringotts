@@ -1,6 +1,45 @@
 Gringotts Changelog
 ===================
 
+v2.11
+---
+###### Upcoming
+* The first out of Snapshot version after a long long time.
+* Update for Spigot v1.14.3-SNAPSHOT
+* Clean up code
+* Update Changelog file
+* Update plugin.yml so can support soft dependencies
+* Update metric dependency to v1.5
+* ! Multiple users per vault
+* ! Support metadata identification for items. Idea by [killrrkillrr](https://www.spigotmc.org/members/killrrkillrr.633320/) on spigot.org
+* ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
+* ! Configurable tag name for the vault signs. Example: [\<name\>]. Idea by [mc_tech](https://www.spigotmc.org/members/mc_tech.587361/) on spigot.org
+> Yes, version 2.10 got skipped, like Apple skipped iPhone 9.
+
+v2.11.1-SNAPSHOT
+---
+###### Jun 23 2019
+* Update for Minecraft 1.14+
+
+v2.11.0-SNAPSHOT
+---
+###### Jan 15, 2019
+* Provide better support for detecting Factions.
+* Changed command display style to table in .md files.
+* Code cleanup and refactor.
+* Implement support for WorldGuard 7.0.0 only dropping support for pre 1.13.
+
+v2.10.1-SNAPSHOT
+---
+###### Apr 11, 2018
+* Fixed unitName method issues that couldn't identify the material's name.
+* Fixed some by mistake schematics.
+
+v2.10-SNAPSHOT
+----
+###### Jun 22, 2017
+* Supports the latest version of WorldGuard and Factions.
+
 v2.9
 ----
 * DEPENDS ON JAVA 8. If your server is not on Java 8 yet, you should upgrade, or ask your service provider to upgrade. Java 7 isn't supported anymore by Oracle.
@@ -69,7 +108,7 @@ v2.0 beta5
 v2.0 beta4
 ----------
 * fix vault creation breaking under some circumstances involving Towny
-* added support for built-in Bukkit database support. This means that the Derby library is no longer required. If the Derby jar is present, Gringotts will continue to use it, otherwise a DB will be created via the Bukkit API. This should also support MySQL if you configure it in bukkit.yml. Please see the [http://wiki.bukkit.org/Bukkit.yml#database](Bukkit Wiki) for details.
+* added support for built-in Bukkit database support. This means that the Derby library is no longer required. If the Derby jar is present, Gringotts will continue to use it, otherwise a DB will be created via the Bukkit API. This should also support MySQL if you configure it in bukkit.yml. Please see the [Bukkit Wiki](http://wiki.bukkit.org/Bukkit.yml#database) for details.
 
 v2.0 beta3
 ----------

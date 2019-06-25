@@ -9,6 +9,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.gestern.gringotts.currency.GringottsCurrency;
 
+@SuppressWarnings("WeakerAccess")
 public class Util {
 
     private Util() {
