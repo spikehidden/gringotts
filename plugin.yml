@@ -1,19 +1,19 @@
 name: Gringotts
-authors: [jasticE, squidicuz, eXeC64, nikosgram13]
-website: https://github.com/MinecraftWars/Gringotts
+authors: [jasticE, squidicuz, eXeC64, nikosgram]
+website: https://github.com/nikosgram/Gringotts
 
 version: ${version}
 main: org.gestern.gringotts.Gringotts
 load: STARTUP
 database: true
 
-api-version: 1.13
+api-version: "1.14"
 
 awareness:
-- !@UTF8
+  - !@UTF8
 
-depend: []
-softdepend: []
+depend: [Vault]
+softdepend: [WorldGuard, Factions, Towny]
 loadbefore: [Vault]
 
 commands:

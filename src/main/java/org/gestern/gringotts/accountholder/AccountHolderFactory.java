@@ -43,6 +43,42 @@ public class AccountHolderFactory {
     }
 
     /**
+     * Get an account holder with automatically determined type, based on the owner's id.
+     *
+     * @param uuid the user id
+     * @return account holder for the given owner name, or null if none could be determined
+     */
+    public AccountHolder get(UUID uuid) {
+        for (AccountHolderProvider provider : accountHolderProviders.values()) {
+            AccountHolder accountHolder = provider.getAccountHolder(uuid);
+
+            if (accountHolder != null) {
+                return accountHolder;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get an account holder with automatically determined type, based on the owner's id.
+     *
+     * @param uuid the user id
+     * @return account holder for the given owner name, or null if none could be determined
+     */
+    public AccountHolder get(OfflinePlayer player) {
+        for (AccountHolderProvider provider : accountHolderProviders.values()) {
+            AccountHolder accountHolder = provider.getAccountHolder(player);
+
+            if (accountHolder != null) {
+                return accountHolder;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get an account holder of known type.
      *
      * @param type  type of the account
@@ -51,8 +87,8 @@ public class AccountHolderFactory {
      * supported.
      */
     public AccountHolder get(String type, String owner) {
-        AccountHolderProvider provider      = accountHolderProviders.get(type);
-        AccountHolder         accountHolder = null;
+        AccountHolderProvider provider = accountHolderProviders.get(type);
+        AccountHolder accountHolder = null;
 
         if (provider != null) {
             accountHolder = provider.getAccountHolder(owner);
@@ -73,18 +109,40 @@ public class AccountHolderFactory {
                 return null;
             }
 
-            OfflinePlayer player;
-
             try {
-                UUID playerId = UUID.fromString(uuidOrName);
-                player = Bukkit.getOfflinePlayer(playerId);
+                return getAccountHolder(UUID.fromString(uuidOrName));
             } catch (IllegalArgumentException ignored) {
                 // don't use getOfflinePlayer(String) because that will do a blocking web request
                 // rather iterate this array, should be quick enough
                 for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
-                    if (uuidOrName.equals(p.getName())) return new PlayerAccountHolder(p);
+                    if (uuidOrName.equals(p.getName())) {
+                        return getAccountHolder(p);
+                    }
                 }
 
+                return null;
+            }
+        }
+
+        @Override
+        public AccountHolder getAccountHolder(UUID uuid) {
+            if (uuid == null) {
+                return null;
+            }
+
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+
+            //noinspection ConstantConditions
+            if (player != null) {
+                return getAccountHolder(player);
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public AccountHolder getAccountHolder(OfflinePlayer player) {
+            if (player == null) {
                 return null;
             }
 
@@ -95,7 +153,6 @@ public class AccountHolderFactory {
                 return null;
             }
         }
-
     }
 
 }
