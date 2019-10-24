@@ -1,11 +1,11 @@
 Gringotts Changelog
 ===================
 
-v2.11
+v2.11.1
 ---
 ###### Upcoming
 * The first out of Snapshot version after a long long time.
-* Update for Spigot v1.14.3-SNAPSHOT.
+* Update for Spigot v1.14.4-SNAPSHOT.
 * Clean up code.
 * Update Changelog file.
 * Update plugin.yml so can support soft dependencies.
