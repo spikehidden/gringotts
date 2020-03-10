@@ -12,9 +12,9 @@ api-version: "1.14"
 awareness:
   - !@UTF8
 
-depend: [Vault]
-softdepend: [WorldGuard, Factions, Towny]
-loadbefore: [Vault]
+#depend: [Vault]
+softdepend: [WorldGuard, Factions, Towny, Reserve, Vault]
+loadbefore: [Reserve, Vault]
 
 commands:
   balance:

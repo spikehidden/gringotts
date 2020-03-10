@@ -50,7 +50,6 @@ import static org.gestern.gringotts.Configuration.CONF;
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.dependency.Dependency.DEP;
 
-
 public class Gringotts extends JavaPlugin {
 
     private static final String MESSAGES_YML = "messages.yml";
@@ -110,7 +109,7 @@ public class Gringotts extends JavaPlugin {
             registerEconomy();
 
             // Setup Metrics support.
-            Metrics metrics = new Metrics(this);
+            Metrics metrics = new Metrics(this, 4998);
 
             // Tracking how many vaults exists.
             metrics.addCustomChart(new Metrics.SingleLineChart("vaultsChart", () -> {

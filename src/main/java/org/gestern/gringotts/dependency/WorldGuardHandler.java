@@ -45,7 +45,7 @@ class InvalidWorldGuardHandler extends WorldGuardHandler {
     /**
      * Get the AccountHolder object mapped to the given id for this provider.
      *
-     * @param uuid
+     * @param uuid the targeted account holder
      * @return account holder for id
      */
     @Override
@@ -223,7 +223,6 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
 }
 
 class WorldGuardAccountHolder implements AccountHolder {
-
     final String world;
     final ProtectedRegion region;
 

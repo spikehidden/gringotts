@@ -1,6 +1,7 @@
 package org.gestern.gringotts.dependency;
 
 import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.*;
 import org.bukkit.Bukkit;
@@ -272,7 +273,6 @@ class TownyListener implements Listener {
 }
 
 class TownyAccountHolder implements AccountHolder {
-
     public final EconomyHandler owner;
     public final String type;
 
@@ -283,7 +283,7 @@ class TownyAccountHolder implements AccountHolder {
 
     @Override
     public String getName() {
-        return ((Nameable)owner).getName();
+        return owner instanceof Nameable ? ((Nameable) owner).getName() : "Unable to find a name";
     }
 
     /**
@@ -294,7 +294,8 @@ class TownyAccountHolder implements AccountHolder {
     @Override
     public void sendMessage(String message) {
         if (owner instanceof ResidentList) {
-            TownyUniverse.getOnlinePlayers((ResidentList) owner)
+            TownyAPI.getInstance()
+                    .getOnlinePlayers((ResidentList) owner)
                     .forEach(player -> player.sendMessage(message));
         }
     }
@@ -313,6 +314,4 @@ class TownyAccountHolder implements AccountHolder {
     public String toString() {
         return "TownyAccountHolder(" + ((Nameable)owner).getName() + ")";
     }
-
 }
-
