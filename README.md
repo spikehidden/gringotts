@@ -122,7 +122,7 @@ That's it!
 
 Metrics
 -------
-![Gringotts Metrics](https://bstats.org/signatures/bukkit/Gringotts.svg)
+[![Gringotts Metrics](https://bstats.org/signatures/bukkit/Gringotts.svg)](https://bstats.org/plugin/bukkit/Gringotts/4998)
 
 License
 -------
