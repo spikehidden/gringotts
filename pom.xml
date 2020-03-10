@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>minecraftwars</groupId>
     <artifactId>Gringotts</artifactId>
-    <version>2.11</version>
+    <version>2.11.2</version>
 
     <build>
         <resources>
@@ -97,9 +97,9 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>towny</groupId>
-            <artifactId>towny</artifactId>
-            <version>0.90.0.0</version>
+            <groupId>com.palmergames.bukkit.towny</groupId>
+            <artifactId>Towny</artifactId>
+            <version>0.95.2.22</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

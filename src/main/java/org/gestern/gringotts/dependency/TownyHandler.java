@@ -273,17 +273,17 @@ class TownyListener implements Listener {
 
 class TownyAccountHolder implements AccountHolder {
 
-    public final TownyEconomyObject owner;
+    public final EconomyHandler owner;
     public final String type;
 
-    public TownyAccountHolder(TownyEconomyObject owner, String type) {
+    public TownyAccountHolder(EconomyHandler owner, String type) {
         this.owner = owner;
         this.type = type;
     }
 
     @Override
     public String getName() {
-        return owner.getName();
+        return ((Nameable)owner).getName();
     }
 
     /**
@@ -306,12 +306,12 @@ class TownyAccountHolder implements AccountHolder {
 
     @Override
     public String getId() {
-        return owner.getEconomyName();
+        return owner.getAccount().getName();
     }
 
     @Override
     public String toString() {
-        return "TownyAccountHolder(" + owner.getName() + ")";
+        return "TownyAccountHolder(" + ((Nameable)owner).getName() + ")";
     }
 
 }
