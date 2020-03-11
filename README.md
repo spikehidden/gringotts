@@ -21,34 +21,32 @@ Features
 * Direct account-to-account transfers commands
 * Optional transaction taxes
 * Fractional currency values (fixed decimal digits)
-* Account support for [Towny](http://dev.bukkit.org/server-mods/towny-advanced/) and [WorldGuard](http://dev.bukkit.org/server-mods/worldguard/)
-* [Vault](http://dev.bukkit.org/server-mods/vault/) integration
+* Account support for [Towny](https://townyadvanced.github.io) and [WorldGuard](http://dev.bukkit.org/projects/worldguard/)
+* [Vault](http://dev.bukkit.org/projects/vault/) integration
 
 Usage
 -----
-Storing money in an account requires a Gringotts vault. A vault consists of a container, which can be either chest, dispenser or furnace, and a sign above or on it declaring it as a vault. A player or faction may claim any number of vaults. Vaults are not protected from access through other players. If you would like them to be, you may use additional plugins such as [LWC](http://dev.bukkit.org/server-mods/lwc/) or [WorldGuard](http://dev.bukkit.org/server-mods/worldguard/).
+Storing money in an account requires a Gringotts vault. A vault consists of a container, which can be either chest, dispenser or furnace, and a sign above or on it declaring it as a vault. A player or faction may claim any number of vaults. Vaults are not protected from access through other players. If you would like them to be, you may use additional plugins such as [LWC](https://dev.bukkit.org/projects/lwc/) or [WorldGuard](https://dev.bukkit.org/projects/worldguard/).
 
-For full usage documentation, please see [the usage page](https://github.com/nikosgram/Gringotts/blob/master/doc/usage.md)
+[Read how to use gringotts](https://github.com/nikosgram/Gringotts/wiki/Usage).
 
-### Player vaults ###
+Configuration
+-----
+Read [how to config gringotts](https://github.com/nikosgram/Gringotts/wiki/Configuration).
 
-Place a sign above a container block, with `[vault]` written on the first line. If it was created correctly, the sign will display your name on the third line and you will receive a message that the vault has been created.
-
-### Towny vaults ###
-
-* To make a vault for your town: place a sign above a container block, with `[town vault]` written on the first line. 
-* To make a vault for your nation: place a sign above a container block, with `[nation vault]` written on the first line. 
-If it was created correctly, the sign will display your town's or nation's tag on the third line and you will receive a message that the vault has been created.
+Permissions
+-----
+Read [how gringotts permissions works](https://github.com/nikosgram/Gringotts/wiki/Permissions).
 
 Commands
 --------
-See [Usage](https://nikosgram.github.io/Gringotts/docs/usage#commands).
+Read [how to use gringotts commands](https://github.com/nikosgram/Gringotts/wiki/Commands).
 
 Installation and Configuration
 ------------------------------
-Download [Gringotts](http://dev.bukkit.org/server-mods/gringotts/files/) and place it in your craftbukkit/plugins folder
+Download [Gringotts](https://www.spigotmc.org/resources/gringotts.42071/) and place it in your craftbukkit/plugins folder
 
-Please see the [Configuration and Permissions](https://nikosgram.github.io/Gringotts/docs/configuration.md) document on how to configure Gringotts.
+Please see the [Configuration](https://github.com/nikosgram/Gringotts/wiki/Permissions) and [Permissions](https://github.com/nikosgram/Gringotts/wiki/Permissions) document on how to configure Gringotts.
 
 Problems? Questions?
 --------------------
