@@ -13,11 +13,6 @@ Gringotts supports vaults for players as well as other plugins: currently Factio
 First line: `[vault]`
 Third line: will display your name on successful creation.
 
-### Faction vaults ###
-
-First line: `[faction vault]`
-Third line: will display your faction's tag on successful creation.
-
 ### Towny vaults ###
 
 * Town vaults first line: `[town vault]`
