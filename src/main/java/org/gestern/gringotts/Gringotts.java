@@ -24,10 +24,11 @@ import org.gestern.gringotts.accountholder.AccountHolderFactory;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Eco;
 import org.gestern.gringotts.api.impl.GringottsEco;
+import org.gestern.gringotts.api.impl.ReserveConnector;
 import org.gestern.gringotts.api.impl.VaultConnector;
 import org.gestern.gringotts.commands.GringottsExecutor;
-import org.gestern.gringotts.commands.MoneyExecutor;
 import org.gestern.gringotts.commands.MoneyAdminExecutor;
+import org.gestern.gringotts.commands.MoneyExecutor;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.data.DAO;
 import org.gestern.gringotts.data.DerbyDAO;
@@ -41,7 +42,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class Gringotts extends JavaPlugin {
             eco = new GringottsEco();
             registerCommands();
             registerEvents();
-            registerVaultEconomy();
+            registerEconomy();
 
             // Setup Metrics support.
             Metrics metrics = new Metrics(this, 4998);
@@ -212,16 +213,26 @@ public class Gringotts extends JavaPlugin {
         // listeners for other account types are loaded with dependencies
     }
 
-
     /**
-     * Register Gringotts as economy provider for vault.
+     * Register Gringotts as economy provider for vault/reserve.
      */
-    private void registerVaultEconomy() {
+    private void registerEconomy() {
         if (DEP.vault.exists()) {
             getServer().getServicesManager().register(Economy.class, new VaultConnector(), this, ServicePriority.Highest);
+
             getLogger().info("Registered Vault interface.");
-        } else {
-            getLogger().info("Vault not found. Other plugins may not be able to access Gringotts accounts.");
+        }
+
+        if (DEP.reserve.exists()) {
+            ReserveConnector.registerProviderSafely();
+
+            getLogger().info("Registered Reserve interface.");
+        }
+
+        if (!DEP.vault.exists() && !DEP.reserve.exists()) {
+            getLogger().info("Neither Vault or Reserve was found. Other plugins may not be able to access Gringotts accounts.");
+
+            Bukkit.getPluginManager().disablePlugin(this);
         }
     }
 
@@ -251,7 +262,7 @@ public class Gringotts extends JavaPlugin {
         InputStream langStream = getResource(langPath);
         final FileConfiguration conf;
         if (langStream != null) {
-            Reader langReader = new InputStreamReader(getResource(langPath), Charset.forName("UTF-8"));
+            Reader langReader = new InputStreamReader(getResource(langPath), StandardCharsets.UTF_8);
             conf = YamlConfiguration.loadConfiguration(langReader);
         } else {
             // use custom/default

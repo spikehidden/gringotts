@@ -21,9 +21,23 @@ public enum Dependency {
      */
     DEP;
 
-    public final TownyHandler      towny;
+    /**
+     * The Towny.
+     */
+    public final TownyHandler towny;
+    /**
+     * The Vault.
+     */
     public final DependencyHandler vault;
+    /**
+     * The Reserve.
+     */
+    public final DependencyHandler reserve;
+    /**
+     * The Worldguard.
+     */
     public final WorldGuardHandler worldguard;
+
     private final Logger log = Gringotts.getInstance().getLogger();
 
     /**
@@ -34,15 +48,19 @@ public enum Dependency {
         towny = TownyHandler.getTownyHandler(hookPlugin(
                 "Towny",
                 "com.palmergames.bukkit.towny.Towny",
-                "0.89.0.0"));
+                "0.95.0.0"));
         vault = new GenericHandler(hookPlugin(
                 "Vault",
                 "net.milkbowl.vault.Vault",
                 "1.5.0"));
+        reserve = new GenericHandler(hookPlugin(
+                "Reserve",
+                "net.tnemc.core.Reserve",
+                "0.1.4.6"));
         worldguard = WorldGuardHandler.getWorldGuardHandler(hookPlugin(
                 "WorldGuard",
                 "com.sk89q.worldguard.bukkit.WorldGuardPlugin",
-                "6.2"));
+                "7.0.0"));
     }
 
     /**
@@ -77,26 +95,32 @@ public enum Dependency {
      * @return the plugin object when hooked successfully, or null if not.
      */
     private Plugin hookPlugin(String name, String classpath, String minVersion) {
-        Plugin plugin;
-
         if (packagesExists(classpath)) {
-            plugin = Bukkit.getServer().getPluginManager().getPlugin(name);
+            Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin(name);
+
+            if (plugin == null) {
+                log.warning("Unable to hook plugin " + name);
+
+                return null;
+            }
 
             log.info("Plugin " + name + " hooked.");
 
-            PluginDescriptionFile desc    = plugin.getDescription();
-            String                version = desc.getVersion();
+            PluginDescriptionFile desc = plugin.getDescription();
+            String version = desc.getVersion();
 
             if (!versionAtLeast(version, minVersion)) {
                 log.warning("Plugin dependency " + name + " is version " + version +
                         ". Expected at least " + minVersion + " -- Errors may occur.");
 
+                return null;
             }
+
+            return plugin;
         } else {
             log.warning("Unable to hook plugin " + name);
-            plugin = null;
-        }
 
-        return plugin;
+            return null;
+        }
     }
 }

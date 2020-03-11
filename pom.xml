@@ -103,6 +103,12 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>net.tnemc</groupId>
+            <artifactId>Reserve</artifactId>
+            <version>0.1.4.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>1.7</version>
@@ -194,6 +200,10 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>reserve-repo</id>
+            <url>https://dl.bintray.com/theneweconomy/java/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
