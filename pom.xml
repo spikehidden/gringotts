@@ -219,15 +219,6 @@
             <id>znode</id>
             <url>http://repo.zno.de/artifactory/repo/</url>
         </repository>
-        <repository>
-            <id>project.local</id>
-            <name>project.local</name>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-            <url>file://${project.basedir}/repo</url>
-        </repository>
     </repositories>
 
     <distributionManagement>
