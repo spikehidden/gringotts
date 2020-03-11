@@ -42,13 +42,13 @@ If it was created correctly, the sign will display your town's or nation's tag o
 
 Commands
 --------
-See [Usage](https://github.com/nikosgram/Gringotts/blob/master/doc/usage.md#commands).
+See [Usage](https://nikosgram.github.io/Gringotts/docs/usage#commands).
 
 Installation and Configuration
 ------------------------------
 Download [Gringotts](http://dev.bukkit.org/server-mods/gringotts/files/) and place it in your craftbukkit/plugins folder
 
-Please see the [Configuration and Permissions](https://github.com/nikosgram/Gringotts/blob/master/doc/configuration.md) document on how to configure Gringotts.
+Please see the [Configuration and Permissions](https://nikosgram.github.io/Gringotts/docs/configuration.md) document on how to configure Gringotts.
 
 Problems? Questions?
 --------------------
