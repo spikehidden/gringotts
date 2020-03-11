@@ -21,7 +21,7 @@ Features
 * Direct account-to-account transfers commands
 * Optional transaction taxes
 * Fractional currency values (fixed decimal digits)
-* Account support for [Factions](http://dev.bukkit.org/server-mods/factions/), [Towny](http://dev.bukkit.org/server-mods/towny-advanced/) and [WorldGuard](http://dev.bukkit.org/server-mods/worldguard/)
+* Account support for [Towny](http://dev.bukkit.org/server-mods/towny-advanced/) and [WorldGuard](http://dev.bukkit.org/server-mods/worldguard/)
 * [Vault](http://dev.bukkit.org/server-mods/vault/) integration
 
 Usage

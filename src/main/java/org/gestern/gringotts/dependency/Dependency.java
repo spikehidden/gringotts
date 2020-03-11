@@ -21,7 +21,6 @@ public enum Dependency {
      */
     DEP;
 
-    public final FactionsHandler   factions;
     public final TownyHandler      towny;
     public final DependencyHandler vault;
     public final WorldGuardHandler worldguard;
@@ -32,10 +31,6 @@ public enum Dependency {
      * but the classes must be visible to the classloader.
      */
     Dependency() {
-        factions = FactionsHandler.getFactionsHandler(hookPlugin(
-                "Factions",
-                "com.massivecraft.factions.TerritoryAccess",
-                "2.12.0"));
         towny = TownyHandler.getTownyHandler(hookPlugin(
                 "Towny",
                 "com.palmergames.bukkit.towny.Towny",
