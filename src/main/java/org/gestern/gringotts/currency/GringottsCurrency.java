@@ -19,35 +19,36 @@ public class GringottsCurrency {
     /**
      * Name of the currency.
      */
-    private final String  name;
+    private final String name;
     /**
      * Name of the currency, plural version.
      */
-    private final String  namePlural;
+    private final String namePlural;
     /**
      * Currency unit divisor. Internally, all calculation is done in "cents".
      * This multiplier changes the external representation.
      * For instance, with unit 100, every cent will be worth 0.01 currency units
      */
-    private final int     unit;
+    private final int unit;
     /**
      * Fractional digits supported by this currency.
      * For example, with 2 digits the minimum currency value would be 0.01
      */
-    private final int     digits;
+    private final int digits;
     /**
      * Show balances and other currency values with individual denomination names.
      */
     private final boolean namedDenominations;
-    private final Map<DenominationKey, Denomination> denoms       = new HashMap<>();
-    private final List<Denomination>                 sortedDenoms = new ArrayList<>();
+    private final Map<DenominationKey, Denomination> denoms = new HashMap<>();
+    private final List<Denomination> sortedDenoms = new ArrayList<>();
 
     /**
      * Create currency.
      *
-     * @param name       name of currency
-     * @param namePlural plural of currency name
-     * @param digits     decimal digits used in currency
+     * @param name               name of currency
+     * @param namePlural         plural of currency name
+     * @param digits             decimal digits used in currency
+     * @param namedDenominations the named denominations
      */
     public GringottsCurrency(String name, String namePlural, int digits, boolean namedDenominations) {
         this.name = name;
@@ -64,12 +65,14 @@ public class GringottsCurrency {
     /**
      * Add a denomination and value to this currency.
      *
-     * @param type  the denomination's item type
-     * @param value the denomination's value
+     * @param type           the denomination's item type
+     * @param value          the denomination's value
+     * @param unitName       the unit name
+     * @param unitNamePlural the unit name plural
      */
     public void addDenomination(ItemStack type, double value, String unitName, String unitNamePlural) {
         DenominationKey k = new DenominationKey(type);
-        Denomination    d = new Denomination(k, centValue(value), unitName, unitNamePlural);
+        Denomination d = new Denomination(k, getCentValue(value), unitName, unitNamePlural);
         denoms.put(k, d);
         // infrequent insertion, so I don't mind sorting on every insert
         sortedDenoms.add(d);
@@ -85,12 +88,12 @@ public class GringottsCurrency {
      * @param stack a stack of items
      * @return the value of given stack of items
      */
-    public long value(ItemStack stack) {
+    public long getValue(ItemStack stack) {
         if (stack == null || stack.getType() == Material.AIR) {
             return 0;
         }
 
-        Denomination d = denominationOf(stack);
+        Denomination d = getDenominationOf(stack);
 
         return d != null ? d.getValue() * stack.getAmount() : 0;
     }
@@ -101,7 +104,7 @@ public class GringottsCurrency {
      * @param value value to calculate display value for
      * @return user representation of value
      */
-    public double displayValue(long value) {
+    public double getDisplayValue(long value) {
         return (double) value / unit;
     }
 
@@ -109,9 +112,9 @@ public class GringottsCurrency {
      * The internal calculation value of a display value.
      *
      * @param value display value
-     * @return Gringotts-internal value of given amount
+     * @return Gringotts -internal value of given amount
      */
-    public long centValue(double value) {
+    public long getCentValue(double value) {
         return Math.round(value * unit);
     }
 
@@ -125,13 +128,20 @@ public class GringottsCurrency {
         return Collections.unmodifiableList(sortedDenoms);
     }
 
+    /**
+     * Format string.
+     *
+     * @param formatString the format string
+     * @param value        the value
+     * @return the string
+     */
     public String format(String formatString, double value) {
 
         if (namedDenominations) {
 
             StringBuilder b = new StringBuilder();
 
-            long cv = centValue(value);
+            long cv = getCentValue(value);
 
             for (Denomination denom : sortedDenoms) {
                 long dv = cv / denom.getValue();
@@ -149,7 +159,7 @@ public class GringottsCurrency {
 
             // might need this check for fractional values
             if (cv > 0 || b.length() == 0) {
-                double displayVal = displayValue(cv);
+                double displayVal = getDisplayValue(cv);
 
                 b.append(String.format(formatString, displayVal, displayVal == 1.0 ? name : namePlural));
             }
@@ -166,12 +176,17 @@ public class GringottsCurrency {
      * @param stack the stack to get the denomination for
      * @return denomination for the item stack, or null if there is no such denomination
      */
-    private Denomination denominationOf(ItemStack stack) {
+    private Denomination getDenominationOf(ItemStack stack) {
         DenominationKey d = new DenominationKey(stack);
 
         return denoms.get(d);
     }
 
+    /**
+     * To string string.
+     *
+     * @return the string
+     */
     @Override
     public String toString() {
         return StringUtils.join(sortedDenoms, '\n');
@@ -180,6 +195,8 @@ public class GringottsCurrency {
     /**
      * Fractional digits supported by this currency.
      * For example, with 2 digits the minimum currency value would be 0.01
+     *
+     * @return the digits
      */
     public int getDigits() {
         return digits;
@@ -189,6 +206,8 @@ public class GringottsCurrency {
      * Currency unit divisor. Internally, all calculation is done in "cents".
      * This multiplier changes the external representation.
      * For instance, with unit 100, every cent will be worth 0.01 currency units
+     *
+     * @return the unit
      */
     public int getUnit() {
         return unit;
@@ -196,6 +215,8 @@ public class GringottsCurrency {
 
     /**
      * Name of the currency.
+     *
+     * @return the name
      */
     public String getName() {
         return name;
@@ -203,6 +224,8 @@ public class GringottsCurrency {
 
     /**
      * Name of the currency, plural version.
+     *
+     * @return the name plural
      */
     public String getNamePlural() {
         return namePlural;

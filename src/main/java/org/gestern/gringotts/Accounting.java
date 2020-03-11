@@ -25,10 +25,7 @@ public class Accounting {
      */
     public GringottsAccount getAccount(AccountHolder owner) {
         GringottsAccount account = new GringottsAccount(owner);
-        if (!getInstance().getDao().hasAccount(owner))  // TODO can we do this via idempotent store action instead?
-        {
-            getInstance().getDao().storeAccount(account);
-        }
+        getInstance().getDao().storeAccount(account);
 
         return account;
     }
@@ -63,12 +60,12 @@ public class Accounting {
     public boolean addChest(AccountChest chest) {
 
         // TODO refactor to do a more intelligent/quick query
-        List<AccountChest> allChests = getInstance().getDao().getChests();
+        List<AccountChest> allChests = getInstance().getDao().retrieveChests();
 
         // if there is an invalid stored chest on location of new chest, remove it from storage.
         if (allChests.contains(chest)) {
             getInstance().getLogger().info("removing orphaned vault: " + chest);
-            getInstance().getDao().destroyAccountChest(chest);
+            getInstance().getDao().deleteAccountChest(chest);
             allChests.remove(chest);
         }
 

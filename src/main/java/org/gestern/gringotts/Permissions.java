@@ -2,21 +2,58 @@ package org.gestern.gringotts;
 
 import org.bukkit.entity.Player;
 
+/**
+ * The enum Permissions.
+ */
 public enum Permissions {
-    USEVAULT_INVENTORY("gringotts.usevault.inventory"),
-    USEVAULT_ENDERCHEST("gringotts.usevault.enderchest"),
-
-    CREATEVAULT_ADMIN("gringotts.createvault.admin"),
-    CREATEVAULT_PLAYER("gringotts.createvault.player"),
-    CREATEVAULT_FACTION("gringotts.createvault.faction"),
-    CREATEVAULT_TOWN("gringotts.createvault.town"),
-    CREATEVAULT_NATION("gringotts.createvault.nation"),
-    CREATEVAULT_WORLDGUARD("gringotts.createvault.worldguard"),
-
+    /**
+     * Use vault inventory permissions.
+     */
+    USE_VAULT_INVENTORY("gringotts.usevault.inventory"),
+    /**
+     * Use vault enderchest permissions.
+     */
+    USE_VAULT_ENDERCHEST("gringotts.usevault.enderchest"),
+    /**
+     * Create vault admin permissions.
+     */
+    CREATE_VAULT_ADMIN("gringotts.createvault.admin"),
+    /**
+     * Create vault player permissions.
+     */
+    CREATE_VAULT_PLAYER("gringotts.createvault.player"),
+    /**
+     * Create vault faction permissions.
+     */
+    CREATE_VAULT_FACTION("gringotts.createvault.faction"),
+    /**
+     * Create vault town permissions.
+     */
+    CREATE_VAULT_TOWN("gringotts.createvault.town"),
+    /**
+     * Create vault nation permissions.
+     */
+    CREATE_VAULT_NATION("gringotts.createvault.nation"),
+    /**
+     * Create vault worldguard permissions.
+     */
+    CREATE_VAULT_WORLDGUARD("gringotts.createvault.worldguard"),
+    /**
+     * Transfer permissions.
+     */
     TRANSFER("gringotts.transfer"),
+    /**
+     * Command withdraw permissions.
+     */
     COMMAND_WITHDRAW("gringotts.command.withdraw"),
+    /**
+     * Command deposit permissions.
+     */
     COMMAND_DEPOSIT("gringotts.command.deposit");
 
+    /**
+     * The Node.
+     */
     public final String node;
 
     Permissions(String node) {
@@ -29,7 +66,7 @@ public enum Permissions {
      * @param player player to check
      * @return whether given player has this permission
      */
-    public boolean allowed(Player player) {
+    public boolean isAllowed(Player player) {
         return player.hasPermission(this.node);
     }
 }

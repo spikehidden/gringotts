@@ -52,10 +52,18 @@ public interface Account {
     /**
      * Return whether this account has at least the specified amount.
      *
-     * @param value amount to check
+     * @param value the amount to check
      * @return whether this account has at least the specified amount.
      */
     boolean has(double value);
+
+    /**
+     * Check if more money can be added to this account's balance.
+     *
+     * @param value the amount of money to check the space for.
+     * @return whether the specified amount of money can fit in this account.
+     */
+    boolean canAdd(double value);
 
     /**
      * Set the balance of this account.
@@ -70,7 +78,7 @@ public interface Account {
     /**
      * Add an amount to this account's balance.
      *
-     * @param value amount to be added.
+     * @param value the amount to be added.
      * @return result of adding (success or failure type)
      */
     TransactionResult add(double value);
@@ -78,18 +86,19 @@ public interface Account {
     /**
      * Remove an amount from this account's balance.
      *
-     * @param value amount to be removed
+     * @param value the amount to be removed
      * @return result of removing (success or failure type)
      */
     TransactionResult remove(double value);
 
     /**
-     * Send an amount to another account. If the transfer fails, both sender and recipient will
-     * have unchanged account balance. To complete the transaction, use the to(Account) method on the result of this
-     * call.
+     * Send an amount to another account.
+     * If the transfer fails, both sender and recipient will have unchanged account balance.
+     * To complete the transaction, use the {@link Transaction#to(Account)} method on the result of this call.
+     * <p>
      * Before sending, it is possible to apply taxes with the withTaxes() method.
      *
-     * @param value amount to be transferred
+     * @param value the amount to be transferred
      * @return A transaction object, which may be used to complete the transaction or add additional properties.
      */
     Transaction send(double value);
@@ -116,8 +125,7 @@ public interface Account {
      * Depending on the type of account, no player is the owner of an account. In this case, send the message to the
      * console.
      *
-     * @param message Message to send.
+     * @param message the message to send.
      */
     void message(String message);
-
 }

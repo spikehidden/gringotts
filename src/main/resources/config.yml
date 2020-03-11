@@ -3,6 +3,9 @@
 # supported languages: "custom" (default, english) and "de" (german)
 language: custom
 
+# regex that create a vault if matches with a sign
+vault_pattern: '[^\[]*\[(\w*) ?vault\]'
+
 # currency name and value config
 currency:
   # currency name to use in messages

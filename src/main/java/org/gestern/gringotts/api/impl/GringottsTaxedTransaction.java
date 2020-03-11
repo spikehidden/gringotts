@@ -6,12 +6,18 @@ import org.gestern.gringotts.api.TransactionResult;
 
 import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
 
+/**
+ * The type Gringotts taxed transaction.
+ */
 public class GringottsTaxedTransaction extends GringottsTransaction implements TaxedTransaction {
-
     /**
      * Taxes to apply to transaction.
      */
     private final double taxes;
+    /**
+     * Taxes will be added to this account vault if any
+     */
+    private Account collector;
 
     /**
      * Create taxed transaction, adding given amount of taxes to the given base transaction
@@ -25,6 +31,12 @@ public class GringottsTaxedTransaction extends GringottsTransaction implements T
         this.taxes = taxes;
     }
 
+    /**
+     * Complete the transaction by sending the transaction amount to a given account.
+     *
+     * @param recipient Account to which receives the value of this transaction.
+     * @return result of the transaction.
+     */
     @Override
     public TransactionResult to(Account recipient) {
         TransactionResult taxResult = from.remove(taxes);
@@ -38,18 +50,40 @@ public class GringottsTaxedTransaction extends GringottsTransaction implements T
         // undo taxing if transaction failed
         if (result != SUCCESS) {
             from.add(taxes);
+        } else {
+            if (collector != null) {
+                collector.add(taxes);
+            }
         }
 
         return result;
     }
 
+    /**
+     * Add a tax collector to this taxed transaction. The tax collector account receives the taxes from this
+     * transaction.
+     *
+     * @param taxCollector account to receive the taxes.
+     * @return taxed transaction with tax collector
+     */
     @Override
-    public TaxedTransaction collectedBy(Account taxCollector) {
-        throw new RuntimeException("tax collector account not yet implemented");
+    public TaxedTransaction setCollectedBy(Account taxCollector) {
+        if (this.collector != null) {
+            throw new RuntimeException("Collector is already set");
+        }
+
+        this.collector = taxCollector;
+
+        return this;
     }
 
+    /**
+     * Return the amount of taxes to be paid in this transaction.
+     *
+     * @return the amount of taxes to be paid in this transaction.
+     */
     @Override
-    public double tax() {
+    public double getTax() {
         return taxes;
     }
 }

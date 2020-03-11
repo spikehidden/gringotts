@@ -20,12 +20,21 @@ import static org.gestern.gringotts.Configuration.CONF;
 import static org.gestern.gringotts.api.TransactionResult.ERROR;
 import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
 
+/**
+ * The type Gringotts eco.
+ */
 public class GringottsEco implements Eco {
 
-    private static final String               TAG_PLAYER    = "player";
-    private final        AccountHolderFactory accountOwners = Gringotts.getInstance().getAccountHolderFactory();
-    private final        DAO                  dao           = Gringotts.getInstance().getDao();
+    private static final String TAG_PLAYER = "player";
+    private final AccountHolderFactory accountOwners = Gringotts.getInstance().getAccountHolderFactory();
+    private final DAO dao = Gringotts.getInstance().getDao();
 
+    /**
+     * Account account.
+     *
+     * @param id the id
+     * @return the account
+     */
     @Override
     public Account account(String id) {
         AccountHolder owner = accountOwners.get(id);
@@ -40,6 +49,12 @@ public class GringottsEco implements Eco {
 
     }
 
+    /**
+     * Player player account.
+     *
+     * @param name the name
+     * @return the player account
+     */
     @Override
     public PlayerAccount player(String name) {
         AccountHolder owner = accountOwners.get(TAG_PLAYER, name);
@@ -51,6 +66,12 @@ public class GringottsEco implements Eco {
         return new InvalidAccount(TAG_PLAYER, name);
     }
 
+    /**
+     * Player player account.
+     *
+     * @param id the id
+     * @return the player account
+     */
     @Override
     public PlayerAccount player(UUID id) {
         AccountHolder owner = accountOwners.get(TAG_PLAYER, id.toString());
@@ -62,11 +83,24 @@ public class GringottsEco implements Eco {
         return new InvalidAccount(TAG_PLAYER, id.toString());
     }
 
+    /**
+     * Bank bank account.
+     *
+     * @param name the name
+     * @return the bank account
+     */
     @Override
     public BankAccount bank(String name) {
         return new InvalidAccount("bank", name);
     }
 
+    /**
+     * Custom account.
+     *
+     * @param type the type
+     * @param id   the id
+     * @return the account
+     */
     @Override
     public Account custom(String type, String id) {
         AccountHolder owner = accountOwners.get(type, id);
@@ -80,32 +114,65 @@ public class GringottsEco implements Eco {
         return new ValidAccount(acc);
     }
 
+    /**
+     * Faction account.
+     *
+     * @param id the id
+     * @return the account
+     */
     @Override
     public Account faction(String id) {
         return custom("faction", id);
     }
 
+    /**
+     * Town account.
+     *
+     * @param id the id
+     * @return the account
+     */
     @Override
     public Account town(String id) {
         return custom("town", id);
 
     }
 
+    /**
+     * Nation account.
+     *
+     * @param id the id
+     * @return the account
+     */
     @Override
     public Account nation(String id) {
         return custom("nation", id);
     }
 
+    /**
+     * Currency currency.
+     *
+     * @return the currency
+     */
     @Override
     public Currency currency() {
         return new Curr(CONF.getCurrency());
     }
 
+    /**
+     * Supports banks boolean.
+     *
+     * @return the boolean
+     */
     @Override
     public boolean supportsBanks() {
         return true;
     }
 
+    /**
+     * Gets banks.
+     *
+     * @return the banks
+     */
     @Override
     public Set<String> getBanks() {
         // TODO implement banks
@@ -117,218 +184,450 @@ public class GringottsEco implements Eco {
         private final String type;
         private final String id;
 
+        /**
+         * Instantiates a new Invalid account.
+         *
+         * @param type the type
+         * @param id   the id
+         */
         InvalidAccount(String type, String id) {
             this.type = type;
             this.id = id;
         }
 
+        /**
+         * Exists boolean.
+         *
+         * @return the boolean
+         */
         @Override
         public boolean exists() {
             return false;
         }
 
+        /**
+         * Create account.
+         *
+         * @return the account
+         */
         @Override
         public Account create() {
             // TODO if account type allows virtual accounts, create it
             return this;
         }
 
+        /**
+         * Delete account.
+         *
+         * @return the account
+         */
         @Override
         public Account delete() {
             return this; // delete invalid account is still invalid
         }
 
+        /**
+         * Balance double.
+         *
+         * @return the double
+         */
         @Override
         public double balance() {
             return 0; // invalid account has 0 balance
         }
 
+        /**
+         * Vault balance double.
+         *
+         * @return the double
+         */
         @Override
         public double vaultBalance() { return 0; }
 
+        /**
+         * Inv balance double.
+         *
+         * @return the double
+         */
         @Override
         public double invBalance() { return 0; }
 
+        /**
+         * Has boolean.
+         *
+         * @param value the value
+         * @return the boolean
+         */
         @Override
         public boolean has(double value) {
             return false; // invalid account has nothing
         }
 
+        /**
+         * Sets balance.
+         *
+         * @param newBalance the new balance
+         * @return the balance
+         */
         @Override
         public TransactionResult setBalance(double newBalance) {
             return ERROR;
         }
 
+        /**
+         * Add transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult add(double value) {
             return ERROR;
         }
 
+        /**
+         * Remove transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult remove(double value) {
             return ERROR;
         }
 
+        /**
+         * Send transaction.
+         *
+         * @param value the value
+         * @return the transaction
+         */
         @Override
         public Transaction send(double value) {
             return new GringottsTransaction(this, value);
         }
 
+        /**
+         * Type string.
+         *
+         * @return the string
+         */
         @Override
         public String type() {
             return type;
         }
 
+        /**
+         * Id string.
+         *
+         * @return the string
+         */
         @Override
         public String id() {
             return id;
         }
 
+        /**
+         * Message.
+         *
+         * @param message the message
+         */
         @Override
         public void message(String message) {
             // do nothing - no owner on this
         }
 
+        /**
+         * Add owner bank account.
+         *
+         * @param player the player
+         * @return the bank account
+         */
         @Override
         public BankAccount addOwner(String player) {
             return this;
         }
 
+        /**
+         * Add member bank account.
+         *
+         * @param player the player
+         * @return the bank account
+         */
         @Override
         public BankAccount addMember(String player) {
             return this;
         }
 
+        /**
+         * Is owner boolean.
+         *
+         * @param player the player
+         * @return the boolean
+         */
         @Override
         public boolean isOwner(String player) {
             return false;
         }
 
+        /**
+         * Is member boolean.
+         *
+         * @param player the player
+         * @return the boolean
+         */
         @Override
         public boolean isMember(String player) {
             return false;
         }
 
+        /**
+         * Deposit transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult deposit(double value) {
             return ERROR;
         }
 
+        /**
+         * Withdraw transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult withdraw(double value) {
             return ERROR;
         }
 
+        /**
+         * Can add boolean.
+         *
+         * @param value the value
+         * @return the boolean
+         */
+        @Override
+        public boolean canAdd(double value) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
     }
 
     private class ValidAccount implements Account {
 
+        /**
+         * The Acc.
+         */
         protected final GringottsAccount acc;
 
+        /**
+         * Instantiates a new Valid account.
+         *
+         * @param acc the acc
+         */
         public ValidAccount(GringottsAccount acc) {
             this.acc = acc;
         }
 
+        /**
+         * Exists boolean.
+         *
+         * @return the boolean
+         */
         @Override
         public boolean exists() {
             // since this is a valid account, returns true
             return true;
         }
 
+        /**
+         * Create account.
+         *
+         * @return the account
+         */
         @Override
         public Account create() {
             return this;
         }
 
+        /**
+         * Delete account.
+         *
+         * @return the account
+         */
         @Override
         public Account delete() {
             dao.deleteAccount(acc);
             throw new RuntimeException("deleting accounts not supported by Gringotts");
         }
 
+        /**
+         * Balance double.
+         *
+         * @return the double
+         */
         @Override
         public double balance() {
-            return CONF.getCurrency().displayValue(acc.getBalance());
+            return CONF.getCurrency().getDisplayValue(acc.getBalance());
         }
 
+        /**
+         * Vault balance double.
+         *
+         * @return the double
+         */
         @Override
         public double vaultBalance() {
-            return CONF.getCurrency().displayValue(acc.getVaultBalance());
+            return CONF.getCurrency().getDisplayValue(acc.getVaultBalance());
         }
 
+        /**
+         * Inv balance double.
+         *
+         * @return the double
+         */
         @Override
         public double invBalance() {
-            return CONF.getCurrency().displayValue(acc.getInvBalance());
+            return CONF.getCurrency().getDisplayValue(acc.getInvBalance());
         }
 
+        /**
+         * Has boolean.
+         *
+         * @param value the value
+         * @return the boolean
+         */
         @Override
         public boolean has(double value) {
-            return acc.getBalance() >= CONF.getCurrency().centValue(value);
+            return acc.getBalance() >= CONF.getCurrency().getCentValue(value);
         }
 
+        /**
+         * Sets balance.
+         *
+         * @param newBalance the new balance
+         * @return the balance
+         */
         @Override
         public TransactionResult setBalance(double newBalance) {
             return add(balance() - newBalance);
         }
 
+        /**
+         * Add transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult add(double value) {
             if (value < 0) {
                 return remove(-value);
             }
 
-            return acc.add(CONF.getCurrency().centValue(value));
+            return acc.add(CONF.getCurrency().getCentValue(value));
         }
 
+        /**
+         * Remove transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult remove(double value) {
             if (value < 0) {
                 return add(-value);
             }
 
-            return acc.remove(CONF.getCurrency().centValue(value));
+            return acc.remove(CONF.getCurrency().getCentValue(value));
         }
 
+        /**
+         * Send transaction.
+         *
+         * @param value the value
+         * @return the transaction
+         */
         @Override
         public Transaction send(double value) {
             return new GringottsTransaction(this, value);
         }
 
+        /**
+         * Type string.
+         *
+         * @return the string
+         */
         @Override
         public String type() {
             return acc.owner.getType();
         }
 
+        /**
+         * Id string.
+         *
+         * @return the string
+         */
         @Override
         public String id() {
             return acc.owner.getId();
         }
 
+        /**
+         * Message.
+         *
+         * @param message the message
+         */
         @Override
         public void message(String message) {
             acc.owner.sendMessage(message);
+        }
+
+        /**
+         * Can add boolean.
+         *
+         * @param value the value
+         * @return the boolean
+         */
+        @Override
+        public boolean canAdd(double value) {
+            throw new UnsupportedOperationException("Not implemented");
         }
     }
 
     private class ValidPlayerAccount extends ValidAccount implements PlayerAccount {
 
+        /**
+         * Instantiates a new Valid player account.
+         *
+         * @param acc the acc
+         */
         public ValidPlayerAccount(GringottsAccount acc) {
             super(acc);
         }
 
+        /**
+         * Deposit transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult deposit(double value) {
-            PlayerAccountHolder owner           = (PlayerAccountHolder) acc.owner;
-            Player              player          = Bukkit.getPlayer(owner.getUUID());
-            AccountInventory    playerInventory = new AccountInventory(player.getInventory());
-            long                centValue       = CONF.getCurrency().centValue(value);
-            long                toDeposit       = playerInventory.remove(centValue);
+            PlayerAccountHolder owner = (PlayerAccountHolder) acc.owner;
+            Player player = Bukkit.getPlayer(owner.getUUID());
+            AccountInventory playerInventory = new AccountInventory(player.getInventory());
+            long centValue = CONF.getCurrency().getCentValue(value);
+            long toDeposit = playerInventory.remove(centValue);
 
             if (toDeposit > centValue) {
                 toDeposit -= playerInventory.add(toDeposit - centValue);
             }
 
-            TransactionResult result = player(player.getUniqueId()).add(CONF.getCurrency().displayValue(toDeposit));
+            TransactionResult result = player(player.getUniqueId()).add(CONF.getCurrency().getDisplayValue(toDeposit));
 
             if (result != SUCCESS) {
                 playerInventory.add(toDeposit);
@@ -337,13 +636,19 @@ public class GringottsEco implements Eco {
             return result;
         }
 
+        /**
+         * Withdraw transaction result.
+         *
+         * @param value the value
+         * @return the transaction result
+         */
         @Override
         public TransactionResult withdraw(double value) {
-            PlayerAccountHolder owner           = (PlayerAccountHolder) acc.owner;
-            Player              player          = Bukkit.getPlayer(owner.getUUID());
-            AccountInventory    playerInventory = new AccountInventory(player.getInventory());
-            long                centValue       = CONF.getCurrency().centValue(value);
-            TransactionResult   remove          = acc.remove(centValue);
+            PlayerAccountHolder owner = (PlayerAccountHolder) acc.owner;
+            Player player = Bukkit.getPlayer(owner.getUUID());
+            AccountInventory playerInventory = new AccountInventory(player.getInventory());
+            long centValue = CONF.getCurrency().getCentValue(value);
+            TransactionResult remove = acc.remove(centValue);
 
             if (remove == SUCCESS) {
                 long withdrawn = playerInventory.add(centValue);
@@ -353,37 +658,78 @@ public class GringottsEco implements Eco {
             return remove;
         }
 
+        /**
+         * Can add boolean.
+         *
+         * @param value the value
+         * @return the boolean
+         */
+        @Override
+        public boolean canAdd(double value) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
     }
 
     private class Curr implements Currency {
 
+        /**
+         * The Gcurr.
+         */
         final GringottsCurrency gcurr;
-        final String            formatString; // TODO this should be configurable
+        /**
+         * The Format string.
+         */
+        final String formatString; // TODO this should be configurable
 
+        /**
+         * Instantiates a new Curr.
+         *
+         * @param curr the curr
+         */
         Curr(GringottsCurrency curr) {
             this.gcurr = curr;
             formatString = "%." + curr.getDigits() + "f %s";
         }
 
+        /**
+         * Gets name.
+         *
+         * @return the name
+         */
         @Override
-        public String name() {
+        public String getName() {
             return gcurr.getName();
         }
 
+        /**
+         * Gets name plural.
+         *
+         * @return the name plural
+         */
         @Override
-        public String namePlural() {
+        public String getNamePlural() {
             return gcurr.getNamePlural();
         }
 
+        /**
+         * Format string.
+         *
+         * @param value the value
+         * @return the string
+         */
         @Override
         public String format(double value) {
             return CONF.getCurrency().format(formatString, value);
         }
 
+        /**
+         * Gets fractional digits.
+         *
+         * @return the fractional digits
+         */
         @Override
-        public int fractionalDigits() {
+        public int getFractionalDigits() {
             return gcurr.getDigits();
         }
-
     }
 }

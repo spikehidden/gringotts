@@ -28,13 +28,13 @@ public enum Configuration {
      */
     CONF;
 
+    private final Logger log = Gringotts.getInstance().getLogger();
+
     /**
      * Regular expression defining what patterns on a sign will create a valid vault. Subpattern 1 denotes the type
      * of the vault.
      */
-    // TODO make this actually configurable(?)
-    public final String vaultPattern = "[^\\[]*\\[(\\w*) ?vault\\]";
-    private final Logger log = Gringotts.getInstance().getLogger();
+    public String vaultPattern = "[^\\[]*\\[(\\w*) ?vault\\]";
     /**
      * Language to be used for messages. Should be an ISO 639-1 (alpha-2) code.
      * If a language is not supported by Gringotts, use user-configured or default (English) messages.
@@ -164,6 +164,8 @@ public enum Configuration {
         CONF.balanceShowVault = savedConfig.getBoolean("balance.show-vault", true);
 
         CONF.language = savedConfig.getString("language", "custom");
+
+        CONF.vaultPattern = savedConfig.getString("vault_pattern", "[^\\[]*\\[(\\w*) ?vault\\]");
     }
 
     /**

@@ -21,7 +21,7 @@ import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
 /**
  * Admin commands for managing ingame aspects.
  */
-public class MoneyadminExecutor extends GringottsAbstractExecutor {
+public class MoneyAdminExecutor extends GringottsAbstractExecutor {
     private static final List<String> commands = Arrays.asList("add", "rm", "b");
 
     /**

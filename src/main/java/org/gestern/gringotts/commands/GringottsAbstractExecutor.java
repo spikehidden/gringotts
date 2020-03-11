@@ -69,7 +69,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     boolean pay(Player player, double value, String[] args) {
-        if (!Permissions.TRANSFER.allowed(player)) {
+        if (!Permissions.TRANSFER.isAllowed(player)) {
             player.sendMessage(LANG.noperm);
 
             return true;
@@ -77,15 +77,13 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
         String recipientName = args[2];
 
-        Account from = eco.player(player.getUniqueId());
+        PlayerAccount from = eco.player(player.getUniqueId());
         Account to = eco.account(recipientName);
 
-        PlayerAccount playerAccount = eco.player(player.getUniqueId());
+        TaxedTransaction transaction = from.send(value).withTaxes();
+        TransactionResult result = transaction.to(eco.player(recipientName));
 
-        TaxedTransaction transaction = playerAccount.send(value).withTaxes();
-        TransactionResult result = playerAccount.send(value).withTaxes().to(eco.player(recipientName));
-
-        double tax = transaction.tax();
+        double tax = transaction.getTax();
         double valueAdded = value + tax;
 
         String formattedBalance = eco.currency().format(from.balance());
@@ -108,26 +106,31 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
                 return true;
             case INSUFFICIENT_FUNDS:
-                String insFMessage = LANG.pay_insufficientFunds.replace(TAG_BALANCE, formattedBalance).replace
-                        (TAG_VALUE, formattedValuePlusTax);
+                String insFMessage = LANG.pay_insufficientFunds
+                        .replace(TAG_BALANCE, formattedBalance)
+                        .replace(TAG_VALUE, formattedValuePlusTax);
 
                 from.message(insFMessage);
 
                 return true;
             case INSUFFICIENT_SPACE:
-                String insSSentMessage = LANG.pay_insS_sender.replace(TAG_PLAYER, recipientName).replace(TAG_VALUE,
-                        formattedValue);
+                String insSSentMessage = LANG.pay_insS_sender
+                        .replace(TAG_PLAYER, recipientName)
+                        .replace(TAG_VALUE, formattedValue);
 
                 from.message(insSSentMessage);
 
-                String insSReceiveMessage = LANG.pay_insS_target.replace(TAG_PLAYER, from.id()).replace(TAG_VALUE,
-                        formattedValue);
+                String insSReceiveMessage = LANG.pay_insS_target
+                        .replace(TAG_PLAYER, from.id())
+                        .replace(TAG_VALUE, formattedValue);
 
                 to.message(insSReceiveMessage);
 
                 return true;
             default:
-                String error = LANG.pay_error.replace(TAG_VALUE, formattedValue).replace(TAG_PLAYER, recipientName);
+                String error = LANG.pay_error
+                        .replace(TAG_VALUE, formattedValue)
+                        .replace(TAG_PLAYER, recipientName);
 
                 from.message(error);
 
@@ -136,7 +139,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     void deposit(Player player, double value) {
-        if (COMMAND_DEPOSIT.allowed(player)) {
+        if (COMMAND_DEPOSIT.isAllowed(player)) {
             TransactionResult result = eco.player(player.getUniqueId()).deposit(value);
             String formattedValue = eco.currency().format(value);
 
@@ -153,7 +156,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     void withdraw(Player player, double value) {
-        if (COMMAND_WITHDRAW.allowed(player)) {
+        if (COMMAND_WITHDRAW.isAllowed(player)) {
             TransactionResult result = eco.player(player.getUniqueId()).withdraw(value);
             String formattedValue = eco.currency().format(value);
 

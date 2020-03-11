@@ -7,6 +7,9 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 
 import java.util.List;
 
+/**
+ * The interface Dao.
+ */
 public interface DAO {
     /**
      * Save an account chest to database.
@@ -18,12 +21,12 @@ public interface DAO {
     boolean storeAccountChest(AccountChest chest);
 
     /**
-     * Remove an account chest from the datastore.
+     * Deletes an account chest from the datastore.
      *
-     * @param chest chest to remove
+     * @param chest chest to delete
      * @return true if the chest was deleted, false if no chest was deleted.
      */
-    boolean destroyAccountChest(AccountChest chest);
+    boolean deleteAccountChest(AccountChest chest);
 
     /**
      * Store the given Account to DB.
@@ -47,7 +50,7 @@ public interface DAO {
      *
      * @return set of all chests registered with Gringotts
      */
-    List<AccountChest> getChests();
+    List<AccountChest> retrieveChests();
 
     /**
      * Get all chests belonging to the given account.
@@ -56,7 +59,7 @@ public interface DAO {
      * @param account account to fetch chests for.
      * @return account to get chests for
      */
-    List<AccountChest> getChests(GringottsAccount account);
+    List<AccountChest> retrieveChests(GringottsAccount account);
 
     /**
      * Store an amount of cents to a given account.
@@ -73,7 +76,7 @@ public interface DAO {
      * @param account account to query
      * @return amount of cents stored in the account, 0 if the account is not stored
      */
-    long getCents(GringottsAccount account);
+    long retrieveCents(GringottsAccount account);
 
     /**
      * Delete an account and associated data from the storage.

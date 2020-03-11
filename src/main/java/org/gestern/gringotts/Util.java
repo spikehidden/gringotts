@@ -9,6 +9,9 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.gestern.gringotts.currency.GringottsCurrency;
 
+/**
+ * The type Util.
+ */
 @SuppressWarnings("WeakerAccess")
 public class Util {
 
@@ -56,12 +59,12 @@ public class Util {
      * @return array with dotted decimal strings turned into int values
      */
     public static int[] versionParts(String version) {
-        String[] strparts = version.split("\\.");
-        int[] parts = new int[strparts.length];
+        String[] strParts = version.split("\\.");
+        int[] parts = new int[strParts.length];
 
-        for (int i = 0; i < strparts.length; i++) {
+        for (int i = 0; i < strParts.length; i++) {
             // just cut off any non-number part
-            String number = strparts[i].replaceAll("(\\d+).*", "$1");
+            String number = strParts[i].replaceAll("(\\d+).*", "$1");
             int part = 0;
 
             try {
@@ -81,7 +84,7 @@ public class Util {
      * @param value the value in cents
      * @return formatted currency value
      */
-    public static String format(double value) {
+    public static String formatCurrency(double value) {
         GringottsCurrency cur = Configuration.CONF.getCurrency();
         String formatString = "%." + cur.getDigits() + "f %s";
 
@@ -110,7 +113,7 @@ public class Util {
         Block blockAttached = signBlock.getRelative(attached);
         Block blockBelow = signBlock.getRelative(BlockFace.DOWN);
 
-        return validContainer(blockAttached.getType()) ? blockAttached : validContainer(blockBelow.getType()) ? blockBelow : null;
+        return isValidContainer(blockAttached.getType()) ? blockAttached : isValidContainer(blockBelow.getType()) ? blockBelow : null;
     }
 
     /**
@@ -119,7 +122,7 @@ public class Util {
      * @param material material to check
      * @return whether the given material is a valid container type for Gringotts vaults
      */
-    public static boolean validContainer(Material material) {
+    public static boolean isValidContainer(Material material) {
         switch (material) {
             case CHEST:
             case TRAPPED_CHEST:
@@ -144,6 +147,12 @@ public class Util {
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
+    /**
+     * Reform material name string.
+     *
+     * @param material the material
+     * @return the string
+     */
     public static String reformMaterialName(Material material) {
         String name = material.name();
         String[] words = name.split("_");

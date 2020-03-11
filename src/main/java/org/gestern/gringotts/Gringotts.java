@@ -27,7 +27,7 @@ import org.gestern.gringotts.api.impl.GringottsEco;
 import org.gestern.gringotts.api.impl.VaultConnector;
 import org.gestern.gringotts.commands.GringottsExecutor;
 import org.gestern.gringotts.commands.MoneyExecutor;
-import org.gestern.gringotts.commands.MoneyadminExecutor;
+import org.gestern.gringotts.commands.MoneyAdminExecutor;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.data.DAO;
 import org.gestern.gringotts.data.DerbyDAO;
@@ -106,7 +106,7 @@ public class Gringotts extends JavaPlugin {
             eco = new GringottsEco();
             registerCommands();
             registerEvents();
-            registerEconomy();
+            registerVaultEconomy();
 
             // Setup Metrics support.
             Metrics metrics = new Metrics(this, 4998);
@@ -119,7 +119,7 @@ public class Gringotts extends JavaPlugin {
                     AccountHolder holder = accountHolderFactory.get(player);
                     GringottsAccount account = accounting.getAccount(holder);
 
-                    returned += Gringotts.getInstance().getDao().getChests(account).size();
+                    returned += Gringotts.getInstance().getDao().retrieveChests(account).size();
                 }
 
                 return returned;
@@ -193,7 +193,7 @@ public class Gringotts extends JavaPlugin {
 
     private void registerCommands() {
         CommandExecutor playerCommands = new MoneyExecutor();
-        CommandExecutor moneyAdminCommands = new MoneyadminExecutor();
+        CommandExecutor moneyAdminCommands = new MoneyAdminExecutor();
         CommandExecutor adminCommands = new GringottsExecutor();
 
         getCommand("balance").setExecutor(playerCommands);
@@ -216,7 +216,7 @@ public class Gringotts extends JavaPlugin {
     /**
      * Register Gringotts as economy provider for vault.
      */
-    private void registerEconomy() {
+    private void registerVaultEconomy() {
         if (DEP.vault.exists()) {
             getServer().getServicesManager().register(Economy.class, new VaultConnector(), this, ServicePriority.Highest);
             getLogger().info("Registered Vault interface.");
