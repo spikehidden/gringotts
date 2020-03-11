@@ -34,10 +34,6 @@ For full usage documentation, please see [the usage page](https://github.com/nik
 
 Place a sign above a container block, with `[vault]` written on the first line. If it was created correctly, the sign will display your name on the third line and you will receive a message that the vault has been created.
 
-### Faction vaults ###
-
-Place a sign above a container block, with `[faction vault]` written on the first line. If it was created correctly, the sign will display your faction's tag on the third line and you will receive a message that the vault has been created.
-
 ### Towny vaults ###
 
 * To make a vault for your town: place a sign above a container block, with `[town vault]` written on the first line. 
