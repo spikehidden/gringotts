@@ -13,7 +13,8 @@ import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
@@ -37,6 +38,7 @@ import org.gestern.gringotts.data.Migration;
 import org.gestern.gringotts.event.AccountListener;
 import org.gestern.gringotts.event.PlayerVaultListener;
 import org.gestern.gringotts.event.VaultCreator;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.InputStream;
@@ -51,8 +53,10 @@ import static org.gestern.gringotts.Configuration.CONF;
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.dependency.Dependency.DEP;
 
+/**
+ * The type Gringotts.
+ */
 public class Gringotts extends JavaPlugin {
-
     private static final String MESSAGES_YML = "messages.yml";
     private static Gringotts instance;
 
@@ -62,6 +66,9 @@ public class Gringotts extends JavaPlugin {
     private EbeanServer ebean;
     private Eco eco;
 
+    /**
+     * Instantiates a new Gringotts.
+     */
     public Gringotts() {
         ServerConfig dbConfig = new ServerConfig();
 
@@ -69,11 +76,13 @@ public class Gringotts extends JavaPlugin {
         dbConfig.setRegister(false);
         dbConfig.setClasses(getDatabaseClasses());
         dbConfig.setName(getDescription().getName());
+
         configureDbConfig(dbConfig);
 
         DataSourceConfig dsConfig = dbConfig.getDataSourceConfig();
 
         dsConfig.setUrl(replaceDatabaseString(dsConfig.getUrl()));
+        //noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
 
         ClassLoader previous = Thread.currentThread().getContextClassLoader();
@@ -85,11 +94,16 @@ public class Gringotts extends JavaPlugin {
 
     /**
      * The Gringotts plugin instance.
+     *
+     * @return the instance
      */
     public static Gringotts getInstance() {
         return instance;
     }
 
+    /**
+     * On enable.
+     */
     @Override
     public void onEnable() {
         instance = this;
@@ -103,63 +117,12 @@ public class Gringotts extends JavaPlugin {
             reloadConfig();
 
             accounting = new Accounting();
-
             eco = new GringottsEco();
+
             registerCommands();
             registerEvents();
             registerEconomy();
-
-            // Setup Metrics support.
-            Metrics metrics = new Metrics(this, 4998);
-
-            // Tracking how many vaults exists.
-            metrics.addCustomChart(new Metrics.SingleLineChart("vaultsChart", () -> {
-                int returned = 0;
-
-                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                    AccountHolder holder = accountHolderFactory.get(player);
-                    GringottsAccount account = accounting.getAccount(holder);
-
-                    returned += Gringotts.getInstance().getDao().retrieveChests(account).size();
-                }
-
-                return returned;
-            }));
-
-            // Tracking the balance of the users exists.
-            metrics.addCustomChart(new Metrics.SingleLineChart("economyChart", () -> {
-                int returned = 0;
-
-                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                    if (player.isOp()) {
-                        continue;
-                    }
-
-                    AccountHolder holder = accountHolderFactory.get(player);
-                    GringottsAccount account = accounting.getAccount(holder);
-
-                    returned += account.getBalance();
-                }
-
-                return returned;
-            }));
-
-            // Tracking the exists denominations.
-            metrics.addCustomChart(new Metrics.AdvancedPie("denominationsChart", () -> {
-                Map<String, Integer> returned = new HashMap<>();
-
-                for (Denomination denomination : CONF.getCurrency().getDenominations()) {
-                    String name = denomination.getKey().type.getType().name();
-
-                    if (!returned.containsKey(name)) {
-                        returned.put(name, 0);
-                    }
-
-                    returned.put(name, returned.get(name) + 1);
-                }
-
-                return returned;
-            }));
+            registerMetrics();
         } catch (GringottsStorageException | GringottsConfigurationException e) {
             getLogger().severe(e.getMessage());
             this.disable();
@@ -167,7 +130,6 @@ public class Gringotts extends JavaPlugin {
             this.disable();
             throw e;
         }
-
 
         getLogger().fine("enabled");
     }
@@ -177,9 +139,11 @@ public class Gringotts extends JavaPlugin {
         getLogger().warning("Gringotts disabled due to startup errors.");
     }
 
+    /**
+     * On disable.
+     */
     @Override
     public void onDisable() {
-
         // shut down db connection
         try {
             if (dao != null) {
@@ -192,15 +156,95 @@ public class Gringotts extends JavaPlugin {
         getLogger().info("disabled");
     }
 
-    private void registerCommands() {
-        CommandExecutor playerCommands = new MoneyExecutor();
-        CommandExecutor moneyAdminCommands = new MoneyAdminExecutor();
-        CommandExecutor adminCommands = new GringottsExecutor();
+    private void registerMetrics() {
+        // Setup Metrics support.
+        Metrics metrics = new Metrics(this, 4998);
 
-        getCommand("balance").setExecutor(playerCommands);
-        getCommand("money").setExecutor(playerCommands);
-        getCommand("moneyadmin").setExecutor(moneyAdminCommands);
-        getCommand("gringotts").setExecutor(adminCommands);
+        // Tracking how many vaults exists.
+        metrics.addCustomChart(new Metrics.SingleLineChart("vaultsChart", () -> {
+            int returned = 0;
+
+            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                AccountHolder holder = accountHolderFactory.get(player);
+                GringottsAccount account = accounting.getAccount(holder);
+
+                returned += Gringotts.getInstance().getDao().retrieveChests(account).size();
+            }
+
+            return returned;
+        }));
+
+        // Tracking the balance of the users exists.
+        metrics.addCustomChart(new Metrics.SingleLineChart("economyChart", () -> {
+            int returned = 0;
+
+            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                if (player.isOp()) {
+                    continue;
+                }
+
+                AccountHolder holder = accountHolderFactory.get(player);
+                GringottsAccount account = accounting.getAccount(holder);
+
+                returned += account.getBalance();
+            }
+
+            return returned;
+        }));
+
+        // Tracking the exists denominations.
+        metrics.addCustomChart(new Metrics.AdvancedPie("denominationsChart", () -> {
+            Map<String, Integer> returned = new HashMap<>();
+
+            for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+                String name = denomination.getKey().type.getType().name();
+
+                if (!returned.containsKey(name)) {
+                    returned.put(name, 0);
+                }
+
+                returned.put(name, returned.get(name) + 1);
+            }
+
+            return returned;
+        }));
+    }
+
+    private void registerCommands() {
+        registerCommand(new String[]{"balance", "money"}, new MoneyExecutor());
+        registerCommand("moneyadmin", new MoneyAdminExecutor());
+        registerCommand("gringotts", new GringottsExecutor());
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    private boolean registerCommand(@NotNull String[] names, @NotNull TabExecutor executor) {
+        boolean returned = true;
+
+        for (String name : names) {
+            if (!registerCommand(name, executor)) {
+                returned = false;
+            }
+        }
+
+        return returned;
+    }
+
+    private boolean registerCommand(@NotNull String name, @NotNull TabExecutor executor) {
+        PluginCommand pluginCommand = getCommand(name);
+
+        if (pluginCommand == null) {
+            getLogger().warning(String.format(
+                    "Looks like the command '%1$s' is not available. Please be sure that Gringotts is the only plugin using it.",
+                    name
+            ));
+
+            return false;
+        }
+
+        pluginCommand.setExecutor(executor);
+        pluginCommand.setTabCompleter(executor);
+
+        return true;
     }
 
     private void registerEvents() {
@@ -237,10 +281,11 @@ public class Gringotts extends JavaPlugin {
     }
 
     /**
-     * Register an accountholder provider with Gringotts. This is necessary for Gringotts to find and create account
-     * holders
-     * of any non-player type. Registering a provider for the same type twice will overwrite the previously
-     * registered provider.
+     * Register an accountholder provider with Gringotts.
+     * This is necessary for Gringotts to find and create
+     * account holders of any non-player type. Registering
+     * a provider for the same type twice will overwrite
+     * the previously registered provider.
      *
      * @param type     type id for an account type
      * @param provider provider for the account type
@@ -255,14 +300,14 @@ public class Gringotts extends JavaPlugin {
      * @return the configured player interaction messages
      */
     public FileConfiguration getMessages() {
-
-        String langPath = "i18n/messages_" + CONF.language + ".yml";
+        String langPath = String.format("i18n/messages_%s.yml", CONF.language);
 
         // try configured language first
         InputStream langStream = getResource(langPath);
-        final FileConfiguration conf;
+        FileConfiguration conf;
+
         if (langStream != null) {
-            Reader langReader = new InputStreamReader(getResource(langPath), StandardCharsets.UTF_8);
+            Reader langReader = new InputStreamReader(langStream, StandardCharsets.UTF_8);
             conf = YamlConfiguration.loadConfiguration(langReader);
         } else {
             // use custom/default
@@ -273,7 +318,10 @@ public class Gringotts extends JavaPlugin {
         return conf;
     }
 
-    // override to handle custom config logic and language loading
+    /**
+     * Reload config.
+     */
+// override to handle custom config logic and language loading
     @Override
     public void reloadConfig() {
         super.reloadConfig();
@@ -281,6 +329,9 @@ public class Gringotts extends JavaPlugin {
         LANG.readLanguage(getMessages());
     }
 
+    /**
+     * Save default config.
+     */
     @Override
     public void saveDefaultConfig() {
         super.saveDefaultConfig();
@@ -292,7 +343,6 @@ public class Gringotts extends JavaPlugin {
     }
 
     private DAO getDAO() {
-
         setupEBean();
 
         // legacy support: migrate derby if it hasn't happened yet
@@ -302,18 +352,25 @@ public class Gringotts extends JavaPlugin {
         DerbyDAO derbyDAO;
         if (!migration.isDerbyMigrated() && (derbyDAO = DerbyDAO.getDao()) != null) {
             getLogger().info("Derby database detected. Migrating to Bukkit-supported database ...");
+
             EBeanDAO eBeanDAO = EBeanDAO.getDao();
             migration.doDerbyMigration(derbyDAO, eBeanDAO);
         }
 
         if (!migration.isUUIDMigrated()) {
             getLogger().info("Player database not migrated to UUIDs yet. Attempting migration");
+
             migration.doUUIDMigration();
         }
 
         return EBeanDAO.getDao();
     }
 
+    /**
+     * Gets database classes.
+     *
+     * @return the database classes
+     */
     public List<Class<?>> getDatabaseClasses() {
         return EBeanDAO.getDatabaseClasses();
     }
@@ -331,6 +388,7 @@ public class Gringotts extends JavaPlugin {
             }
         } catch (Exception ignored) {
             getLogger().info("Initializing database tables.");
+
             installDDL();
         }
     }
@@ -339,35 +397,39 @@ public class Gringotts extends JavaPlugin {
      * Gets the {@link EbeanServer} tied to this plugin.
      * <p>
      * <i>For more information on the use of <a href="http://www.avaje.org/">
-     * Avaje Ebeans ORM</a>, see <a
-     * href="http://www.avaje.org/ebean/documentation.html">Avaje Ebeans
-     * Documentation</a></i>
+     * Avaje Ebeans ORM</a>, see <a href="http://www.avaje.org/ebean/documentation.html">
+     * Avaje Ebeans Documentation
+     * </a></i>
      * <p>
      * <i>For an example using Ebeans ORM, see <a
      * href="https://github.com/Bukkit/HomeBukkit">Bukkit's Homebukkit Plugin
      * </a></i>
      *
-     * @return ebean server instance or null if not enabled
-     * all EBean related methods has been removed with Minecraft 1.12
-     * - see https://www.spigotmc.org/threads/194144/
+     * @return ebean server instance or null if not enabled all EBean related methods has been removed with Minecraft 1.12 - see https://www.spigotmc.org/threads/194144/
      */
     public EbeanServer getDatabase() {
         return ebean;
     }
 
+    /**
+     * Install ddl.
+     */
     protected void installDDL() {
-        SpiEbeanServer serv = (SpiEbeanServer) getDatabase();
-        DdlGenerator gen = serv.getDdlGenerator();
+        SpiEbeanServer server = (SpiEbeanServer) getDatabase();
+        DdlGenerator gen = server.getDdlGenerator();
 
         gen.runScript(false, gen.generateCreateDdl());
     }
 
-    protected void removeDDL() {
-        SpiEbeanServer serv = (SpiEbeanServer) getDatabase();
-        DdlGenerator gen = serv.getDdlGenerator();
-
-        gen.runScript(true, gen.generateDropDdl());
-    }
+//    /**
+//     * Remove ddl.
+//     */
+//    protected void removeDDL() {
+//        SpiEbeanServer server = (SpiEbeanServer) getDatabase();
+//        DdlGenerator gen = server.getDdlGenerator();
+//
+//        gen.runScript(true, gen.generateDropDdl());
+//    }
 
     private String replaceDatabaseString(String input) {
         input = input.replaceAll(
@@ -380,6 +442,11 @@ public class Gringotts extends JavaPlugin {
         return input;
     }
 
+    /**
+     * Configure db config.
+     *
+     * @param config the config
+     */
     public void configureDbConfig(ServerConfig config) {
         Validate.notNull(config, "Config cannot be null");
 
@@ -398,12 +465,19 @@ public class Gringotts extends JavaPlugin {
         config.setDataSourceConfig(ds);
     }
 
+    /**
+     * Gets dao.
+     *
+     * @return the dao
+     */
     public DAO getDao() {
         return dao;
     }
 
     /**
      * The account holder factory is the place to go if you need an AccountHolder instance for an id.
+     *
+     * @return the account holder factory
      */
     public AccountHolderFactory getAccountHolderFactory() {
         return accountHolderFactory;
@@ -411,11 +485,18 @@ public class Gringotts extends JavaPlugin {
 
     /**
      * Manages accounts.
+     *
+     * @return the accounting
      */
     public Accounting getAccounting() {
         return accounting;
     }
 
+    /**
+     * Gets eco.
+     *
+     * @return the eco
+     */
     public Eco getEco() {
         return eco;
     }
