@@ -1,4 +1,4 @@
-package org.gestern.gringotts.dependency;
+package org.gestern.gringotts.dependency.worldguard;
 
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldguard.WorldGuard;
@@ -13,12 +13,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.accountholder.AccountHolder;
-import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.event.PlayerVaultCreationEvent;
-import org.gestern.gringotts.event.VaultCreationEvent.Type;
+import org.gestern.gringotts.event.VaultCreationEvent;
 
 import java.util.UUID;
 
@@ -26,86 +24,60 @@ import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.Permissions.CREATE_VAULT_ADMIN;
 import static org.gestern.gringotts.Permissions.CREATE_VAULT_WORLDGUARD;
 
-public abstract class WorldGuardHandler implements DependencyHandler, AccountHolderProvider {
-    public static WorldGuardHandler getWorldGuardHandler(Plugin plugin) {
-        if (plugin instanceof WorldGuardPlugin) {
-            return new ValidWorldGuardHandler((WorldGuardPlugin) plugin);
-        } else {
-            return new InvalidWorldGuardHandler();
-        }
-    }
-}
-
-class InvalidWorldGuardHandler extends WorldGuardHandler {
-    @Override
-    public AccountHolder getAccountHolder(String id) {
-        return null;
-    }
-
-    /**
-     * Get the AccountHolder object mapped to the given id for this provider.
-     *
-     * @param uuid the targeted account holder
-     * @return account holder for id
-     */
-    @Override
-    public AccountHolder getAccountHolder(UUID uuid) {
-        return null;
-    }
-
-    /**
-     * Get the AccountHolder object mapped to the given id for this provider.
-     *
-     * @param player the target player
-     * @return account holder for id
-     */
-    @Override
-    public AccountHolder getAccountHolder(OfflinePlayer player) {
-        return null;
-    }
-
-    @Override
-    public boolean enabled() {
-        return false;
-    }
-
-    @Override
-    public boolean exists() {
-        return false;
-    }
-}
-
+/**
+ * The type Valid world guard handler.
+ */
 class ValidWorldGuardHandler extends WorldGuardHandler {
-
     private WorldGuardPlugin plugin;
 
+    /**
+     * Instantiates a new Valid world guard handler.
+     *
+     * @param plugin the plugin
+     */
     public ValidWorldGuardHandler(WorldGuardPlugin plugin) {
         this.plugin = plugin;
 
         Bukkit.getPluginManager().registerEvents(new WorldGuardListener(), Gringotts.getInstance());
         Gringotts.getInstance().registerAccountHolderProvider("worldguard", this);
-
     }
 
-
+    /**
+     * Enabled boolean.
+     *
+     * @return the boolean
+     */
     @Override
-    public boolean enabled() {
+    public boolean isEnabled() {
         if (plugin != null) {
             return plugin.isEnabled();
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
+    /**
+     * Exists boolean.
+     *
+     * @return the boolean
+     */
     @Override
-    public boolean exists() {
+    public boolean isPresent() {
         return plugin != null;
     }
 
-
+    /**
+     * Gets account holder.
+     *
+     * @param id the id
+     * @return the account holder
+     */
     @Override
     public WorldGuardAccountHolder getAccountHolder(String id) {
         // FIXME use something more robust than - as world-id delimiter
         // try explicit world+id first
         String[] parts = id.split("-", 2);
+
         if (parts.length == 2) {
             WorldGuardAccountHolder wgah = getAccountHolder(parts[0], parts[1]);
 
@@ -182,15 +154,24 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
         return null;
     }
 
+    /**
+     * The type World guard listener.
+     */
     public class WorldGuardListener implements Listener {
 
+        /**
+         * Vault created.
+         *
+         * @param event the event
+         */
         @EventHandler
         public void vaultCreated(PlayerVaultCreationEvent event) {
             // some listener already claimed this event
             if (event.isValid()) return;
 
-            if (event.getType() == Type.REGION) {
+            if (event.getType() == VaultCreationEvent.Type.REGION) {
                 Player player = event.getCause().getPlayer();
+
                 if (!CREATE_VAULT_WORLDGUARD.isAllowed(player)) {
                     player.sendMessage(LANG.plugin_worldguard_noVaultPerm);
 
@@ -212,6 +193,7 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
 
                 if (owner != null && (owner.region.hasMembersOrOwners() || CREATE_VAULT_ADMIN.isAllowed(player))) {
                     DefaultDomain regionOwners = owner.region.getOwners();
+
                     if (regionOwners.contains(player.getName())) {
                         event.setOwner(owner);
                         event.setValid(true);
@@ -219,51 +201,5 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
                 }
             }
         }
-    }
-}
-
-class WorldGuardAccountHolder implements AccountHolder {
-    final String world;
-    final ProtectedRegion region;
-
-    public WorldGuardAccountHolder(String world, ProtectedRegion region) {
-        this.world = world;
-        this.region = region;
-    }
-
-    @Override
-    public String getName() {
-        return region.getId();
-    }
-
-    @Override
-    public void sendMessage(String message) {
-        //Send the message to owners.
-        for (UUID uuid : region.getOwners().getUniqueIds()) {
-            Player player = Bukkit.getPlayer(uuid);
-
-            if (player != null) {
-                player.sendMessage(message);
-            }
-        }
-
-        //Send the message to members.
-        for (UUID uuid : region.getMembers().getUniqueIds()) {
-            Player player = Bukkit.getPlayer(uuid);
-
-            if (player != null) {
-                player.sendMessage(message);
-            }
-        }
-    }
-
-    @Override
-    public String getType() {
-        return "worldguard";
-    }
-
-    @Override
-    public String getId() {
-        return world + "-" + region.getId();
     }
 }

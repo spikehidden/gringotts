@@ -16,7 +16,6 @@ import static org.gestern.gringotts.Configuration.CONF;
  * @author jast
  */
 public class AccountInventory {
-
     private final Inventory inventory;
 
     public AccountInventory(Inventory inventory) {
@@ -29,8 +28,8 @@ public class AccountInventory {
      * @return current balance of this inventory in cents
      */
     public long balance() {
-        GringottsCurrency cur   = CONF.getCurrency();
-        long              count = 0;
+        GringottsCurrency cur = CONF.getCurrency();
+        long count = 0;
 
         for (ItemStack stack : inventory) {
             count += cur.getValue(stack);
@@ -51,15 +50,15 @@ public class AccountInventory {
         long remaining = value;
 
         // try denominations from largest to smallest
-        for (Denomination denom : CONF.getCurrency().getDenominations()) {
-            if (denom.getValue() <= remaining) {
-                ItemStack stack          = new ItemStack(denom.getKey().type);
-                int       stacksize      = stack.getMaxStackSize();
-                long      denomItemCount = denom.getValue() > 0 ? remaining / denom.getValue() : 0;
+        for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+            if (denomination.getValue() <= remaining) {
+                ItemStack stack = new ItemStack(denomination.getKey().type);
+                int stackSize = stack.getMaxStackSize();
+                long denItemCount = denomination.getValue() > 0 ? remaining / denomination.getValue() : 0;
 
                 // add stacks in this denomination until stuff is returned
-                while (denomItemCount > 0) {
-                    int remainderStackSize = denomItemCount > stacksize ? stacksize : (int) denomItemCount;
+                while (denItemCount > 0) {
+                    int remainderStackSize = denItemCount > stackSize ? stackSize : (int) denItemCount;
                     stack.setAmount(remainderStackSize);
 
                     int returned = 0;
@@ -69,8 +68,9 @@ public class AccountInventory {
 
                     // reduce remaining amount by whatever was deposited
                     long added = (long) remainderStackSize - returned;
-                    denomItemCount -= added;
-                    remaining -= added * denom.getValue();
+
+                    denItemCount -= added;
+                    remaining -= added * denomination.getValue();
 
                     // no more space for this denomination
                     if (returned > 0) {
@@ -96,22 +96,22 @@ public class AccountInventory {
             return 0;
         }
 
-        GringottsCurrency cur       = CONF.getCurrency();
-        long              remaining = value;
+        GringottsCurrency cur = CONF.getCurrency();
+        long remaining = value;
 
         // try denominations from smallest to largest
-        List<Denomination> denoms = cur.getDenominations();
-        for (ListIterator<Denomination> it = denoms.listIterator(denoms.size()); it.hasPrevious(); ) {
-            Denomination denom     = it.previous();
-            ItemStack    stack     = new ItemStack(denom.getKey().type);
-            int          stacksize = stack.getMaxStackSize();
+        List<Denomination> denominations = cur.getDenominations();
+        for (ListIterator<Denomination> it = denominations.listIterator(denominations.size()); it.hasPrevious(); ) {
+            Denomination denomination = it.previous();
+            ItemStack stack = new ItemStack(denomination.getKey().type);
+            int stackSize = stack.getMaxStackSize();
 
             // take 1 more than necessary if it doesn't round. add the extra later
-            long denomItemCount = (long) Math.ceil((double) remaining / denom.getValue());
+            long denItemCount = (long) Math.ceil((double) remaining / denomination.getValue());
 
             // add stacks in this denomination until stuff is returned or we are done
-            while (denomItemCount > 0) {
-                int remainderStackSize = denomItemCount > stacksize ? stacksize : (int) denomItemCount;
+            while (denItemCount > 0) {
+                int remainderStackSize = denItemCount > stackSize ? stackSize : (int) denItemCount;
                 stack.setAmount(remainderStackSize);
 
                 int returned = 0;
@@ -122,8 +122,8 @@ public class AccountInventory {
 
                 // reduce remaining amount by whatever was removed
                 long removed = (long) remainderStackSize - returned;
-                denomItemCount -= removed;
-                remaining -= removed * denom.getValue();
+                denItemCount -= removed;
+                remaining -= removed * denomination.getValue();
 
                 // stuff was returned, no more items of this type to take
                 if (returned > 0) {

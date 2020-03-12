@@ -7,9 +7,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.gestern.gringotts.data.DAO;
-
-import java.util.logging.Logger;
 
 import static org.gestern.gringotts.Configuration.CONF;
 
@@ -19,17 +16,14 @@ import static org.gestern.gringotts.Configuration.CONF;
  * @author jast
  */
 public class AccountChest {
-
     /**
      * Sign marking the chest as an account chest.
      */
-    public final Sign             sign;
+    public final Sign sign;
     /**
      * Account this chest belongs to.
      */
     public final GringottsAccount account;
-    private final Logger log = Gringotts.getInstance().getLogger();
-    private final DAO    dao = Gringotts.getInstance().getDao();
 
     /**
      * Create Account chest based on a sign marking its position and belonging to an account.
@@ -39,8 +33,11 @@ public class AccountChest {
      */
     public AccountChest(Sign sign, GringottsAccount account) {
         if (sign == null || account == null) {
-            throw new IllegalArgumentException("null arguments to AccountChest() not allowed. args were: sign: " +
-                    sign + ", account: " + account);
+            throw new IllegalArgumentException(String.format(
+                    "null arguments to AccountChest() not allowed. args were: sign: %s, account: %s",
+                    sign,
+                    account
+            ));
         }
 
         this.sign = sign;
@@ -79,9 +76,9 @@ public class AccountChest {
      * @return inventory of this AccountChest, if any. otherwise null.
      */
     private Inventory inventory() {
-        InventoryHolder chest = chest();
+        InventoryHolder inventoryHolder = chest();
 
-        return (chest != null) ? chest.getInventory() : null;
+        return (inventoryHolder != null) ? inventoryHolder.getInventory() : null;
     }
 
     /**
@@ -90,9 +87,9 @@ public class AccountChest {
      * @return account inventory of this account chest
      */
     private AccountInventory accountInventory() {
-        Inventory inv = inventory();
+        Inventory inventory = inventory();
 
-        return inv != null ? new AccountInventory(inv) : null;
+        return inventory != null ? new AccountInventory(inventory) : null;
     }
 
     /**
@@ -102,7 +99,9 @@ public class AccountChest {
      */
     private boolean updateValid() {
         if (notValid()) {
-            log.info("Destroying orphaned vault: " + this);
+            Gringotts.getInstance()
+                    .getLogger()
+                    .info("Destroying orphaned vault: " + this);
             destroy();
 
             return false;
@@ -117,7 +116,6 @@ public class AccountChest {
      * @return balance of this chest
      */
     public long balance() {
-
         if (!updateValid()) {
             return 0;
         }
@@ -135,20 +133,17 @@ public class AccountChest {
      * If the amount is larger than available space, the space is filled and the actually
      * added amount returned.
      *
+     * @param value the value
      * @return amount actually added
      */
     public long add(long value) {
-
         if (!updateValid()) {
             return 0;
         }
 
         AccountInventory inv = accountInventory();
-        if (inv == null) {
-            return 0;
-        }
 
-        return inv.add(value);
+        return inv == null ? 0 : inv.add(value);
     }
 
     /**
@@ -160,17 +155,13 @@ public class AccountChest {
      * @return amount actually removed from this chest
      */
     public long remove(long value) {
-
         if (!updateValid()) {
             return 0;
         }
 
         AccountInventory inv = accountInventory();
-        if (inv == null) {
-            return 0;
-        }
 
-        return inv.remove(value);
+        return inv == null ? 0 : inv.remove(value);
     }
 
     /**
@@ -189,31 +180,33 @@ public class AccountChest {
 
         // TODO refactor: common definition of valid vault types
         String[] lines = sign.getLines();
-        String   line0 = lines[0].toLowerCase();
+        String line0 = lines[0].toLowerCase();
 
-        if (!line0.matches(CONF.vaultPattern)) {
-            return true;
-        }
-
-        if (lines[2] == null || lines[2].length() == 0) {
-            return true;
-        }
-
-        return chest() == null;
-
+        return !line0.matches(CONF.vaultPattern) ||
+                lines[2] == null ||
+                lines[2].length() == 0 || chest() == null;
     }
 
     /**
      * Triggered on destruction of physical chest or sign.
      */
     void destroy() {
-        dao.deleteAccountChest(this);
+        Gringotts.getInstance()
+                .getDao()
+                .deleteAccountChest(this);
+
         sign.getBlock().breakNaturally();
     }
 
+    /**
+     * To string string.
+     *
+     * @return the string
+     */
     @Override
     public String toString() {
         Location loc = sign.getLocation();
+
         return "[vault] "
                 + loc.getBlockX() + ", "
                 + loc.getBlockY() + ", "
@@ -227,21 +220,22 @@ public class AccountChest {
      * @return chest blocks connected to this chest, if any
      */
     private Chest[] connectedChests() {
-        Inventory inv = inventory();
-        if (inv == null) {
+        Inventory inventory = inventory();
+
+        if (inventory == null) {
             return new Chest[0];
         }
 
-        if (inv instanceof DoubleChestInventory) {
-            DoubleChestInventory dinv  = (DoubleChestInventory) inv;
-            Chest                left  = (Chest) (dinv.getLeftSide().getHolder());
-            Chest                right = (Chest) (dinv.getRightSide().getHolder());
+        if (inventory instanceof DoubleChestInventory) {
+            DoubleChestInventory chestInventory = (DoubleChestInventory) inventory;
+            Chest left = (Chest) (chestInventory.getLeftSide().getHolder());
+            Chest right = (Chest) (chestInventory.getRightSide().getHolder());
 
             return new Chest[]{left, right};
         } else {
-            InventoryHolder invHolder = inv.getHolder();
-            if (invHolder instanceof Chest) {
-                return new Chest[]{(Chest) (inv.getHolder())};
+            InventoryHolder inventoryHolder = inventory.getHolder();
+            if (inventoryHolder instanceof Chest) {
+                return new Chest[]{(Chest) (inventory.getHolder())};
             }
         }
 
@@ -249,13 +243,18 @@ public class AccountChest {
     }
 
 
+    /**
+     * Hash code int.
+     *
+     * @return the int
+     */
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        final int prime  = 31;
-        int       result = 1;
+        final int prime = 31;
+        int result = 1;
 
         result = prime * result + sign.getLocation().hashCode();
 
@@ -263,6 +262,12 @@ public class AccountChest {
     }
 
 
+    /**
+     * Equals boolean.
+     *
+     * @param obj the obj
+     * @return the boolean
+     */
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -292,7 +297,6 @@ public class AccountChest {
      * @return whether the chest of another AccountChest would be connected to this chest
      */
     public boolean connected(AccountChest chest) {
-
         // no valid account chest anymore -> no connection
         if (!updateValid()) {
             return false;
@@ -313,7 +317,6 @@ public class AccountChest {
             return false;
         }
 
-
         for (Chest c : chest.connectedChests()) {
             if (c.getLocation().equals(myLoc)) {
                 return true;
@@ -323,6 +326,11 @@ public class AccountChest {
         return false;
     }
 
+    /**
+     * Gets account.
+     *
+     * @return the account
+     */
     public GringottsAccount getAccount() {
         return account;
     }

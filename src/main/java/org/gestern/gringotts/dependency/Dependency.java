@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.dependency.towny.TownyHandler;
+import org.gestern.gringotts.dependency.worldguard.WorldGuardHandler;
 
 import java.util.logging.Logger;
 
@@ -15,7 +17,6 @@ import static org.gestern.gringotts.Util.versionAtLeast;
  * @author jast
  */
 public enum Dependency {
-
     /**
      * Singleton dependency manager instance.
      */
@@ -45,22 +46,26 @@ public enum Dependency {
      * but the classes must be visible to the classloader.
      */
     Dependency() {
-        towny = TownyHandler.getTownyHandler(hookPlugin(
-                "Towny",
-                "com.palmergames.bukkit.towny.Towny",
-                "0.95.0.0"));
         vault = new GenericHandler(hookPlugin(
                 "Vault",
                 "net.milkbowl.vault.Vault",
-                "1.5.0"));
+                "1.5.0"
+        ));
         reserve = new GenericHandler(hookPlugin(
                 "Reserve",
                 "net.tnemc.core.Reserve",
-                "0.1.4.6"));
+                "0.1.4.6"
+        ));
+        towny = TownyHandler.getTownyHandler(hookPlugin(
+                "Towny",
+                "com.palmergames.bukkit.towny.Towny",
+                "0.95.0.0"
+        ));
         worldguard = WorldGuardHandler.getWorldGuardHandler(hookPlugin(
                 "WorldGuard",
                 "com.sk89q.worldguard.bukkit.WorldGuardPlugin",
-                "7.0.0"));
+                "7.0.0"
+        ));
     }
 
     /**
@@ -104,14 +109,18 @@ public enum Dependency {
                 return null;
             }
 
-            log.info("Plugin " + name + " hooked.");
+            log.info(String.format("Plugin %s hooked.", name));
 
             PluginDescriptionFile desc = plugin.getDescription();
             String version = desc.getVersion();
 
             if (!versionAtLeast(version, minVersion)) {
-                log.warning("Plugin dependency " + name + " is version " + version +
-                        ". Expected at least " + minVersion + " -- Errors may occur.");
+                log.warning(String.format(
+                        "Plugin dependency %1$s is version %2$s. Expected at least %3$s -- Errors may occur.",
+                        name,
+                        version,
+                        minVersion
+                ));
 
                 return null;
             }

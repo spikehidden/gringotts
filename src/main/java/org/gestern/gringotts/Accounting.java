@@ -3,7 +3,6 @@ package org.gestern.gringotts;
 import org.gestern.gringotts.accountholder.AccountHolder;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.gestern.gringotts.Gringotts.getInstance;
 
@@ -13,9 +12,6 @@ import static org.gestern.gringotts.Gringotts.getInstance;
  * @author jast
  */
 public class Accounting {
-
-    private final Logger log = getInstance().getLogger();
-
     /**
      * Get the account associated with an account holder.
      * If it was not yet stored in the data storage, it will be persisted.
@@ -46,6 +42,7 @@ public class Accounting {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -53,12 +50,10 @@ public class Accounting {
      * Save an AccountChest to Account association.
      *
      * @param chest chest to add to the account
-     * @return false if the specified AccountChest is already registered or would be connected to
-     * a registered chest. true if the association was successful.
+     * @return false if the specified AccountChest is already registered or would be connected to a registered chest. true if the association was successful.
      * @throws GringottsStorageException when saving of account chest failed
      */
     public boolean addChest(AccountChest chest) {
-
         // TODO refactor to do a more intelligent/quick query
         List<AccountChest> allChests = getInstance().getDao().retrieveChests();
 

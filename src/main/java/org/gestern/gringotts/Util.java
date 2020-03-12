@@ -13,11 +13,7 @@ import org.gestern.gringotts.currency.GringottsCurrency;
  * The type Util.
  */
 @SuppressWarnings("WeakerAccess")
-public class Util {
-
-    private Util() {
-    }
-
+public final class Util {
     /**
      * Check whether a block is a sign or wall sign type.
      *

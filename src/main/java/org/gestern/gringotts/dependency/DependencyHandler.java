@@ -14,12 +14,12 @@ public interface DependencyHandler {
      *
      * @return whether the plugin handled by this handler is enabled.
      */
-    boolean enabled();
+    boolean isEnabled();
 
     /**
      * Return whether the dependency is loaded into classpath.
      *
      * @return whether the dependency is loaded into classpath.
      */
-    boolean exists();
+    boolean isPresent();
 }

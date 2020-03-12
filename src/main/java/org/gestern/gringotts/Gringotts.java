@@ -217,19 +217,19 @@ public class Gringotts extends JavaPlugin {
      * Register Gringotts as economy provider for vault/reserve.
      */
     private void registerEconomy() {
-        if (DEP.vault.exists()) {
+        if (DEP.vault.isPresent()) {
             getServer().getServicesManager().register(Economy.class, new VaultConnector(), this, ServicePriority.Highest);
 
             getLogger().info("Registered Vault interface.");
         }
 
-        if (DEP.reserve.exists()) {
+        if (DEP.reserve.isPresent()) {
             ReserveConnector.registerProviderSafely();
 
             getLogger().info("Registered Reserve interface.");
         }
 
-        if (!DEP.vault.exists() && !DEP.reserve.exists()) {
+        if (!DEP.vault.isPresent() && !DEP.reserve.isPresent()) {
             getLogger().info("Neither Vault or Reserve was found. Other plugins may not be able to access Gringotts accounts.");
 
             Bukkit.getPluginManager().disablePlugin(this);

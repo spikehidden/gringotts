@@ -675,7 +675,8 @@ public class ReserveConnector implements EconomyAPI {
     }
 
     /**
-     * Used to determine if a call to the corresponding addHoldings method would be successful. This method does not
+     * Used to determine if a call to the corresponding addHoldings
+     * method would be successful. This method does not
      * affect an account's funds.
      *
      * @param identifier The identifier of the account that is associated with this call.
@@ -689,7 +690,8 @@ public class ReserveConnector implements EconomyAPI {
     }
 
     /**
-     * Used to determine if a call to the corresponding addHoldings method would be successful. This method does not
+     * Used to determine if a call to the corresponding addHoldings
+     * method would be successful. This method does not
      * affect an account's funds.
      *
      * @param identifier The identifier of the account that is associated with this call.
@@ -703,7 +705,8 @@ public class ReserveConnector implements EconomyAPI {
     }
 
     /**
-     * Used to determine if a call to the corresponding addHoldings method would be successful. This method does not
+     * Used to determine if a call to the corresponding addHoldings
+     * method would be successful. This method does not
      * affect an account's funds.
      *
      * @param identifier The identifier of the account that is associated with this call.
@@ -717,7 +720,8 @@ public class ReserveConnector implements EconomyAPI {
     }
 
     /**
-     * Used to determine if a call to the corresponding addHoldings method would be successful. This method does not
+     * Used to determine if a call to the corresponding addHoldings
+     * method would be successful. This method does not
      * affect an account's funds.
      *
      * @param identifier The identifier of the account that is associated with this call.
@@ -731,7 +735,8 @@ public class ReserveConnector implements EconomyAPI {
     }
 
     /**
-     * Used to determine if a call to the corresponding addHoldings method would be successful. This method does not
+     * Used to determine if a call to the corresponding addHoldings
+     * method would be successful. This method does not
      * affect an account's funds.
      *
      * @param identifier The identifier of the account that is associated with this call.
@@ -749,7 +754,8 @@ public class ReserveConnector implements EconomyAPI {
     }
 
     /**
-     * Used to determine if a call to the corresponding addHoldings method would be successful. This method does not
+     * Used to determine if a call to the corresponding addHoldings
+     * method would be successful. This method does not
      * affect an account's funds.
      *
      * @param identifier The identifier of the account that is associated with this call.

@@ -314,7 +314,9 @@ public enum Configuration {
             } catch (Exception e) {
                 throw new GringottsConfigurationException(
                         "Encountered an error parsing currency. Please check your Gringotts configuration. Error was: "
-                                + e.getMessage(), e);
+                                + e.getMessage(),
+                        e
+                );
             }
         }
     }
