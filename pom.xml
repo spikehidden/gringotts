@@ -217,10 +217,6 @@
             <id>znode</id>
             <url>http://repo.zno.de/artifactory/repo/</url>
         </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
     </repositories>
 
     <distributionManagement>
