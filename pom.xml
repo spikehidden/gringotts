@@ -6,6 +6,7 @@
     <version>2.11.2-SNAPSHOT</version>
 
     <build>
+        <finalName>${project.artifactId}-${project.version}-r${buildNumber}</finalName>
         <resources>
             <resource>
                 <directory>${basedir}</directory>
@@ -78,6 +79,26 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <useLastCommittedRevision>true</useLastCommittedRevision>
+                        </configuration>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>true</doUpdate>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -163,7 +184,7 @@
 
     <scm>
         <url>https://github.com/nikosgram/Gringotts</url>
-        <connection>scm:git:git://github.com:nikosgram/Gringotts.git</connection>
+        <connection>scm:git:git@github.com:nikosgram/Gringotts.git</connection>
         <developerConnection>scm:git:git@github.com:nikosgram/Gringotts.git</developerConnection>
     </scm>
 
