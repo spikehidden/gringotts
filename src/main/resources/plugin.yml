@@ -10,7 +10,7 @@ database: true
 api-version: "1.15"
 
 awareness:
-  - "!@UTF-8"
+  - !@UTF-8
 
 softdepend: [WorldGuard, Towny, Reserve, Vault]
 loadbefore: [Reserve, Vault]
