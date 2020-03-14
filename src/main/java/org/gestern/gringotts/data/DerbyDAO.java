@@ -11,6 +11,7 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static org.gestern.gringotts.Configuration.CONF;
@@ -422,7 +423,6 @@ public class DerbyDAO implements DAO {
                 String ownerId = result.getString("owner");
 
                 World world = Bukkit.getWorld(worldName);
-                Location loc = new Location(world, x, y, z);
 
                 if (world == null) {
                     Gringotts.getInstance().getLogger().warning(
@@ -431,9 +431,13 @@ public class DerbyDAO implements DAO {
                     continue;
                 }
 
-                Block signBlock = loc.getBlock();
+                Block signBlock = world.getBlockAt(x, y, z);
+                Optional<Sign> optionalSign = Util.getBlockStateAs(
+                        signBlock,
+                        Sign.class
+                );
 
-                if (Util.isSignBlock(signBlock)) {
+                if (optionalSign.isPresent()) {
                     AccountHolder owner = Gringotts.getInstance().getAccountHolderFactory().get(type, ownerId);
 
                     if (owner == null) {
@@ -448,8 +452,8 @@ public class DerbyDAO implements DAO {
                                 signBlock.getZ());
                     } else {
                         GringottsAccount ownerAccount = new GringottsAccount(owner);
-                        Sign sign = (Sign) signBlock.getState();
-                        chests.add(new AccountChest(sign, ownerAccount));
+
+                        chests.add(new AccountChest(optionalSign.get(), ownerAccount));
                     }
                 } else {
                     // remove accountchest from storage if it is not a valid chest
@@ -496,7 +500,6 @@ public class DerbyDAO implements DAO {
                 int z = result.getInt("z");
 
                 World world = Bukkit.getWorld(worldName);
-                Location loc = new Location(world, x, y, z);
 
                 if (world == null) {
                     deleteAccountChest(worldName, x, y, x); // FIXME: Isn't actually removing the non-existent vaults..
@@ -507,11 +510,14 @@ public class DerbyDAO implements DAO {
                     continue;
                 }
 
-                Block signBlock = loc.getBlock();
-                if (Util.isSignBlock(signBlock)) {
-                    Sign sign = (Sign) loc.getBlock().getState();
+                Block signBlock = world.getBlockAt(x, y, z);
+                Optional<Sign> optionalSign = Util.getBlockStateAs(
+                        signBlock,
+                        Sign.class
+                );
 
-                    chests.add(new AccountChest(sign, account));
+                if (optionalSign.isPresent()) {
+                    chests.add(new AccountChest(optionalSign.get(), account));
                 } else {
                     // remove accountchest from storage if it is not a valid chest
                     deleteAccountChest(

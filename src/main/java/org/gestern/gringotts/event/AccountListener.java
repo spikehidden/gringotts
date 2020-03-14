@@ -1,18 +1,18 @@
 package org.gestern.gringotts.event;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.gestern.gringotts.Util;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.gestern.gringotts.Configuration.CONF;
-import static org.gestern.gringotts.event.VaultCreationEvent.*;
+import static org.gestern.gringotts.event.VaultCreationEvent.Type;
 
 /**
  * Listens for chest creation and destruction events.
@@ -53,9 +53,12 @@ public class AccountListener implements Listener {
             }
         }
 
-        // is sign attached to a valid vault container?
-        BlockState signBlock = event.getBlock().getState();
-        if (signBlock instanceof Sign && Util.chestBlock((Sign) signBlock) != null) {
+        Optional<Sign> optionalSign = Util.getBlockStateAs(
+                event.getBlock(),
+                Sign.class
+        );
+
+        if (optionalSign.isPresent() && Util.chestBlock(optionalSign.get()) != null) {
             // we made it this far, throw the event to manage vault creation
             final VaultCreationEvent creation = new PlayerVaultCreationEvent(type, event);
 

@@ -1,7 +1,9 @@
 package org.gestern.gringotts;
 
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.DoubleChestInventory;
@@ -52,11 +54,18 @@ public class AccountChest {
     private InventoryHolder chest() {
         Block block = Util.chestBlock(sign);
 
-        if (block == null) {
-            return null;
-        } else {
-            return (InventoryHolder) block.getState();
+        if (block != null) {
+            BlockState blockState = PaperLib.getBlockState(
+                    block,
+                    false
+            ).getState();
+
+            if (blockState instanceof InventoryHolder) {
+                return (InventoryHolder) blockState;
+            }
         }
+
+        return null;
     }
 
     /**

@@ -1,13 +1,17 @@
 package org.gestern.gringotts;
 
+import io.papermc.lib.PaperLib;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.gestern.gringotts.currency.GringottsCurrency;
+
+import java.util.Optional;
 
 /**
  * The type Util.
@@ -21,7 +25,36 @@ public final class Util {
      * @return true if the block is a sign or wall sign
      */
     public static boolean isSignBlock(Block block) {
-        return block.getState() instanceof Sign;
+        BlockState blockState = PaperLib.getBlockState(
+                block,
+                true
+        ).getState();
+
+        return blockState instanceof Sign;
+    }
+
+    /**
+     * Gets block state as T, if blockState
+     * is not assignable from T class, is
+     * gonna return an empty {@link Optional}.
+     *
+     * @param <T>             the type parameter
+     * @param block           the block
+     * @param blockStateClass the block state class
+     * @return the block state as
+     */
+    public static <T extends BlockState> Optional<T> getBlockStateAs(Block block, Class<T> blockStateClass) {
+        BlockState blockState = PaperLib.getBlockState(
+                block,
+                false
+        ).getState();
+
+        if (blockStateClass.isInstance(blockState)) {
+            //noinspection unchecked
+            return (Optional<T>) Optional.of(blockState);
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**

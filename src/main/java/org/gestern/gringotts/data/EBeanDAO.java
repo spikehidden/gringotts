@@ -5,7 +5,6 @@ import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.SqlUpdate;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -18,6 +17,7 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static org.gestern.gringotts.Configuration.CONF;
@@ -119,9 +119,9 @@ public class EBeanDAO implements DAO {
 
     @Override
     public synchronized List<AccountChest> retrieveChests() {
-        List<SqlRow> result = db.createSqlQuery("SELECT ac.world, ac.x, ac.y, ac.z, a.type, a.owner " +
-                "FROM gringotts_accountchest ac JOIN gringotts_account a ON ac.account = a.id ")
-                .findList();
+        List<SqlRow> result = db.createSqlQuery(
+                "SELECT ac.world, ac.x, ac.y, ac.z, a.type, a.owner FROM gringotts_accountchest ac JOIN gringotts_account a ON ac.account = a.id "
+        ).findList();
 
         List<AccountChest> chests = new LinkedList<>();
 
@@ -135,21 +135,37 @@ public class EBeanDAO implements DAO {
             String ownerId = c.getString("owner");
 
             World world = Bukkit.getWorld(worldName);
-            if (world == null) continue; // skip vaults in non-existing worlds
+            if (world == null) {
+                continue; // skip vaults in non-existing worlds
+            }
 
-            Location loc = new Location(world, x, y, z);
-            Block signBlock = loc.getBlock();
-            if (Util.isSignBlock(signBlock)) {
+            Block signBlock = world.getBlockAt(x, y, z);
+            Optional<Sign> optionalSign = Util.getBlockStateAs(
+                    signBlock,
+                    Sign.class
+            );
+
+            if (optionalSign.isPresent()) {
                 AccountHolder owner = Gringotts.getInstance().getAccountHolderFactory().get(type, ownerId);
+
                 if (owner == null) {
-                    log.info("AccountHolder " + type + ":" + ownerId + " is not valid. Deleting associated account " +
-                            "chest at " + signBlock.getLocation());
-                    deleteAccountChest(signBlock.getWorld().getName(), signBlock.getX(), signBlock.getY(), signBlock
-                            .getZ());
+                    log.info(String.format(
+                            "AccountHolder %s:%s is not valid. Deleting associated account chest at %s",
+                            type,
+                            ownerId,
+                            signBlock.getLocation()
+                    ));
+
+                    deleteAccountChest(
+                            signBlock.getWorld().getName(),
+                            signBlock.getX(),
+                            signBlock.getY(),
+                            signBlock.getZ()
+                    );
                 } else {
                     GringottsAccount ownerAccount = new GringottsAccount(owner);
-                    Sign sign = (Sign) signBlock.getState();
-                    chests.add(new AccountChest(sign, ownerAccount));
+
+                    chests.add(new AccountChest(optionalSign.get(), ownerAccount));
                 }
             } else {
                 // remove accountchest from storage if it is not a valid chest
@@ -161,8 +177,9 @@ public class EBeanDAO implements DAO {
     }
 
     private boolean deleteAccountChest(String world, int x, int y, int z) {
-        SqlUpdate deleteChest = db.createSqlUpdate("delete from gringotts_accountchest " +
-                "where world = :world and x = :x and y = :y and z = :z");
+        SqlUpdate deleteChest = db.createSqlUpdate(
+                "delete from gringotts_accountchest where world = :world and x = :x and y = :y and z = :z"
+        );
 
         deleteChest.setParameter("world", world);
         deleteChest.setParameter("x", x);
@@ -195,13 +212,13 @@ public class EBeanDAO implements DAO {
                 continue; // skip chest if it is in non-existent world
             }
 
-            Location loc = new Location(world, x, y, z);
-            Block signBlock = loc.getBlock();
+            Optional<Sign> optionalSign = Util.getBlockStateAs(
+                    world.getBlockAt(x, y, z),
+                    Sign.class
+            );
 
-            if (Util.isSignBlock(signBlock)) {
-                Sign sign = (Sign) loc.getBlock().getState();
-
-                chests.add(new AccountChest(sign, account));
+            if (optionalSign.isPresent()) {
+                chests.add(new AccountChest(optionalSign.get(), account));
             } else {
                 // remove accountchest from storage if it is not a valid chest
                 deleteAccountChest(worldName, x, y, z);

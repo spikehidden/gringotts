@@ -6,11 +6,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
-import org.gestern.gringotts.AccountChest;
-import org.gestern.gringotts.Accounting;
-import org.gestern.gringotts.Gringotts;
-import org.gestern.gringotts.GringottsAccount;
+import org.gestern.gringotts.*;
 import org.gestern.gringotts.accountholder.AccountHolder;
+
+import java.util.Optional;
 
 import static org.gestern.gringotts.Language.LANG;
 
@@ -31,6 +30,7 @@ public class VaultCreator implements Listener {
         }
 
         AccountHolder owner = event.getOwner();
+
         if (owner == null) {
             return;
         }
@@ -38,8 +38,17 @@ public class VaultCreator implements Listener {
         GringottsAccount account = accounting.getAccount(owner);
 
         SignChangeEvent cause = event.getCause();
+        Optional<Sign> optionalSign = Util.getBlockStateAs(
+                cause.getBlock(),
+                Sign.class
+        );
+
+        if (!optionalSign.isPresent()) {
+            return;
+        }
+
         // create account chest
-        AccountChest accountChest = new AccountChest((Sign) cause.getBlock().getState(), account);
+        AccountChest accountChest = new AccountChest(optionalSign.get(), account);
 
         // check for existence / add to tracking
         if (accounting.addChest(accountChest)) {
