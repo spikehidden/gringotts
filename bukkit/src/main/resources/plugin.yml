@@ -1,0 +1,5 @@
+main: com.oglofus.gringotts.GringottsBukkit
+name: Gringotts
+version: ${project.version}
+
+api-version: "1.5"
