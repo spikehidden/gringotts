@@ -52,14 +52,14 @@ public class VaultCreator implements Listener {
 
         // check for existence / add to tracking
         if (accounting.addChest(accountChest)) {
-            // only embolden if the bold marker doesn't increase line length beyond 15
-            if (cause.getLine(0).length() <= 13) {
-                cause.setLine(0, ChatColor.BOLD + cause.getLine(0));
+            String firstLine = cause.getLine(0);
+
+            if (firstLine != null && firstLine.length() <= 16) {
+                cause.setLine(0, " " + ChatColor.BOLD + firstLine + " ");
             }
 
             cause.setLine(2, owner.getName());
             cause.getPlayer().sendMessage(LANG.vault_created);
-
         } else {
             cause.setCancelled(true);
             cause.getPlayer().sendMessage(LANG.vault_error);

@@ -1,6 +1,7 @@
 package org.gestern.gringotts;
 
 import io.papermc.lib.PaperLib;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -189,7 +190,7 @@ public class AccountChest {
 
         // TODO refactor: common definition of valid vault types
         String[] lines = sign.getLines();
-        String line0 = lines[0].toLowerCase();
+        String line0 = lines[0].toLowerCase().trim();
 
         return !line0.matches(CONF.vaultPattern) ||
                 lines[2] == null ||
@@ -342,5 +343,11 @@ public class AccountChest {
      */
     public GringottsAccount getAccount() {
         return account;
+    }
+
+    public void updateSign() {
+        this.sign.setLine(2, this.account.owner.getName());
+
+        this.sign.update();
     }
 }

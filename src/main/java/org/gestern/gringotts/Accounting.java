@@ -21,6 +21,7 @@ public class Accounting {
      */
     public GringottsAccount getAccount(AccountHolder owner) {
         GringottsAccount account = new GringottsAccount(owner);
+
         getInstance().getDao().storeAccount(account);
 
         return account;

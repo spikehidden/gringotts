@@ -3,26 +3,16 @@ package org.gestern.gringotts.dependency.worldguard;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.accountholder.AccountHolder;
-import org.gestern.gringotts.event.PlayerVaultCreationEvent;
-import org.gestern.gringotts.event.VaultCreationEvent;
 
 import java.util.UUID;
-
-import static org.gestern.gringotts.Language.LANG;
-import static org.gestern.gringotts.Permissions.CREATE_VAULT_ADMIN;
-import static org.gestern.gringotts.Permissions.CREATE_VAULT_WORLDGUARD;
 
 /**
  * The type Valid world guard handler.
@@ -38,7 +28,7 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
     public ValidWorldGuardHandler(WorldGuardPlugin plugin) {
         this.plugin = plugin;
 
-        Bukkit.getPluginManager().registerEvents(new WorldGuardListener(), Gringotts.getInstance());
+        Bukkit.getPluginManager().registerEvents(new WorldGuardListener(this), Gringotts.getInstance());
         Gringotts.getInstance().registerAccountHolderProvider("worldguard", this);
     }
 
@@ -127,19 +117,19 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
     /**
      * Get account holder for known world and region id.
      *
-     * @param world name of world
-     * @param id    worldguard region id
+     * @param worldName name of world
+     * @param id        worldguard region id
      * @return account holder for the region
      */
-    public WorldGuardAccountHolder getAccountHolder(String world, String id) {
-        World w = Bukkit.getWorld(world);
+    public WorldGuardAccountHolder getAccountHolder(String worldName, String id) {
+        World world = Bukkit.getWorld(worldName);
 
-        if (w == null) {
+        if (world == null) {
             return null;
         }
 
         WorldGuardPlatform worldguardPlatform = WorldGuard.getInstance().getPlatform();
-        RegionManager worldManager = worldguardPlatform.getRegionContainer().get(new BukkitWorld(w));
+        RegionManager worldManager = worldguardPlatform.getRegionContainer().get(new BukkitWorld(world));
 
         if (worldManager == null) {
             return null;
@@ -148,58 +138,9 @@ class ValidWorldGuardHandler extends WorldGuardHandler {
         if (worldManager.hasRegion(id)) {
             ProtectedRegion region = worldManager.getRegion(id);
 
-            return new WorldGuardAccountHolder(world, region);
+            return new WorldGuardAccountHolder(worldName, region);
         }
 
         return null;
-    }
-
-    /**
-     * The type World guard listener.
-     */
-    public class WorldGuardListener implements Listener {
-
-        /**
-         * Vault created.
-         *
-         * @param event the event
-         */
-        @EventHandler
-        public void vaultCreated(PlayerVaultCreationEvent event) {
-            // some listener already claimed this event
-            if (event.isValid()) return;
-
-            if (event.getType() == VaultCreationEvent.Type.REGION) {
-                Player player = event.getCause().getPlayer();
-
-                if (!CREATE_VAULT_WORLDGUARD.isAllowed(player)) {
-                    player.sendMessage(LANG.plugin_worldguard_noVaultPerm);
-
-                    return;
-                }
-
-                String regionId = event.getCause().getLine(2);
-                String[] regionComponents = regionId.split("-", 1);
-
-                WorldGuardAccountHolder owner;
-                if (regionComponents.length == 1) {
-                    // try to guess the world
-                    owner = getAccountHolder(regionComponents[0]);
-                } else {
-                    String world = regionComponents[0];
-                    String id = regionComponents[1];
-                    owner = getAccountHolder(world, id);
-                }
-
-                if (owner != null && (owner.region.hasMembersOrOwners() || CREATE_VAULT_ADMIN.isAllowed(player))) {
-                    DefaultDomain regionOwners = owner.region.getOwners();
-
-                    if (regionOwners.contains(player.getName())) {
-                        event.setOwner(owner);
-                        event.setValid(true);
-                    }
-                }
-            }
-        }
     }
 }

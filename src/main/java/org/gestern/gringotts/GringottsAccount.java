@@ -97,7 +97,7 @@ public class GringottsAccount {
     public long getInvBalance() {
         CompletableFuture<Long> cents = getCents();
         CompletableFuture<Long> playerInv = countPlayerInventory();
-        CompletableFuture<Long> f = cents.thenCombine(playerInv, (p, c) -> p + c);
+        CompletableFuture<Long> f = cents.thenCombine(playerInv, Long::sum);
 
         return getTimeout(f);
     }

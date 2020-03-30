@@ -46,7 +46,6 @@ public class GringottsEco implements Eco {
         GringottsAccount gAccount = Gringotts.getInstance().getAccounting().getAccount(owner);
 
         return new ValidAccount(gAccount);
-
     }
 
     /**

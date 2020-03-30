@@ -1,7 +1,6 @@
 package org.gestern.gringotts.dependency.towny;
 
 import com.palmergames.bukkit.towny.Towny;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.dependency.DependencyHandler;
@@ -28,28 +27,4 @@ public abstract class TownyHandler implements DependencyHandler {
             return new InvalidTownyHandler();
         }
     }
-
-    /**
-     * Gets town account holder.
-     *
-     * @param player the player
-     * @return the town account holder
-     */
-    public abstract TownyAccountHolder getTownAccountHolder(Player player);
-
-    /**
-     * Gets nation account holder.
-     *
-     * @param player the player
-     * @return the nation account holder
-     */
-    public abstract TownyAccountHolder getNationAccountHolder(Player player);
-
-    /**
-     * Gets account holder by account name.
-     *
-     * @param name the name
-     * @return the account holder by account name
-     */
-    public abstract TownyAccountHolder getAccountHolderByAccountName(String name);
 }

@@ -7,10 +7,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.gestern.gringotts.*;
 import org.gestern.gringotts.accountholder.AccountHolder;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -43,6 +45,9 @@ public class DerbyDAO implements DAO {
             retrieveChests,
             retrieveChestsForAccount,
             retrieveCents,
+            renameAccount,
+            deleteAccount,
+            deleteAccountChests,
             storeCents;
 
     private DerbyDAO() {
@@ -156,6 +161,15 @@ public class DerbyDAO implements DAO {
                 "insert into account (type, owner, cents) values (?,?,?)");
         retrieveAccount = connection.prepareStatement(
                 "select * from account where owner = ? and type = ?");
+        renameAccount = connection.prepareStatement(
+                "UPDATE account set owner = ? where owner = ? and type = ?"
+        );
+        deleteAccount = connection.prepareStatement(
+                "DELETE FROM account WHERE owner = ? AND type = ?"
+        );
+        deleteAccountChests = connection.prepareStatement(
+                "DELETE FROM accountchest WHERE account = ?"
+        );
         retrieveChests = connection.prepareStatement(
                 "SELECT ac.world, ac.x, ac.y, ac.z, a.type, a.owner " +
                         "FROM accountchest ac JOIN account a ON ac.account = a.id ");
@@ -230,6 +244,28 @@ public class DerbyDAO implements DAO {
         }
     }
 
+    public synchronized boolean renameAccount(@NotNull String type,
+                                              @NotNull AccountHolder holder,
+                                              @NotNull String newName) {
+        return renameAccount(type, holder.getId(), newName);
+    }
+
+    public synchronized boolean renameAccount(@NotNull String type,
+                                              @NotNull String oldName,
+                                              @NotNull String newName) {
+        try {
+            renameAccount.setString(1, newName);
+            renameAccount.setString(2, type);
+            renameAccount.setString(3, oldName);
+
+            int updated = renameAccount.executeUpdate();
+
+            return updated > 0;
+        } catch (SQLException e) {
+            throw new GringottsStorageException("Failed to rename account: " + oldName, e);
+        }
+    }
+
     private boolean deleteAccountChest(String world, int x, int y, int z) throws SQLException {
         deleteAccountChest.setString(1, world);
         deleteAccountChest.setInt(2, x);
@@ -251,6 +287,38 @@ public class DerbyDAO implements DAO {
         // don't store/overwrite if it's already there
         if (hasAccount(owner)) {
             return false;
+        }
+
+        if (Objects.equals(owner.getType(), "town") || Objects.equals(owner.getType(), "nation")) {
+            if (hasAccount(new AccountHolder() {
+                @Override
+                public String getName() {
+                    return null;
+                }
+
+                @Override
+                public void sendMessage(String message) {
+
+                }
+
+                @Override
+                public String getType() {
+                    return owner.getType();
+                }
+
+                @Override
+                public String getId() {
+                    return owner.getType() + "-" + owner.getName();
+                }
+            })) {
+                renameAccount(
+                        owner.getType(),
+                        owner.getType() + "-" + owner.getName(),
+                        owner.getId()
+                );
+
+                return false;
+            }
         }
 
         try {
@@ -503,9 +571,12 @@ public class DerbyDAO implements DAO {
 
                 if (world == null) {
                     deleteAccountChest(worldName, x, y, x); // FIXME: Isn't actually removing the non-existent vaults..
-                    Gringotts.getInstance().getLogger().severe(
-                            "Vault of " + account.owner.getName() + " located on a non-existent world. " +
-                                    "Deleting Vault on world " + worldName);
+
+                    Gringotts.getInstance().getLogger().severe(String.format(
+                            "Vault of %s located on a non-existent world. Deleting Vault on world %s",
+                            owner.getName(),
+                            worldName
+                    ));
 
                     continue;
                 }
@@ -619,13 +690,56 @@ public class DerbyDAO implements DAO {
         shutdown();
     }
 
-    /* (non-Javadoc)
-     * @see org.gestern.gringotts.data.DAO#deleteAccount(org.gestern.gringotts.GringottsAccount)
+    @Override
+    public synchronized boolean deleteAccount(GringottsAccount acc) {
+        return deleteAccount(acc.owner.getType(), acc.owner.getId());
+    }
+
+    /**
+     * Delete account boolean.
+     *
+     * @param type    the type
+     * @param account the account
+     * @return the boolean
      */
     @Override
-    public synchronized void deleteAccount(GringottsAccount acc) {
-        // TODO implement this, mayhaps?
-        throw new RuntimeException("delete account not yet implemented");
+    public boolean deleteAccount(String type, String account) {
+        try {
+            deleteAccount.setString(1, account);
+            deleteAccount.setString(2, type);
+
+            return deleteAccount.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new GringottsStorageException("Failed to delete account: " + account, e);
+        }
+    }
+
+    /**
+     * Delete account chests boolean.
+     *
+     * @param acc the acc
+     * @return the boolean
+     */
+    @Override
+    public boolean deleteAccountChests(GringottsAccount acc) {
+        return deleteAccountChests(acc.owner.getId());
+    }
+
+    /**
+     * Delete account chests boolean.
+     *
+     * @param account the account
+     * @return the boolean
+     */
+    @Override
+    public boolean deleteAccountChests(String account) {
+        try {
+            deleteAccountChests.setString(1, account);
+
+            return deleteAccountChests.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new GringottsStorageException("Failed to delete chests from account: " + account, e);
+        }
     }
 
     /**

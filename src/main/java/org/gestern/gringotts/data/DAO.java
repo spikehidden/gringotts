@@ -4,6 +4,7 @@ import org.gestern.gringotts.AccountChest;
 import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.GringottsStorageException;
 import org.gestern.gringotts.accountholder.AccountHolder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -45,6 +46,26 @@ public interface DAO {
     boolean hasAccount(AccountHolder accountHolder);
 
     /**
+     * Rename account boolean.
+     *
+     * @param type    the type
+     * @param holder  the holder
+     * @param newName the new name
+     * @return the boolean
+     */
+    boolean renameAccount(String type, @NotNull AccountHolder holder, String newName);
+
+    /**
+     * Rename account boolean.
+     *
+     * @param type    the type
+     * @param oldName the old name
+     * @param newName the new name
+     * @return the boolean
+     */
+    boolean renameAccount(String type, String oldName, String newName);
+
+    /**
      * Get set of all chests registered with Gringotts.
      * If a stored chest turns out to be invalid, that chest may be removed from storage.
      *
@@ -82,8 +103,34 @@ public interface DAO {
      * Delete an account and associated data from the storage.
      *
      * @param acc account to delete
+     * @return the boolean
      */
-    void deleteAccount(GringottsAccount acc);
+    boolean deleteAccount(GringottsAccount acc);
+
+    /**
+     * Delete account boolean.
+     *
+     * @param type    the type
+     * @param account the account
+     * @return the boolean
+     */
+    boolean deleteAccount(String type, String account);
+
+    /**
+     * Delete account chests boolean.
+     *
+     * @param acc the acc
+     * @return the boolean
+     */
+    boolean deleteAccountChests(GringottsAccount acc);
+
+    /**
+     * Delete account chests boolean.
+     *
+     * @param account the account
+     * @return the boolean
+     */
+    boolean deleteAccountChests(String account);
 
     /**
      * Shutdown the database connection.

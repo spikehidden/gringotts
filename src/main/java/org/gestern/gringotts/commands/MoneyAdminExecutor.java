@@ -199,7 +199,7 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                         return Stream.of(Bukkit.getOfflinePlayers())
                                 .map(OfflinePlayer::getName)
                                 .filter(Objects::nonNull)
-                                .filter(name -> name.startsWith(args[1]))
+                                .filter(name -> name.startsWith(args[2]))
                                 .collect(Collectors.toList());
                     }
                 }

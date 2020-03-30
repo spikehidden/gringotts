@@ -13,11 +13,9 @@ import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.Util;
 import org.gestern.gringotts.accountholder.AccountHolder;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static org.gestern.gringotts.Configuration.CONF;
@@ -72,18 +70,53 @@ public class EBeanDAO implements DAO {
 
     @Override
     public synchronized boolean storeAccount(GringottsAccount account) {
-        if (hasAccount(account.owner))
+        AccountHolder owner = account.owner;
+
+        if (hasAccount(owner)) {
             return false;
+        }
+
+        if (Objects.equals(owner.getType(), "town") || Objects.equals(owner.getType(), "nation")) {
+            if (hasAccount(new AccountHolder() {
+                @Override
+                public String getName() {
+                    return owner.getName();
+                }
+
+                @Override
+                public void sendMessage(String message) {
+
+                }
+
+                @Override
+                public String getType() {
+                    return owner.getType();
+                }
+
+                @Override
+                public String getId() {
+                    return owner.getType() + "-" + owner.getName();
+                }
+            })) {
+                renameAccount(
+                        owner.getType(),
+                        owner.getType() + "-" + owner.getName(),
+                        owner.getId()
+                );
+
+                return false;
+            }
+        }
 
         EBeanAccount acc = new EBeanAccount();
 
-        acc.setOwner(account.owner.getId());
-        acc.setType(account.owner.getType());
+        acc.setOwner(owner.getId());
+        acc.setType(owner.getType());
 
         // TODO this is business logic and should probably be outside of the DAO implementation.
         // also find a more elegant way of handling different account types
         double startValue = 0;
-        String type = account.owner.getType();
+        String type = owner.getType();
 
         switch (type) {
             case "player":
@@ -189,6 +222,40 @@ public class EBeanDAO implements DAO {
         return deleteChest.execute() > 0;
     }
 
+    /**
+     * Rename account boolean.
+     *
+     * @param type    the type
+     * @param holder  the holder
+     * @param newName the new name
+     * @return the boolean
+     */
+    @Override
+    public boolean renameAccount(String type, @NotNull AccountHolder holder, String newName) {
+        return renameAccount(type, holder.getId(), newName);
+    }
+
+    /**
+     * Rename account boolean.
+     *
+     * @param type    the type
+     * @param oldName the old name
+     * @param newName the new name
+     * @return the boolean
+     */
+    @Override
+    public boolean renameAccount(String type, String oldName, String newName) {
+        SqlUpdate renameAccount = db.createSqlUpdate(
+                "UPDATE gringotts_account SET owner = :newName WHERE owner = :oldName and type = :type"
+        );
+
+        renameAccount.setParameter("type", type);
+        renameAccount.setParameter("oldName", oldName);
+        renameAccount.setParameter("newName", newName);
+
+        return renameAccount.execute() > 0;
+    }
+
     @Override
     public synchronized List<AccountChest> retrieveChests(GringottsAccount account) {
         // TODO ensure world interaction is done in sync task
@@ -251,9 +318,36 @@ public class EBeanDAO implements DAO {
     }
 
     @Override
-    public synchronized void deleteAccount(GringottsAccount acc) {
-        // TODO implement deleteAccount, mayhaps?
-        throw new RuntimeException("delete account not supported yet in EBeanDAO");
+    public synchronized boolean deleteAccount(GringottsAccount acc) {
+        return deleteAccount(acc.owner.getType(), acc.owner.getId());
+    }
+
+    @Override
+    public synchronized boolean deleteAccount(String type, String account) {
+        SqlUpdate renameAccount = db.createSqlUpdate(
+                "DELETE FROM gringotts_account WHERE owner = :account and type = :type"
+        );
+
+        renameAccount.setParameter("type", type);
+        renameAccount.setParameter("account", account);
+
+        return renameAccount.execute() > 0;
+    }
+
+    @Override
+    public synchronized boolean deleteAccountChests(GringottsAccount acc) {
+        return deleteAccountChests(acc.owner.getId());
+    }
+
+    @Override
+    public synchronized boolean deleteAccountChests(String account) {
+        SqlUpdate renameAccount = db.createSqlUpdate(
+                "DELETE FROM gringotts_accountchest WHERE account = :account"
+        );
+
+        renameAccount.setParameter("account", account);
+
+        return renameAccount.execute() > 0;
     }
 
     @Override
