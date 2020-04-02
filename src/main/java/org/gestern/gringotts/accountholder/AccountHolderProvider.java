@@ -2,7 +2,10 @@ package org.gestern.gringotts.accountholder;
 
 
 import org.bukkit.OfflinePlayer;
+import org.gestern.gringotts.event.VaultCreationEvent;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -20,7 +23,7 @@ public interface AccountHolderProvider {
      * @param id id of account holder
      * @return account holder for id
      */
-    AccountHolder getAccountHolder(String id);
+    AccountHolder getAccountHolder(@NotNull String id);
 
     /**
      * Get the AccountHolder object mapped to the given id for this provider.
@@ -28,7 +31,7 @@ public interface AccountHolderProvider {
      * @param uuid id of account holder
      * @return account holder for id
      */
-    AccountHolder getAccountHolder(UUID uuid);
+    AccountHolder getAccountHolder(@NotNull UUID uuid);
 
     /**
      * Get the AccountHolder object mapped to the given id for this provider.
@@ -36,5 +39,19 @@ public interface AccountHolderProvider {
      * @param player the target player
      * @return account holder for id
      */
-    AccountHolder getAccountHolder(OfflinePlayer player);
+    AccountHolder getAccountHolder(@NotNull OfflinePlayer player);
+
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
+    VaultCreationEvent.Type getType();
+
+    /**
+     * Gets account names.
+     *
+     * @return the account names
+     */
+    Set<String> getAccountNames();
 }

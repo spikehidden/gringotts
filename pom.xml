@@ -181,6 +181,13 @@
             <version>1.0.2</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.jojodmo</groupId>
+            <artifactId>customitems-api</artifactId>
+            <version>PLACEHOLDER</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/CustomItemsAPI_PLACEHOLDER.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <properties>

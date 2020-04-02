@@ -1,6 +1,7 @@
 package org.gestern.gringotts.api.impl;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.gestern.gringotts.AccountInventory;
 import org.gestern.gringotts.Gringotts;
@@ -176,6 +177,23 @@ public class GringottsEco implements Eco {
     public Set<String> getBanks() {
         // TODO implement banks
         return Collections.emptySet();
+    }
+
+    /**
+     * Gets account.
+     *
+     * @param id the id
+     * @return the account
+     */
+    @Override
+    public Account getAccount(String id) {
+        String[] parts = id.split(":");
+
+        if (parts.length == 1) {
+            return player(id);
+        }
+
+        return custom(parts[0], parts[1]);
     }
 
     private class InvalidAccount implements Account, BankAccount, PlayerAccount {

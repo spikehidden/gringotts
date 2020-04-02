@@ -9,6 +9,7 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.milkbowl.vault.economy.Economy;
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -24,6 +25,8 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderFactory;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Eco;
+import org.gestern.gringotts.api.dependency.Dependency;
+import org.gestern.gringotts.api.dependency.DependencyProvider;
 import org.gestern.gringotts.api.impl.GringottsEco;
 import org.gestern.gringotts.api.impl.ReserveConnector;
 import org.gestern.gringotts.api.impl.VaultConnector;
@@ -35,6 +38,9 @@ import org.gestern.gringotts.data.DAO;
 import org.gestern.gringotts.data.DerbyDAO;
 import org.gestern.gringotts.data.EBeanDAO;
 import org.gestern.gringotts.data.Migration;
+import org.gestern.gringotts.dependency.DependencyProviderImpl;
+import org.gestern.gringotts.dependency.GenericDependency;
+import org.gestern.gringotts.dependency.towny.TownyDependency;
 import org.gestern.gringotts.event.AccountListener;
 import org.gestern.gringotts.event.PlayerVaultListener;
 import org.gestern.gringotts.event.VaultCreator;
@@ -51,7 +57,6 @@ import java.util.Map;
 
 import static org.gestern.gringotts.Configuration.CONF;
 import static org.gestern.gringotts.Language.LANG;
-import static org.gestern.gringotts.dependency.Dependency.DEP;
 
 /**
  * The type Gringotts.
@@ -61,6 +66,7 @@ public class Gringotts extends JavaPlugin {
     private static Gringotts instance;
 
     private final AccountHolderFactory accountHolderFactory = new AccountHolderFactory();
+    private final DependencyProvider dependencies = new DependencyProviderImpl(this);
     private Accounting accounting;
     private DAO dao;
     private EbeanServer ebean;
@@ -119,9 +125,39 @@ public class Gringotts extends JavaPlugin {
             accounting = new Accounting();
             eco = new GringottsEco();
 
+            if (!(this.dependencies.hasDependency("vault") ||
+                    this.dependencies.hasDependency("reserve"))) {
+                Bukkit.getPluginManager().disablePlugin(this);
+
+                getLogger().warning(
+                        "Neither Vault or Reserve was found. Other plugins may not be able to access Gringotts accounts."
+                );
+
+                return;
+            }
+
+            this.dependencies.onEnable();
+
             registerCommands();
             registerEvents();
-            registerEconomy();
+
+            if (this.dependencies.hasDependency("vault")) {
+                getServer().getServicesManager().register(
+                        Economy.class,
+                        new VaultConnector(),
+                        this,
+                        ServicePriority.Highest
+                );
+
+                getLogger().info("Registered Vault interface.");
+            }
+
+            if (this.dependencies.hasDependency("reserve")) {
+                ReserveConnector.registerProviderSafely();
+
+                getLogger().info("Registered Reserve interface.");
+            }
+
             registerMetrics();
         } catch (GringottsStorageException | GringottsConfigurationException e) {
             getLogger().severe(e.getMessage());
@@ -139,11 +175,94 @@ public class Gringotts extends JavaPlugin {
         getLogger().warning("Gringotts disabled due to startup errors.");
     }
 
+    @Override
+    public void onLoad() {
+        try {
+            if (!this.dependencies.registerDependency(new TownyDependency(
+                    this,
+                    this.dependencies.hookPlugin(
+                            "Towny",
+                            "com.palmergames.bukkit.towny.Towny",
+                            "0.95.0.0"
+                    )
+            ))) {
+                getLogger().warning("Towny plugin is already assigned into the dependencies.");
+            }
+        } catch (NullArgumentException ignored) {
+        } catch (IllegalArgumentException e) {
+            getLogger().warning(
+                    "Looks like Towny plugin is not compatible with Gringotts's code."
+            );
+        }
+
+        this.registerGenericDependency(
+                "vault",
+                "Vault",
+                "net.milkbowl.vault.Vault",
+                "1.5.0"
+        );
+        this.registerGenericDependency(
+                "reserve",
+                "Reserve",
+                "net.tnemc.core.Reserve",
+                "0.1.4.6"
+        );
+
+        this.dependencies.onLoad();
+    }
+
+    /**
+     * Register generic dependency.
+     *
+     * @param id         the id
+     * @param name       the name
+     * @param classPath  the class path
+     * @param minVersion the min version
+     */
+    private void registerGenericDependency(@NotNull String id,
+                                           @NotNull String name,
+                                           @NotNull String classPath,
+                                           @NotNull String minVersion) {
+        try {
+            if (!this.dependencies.registerDependency(new GenericDependency(
+                    this.dependencies.hookPlugin(
+                            name,
+                            classPath,
+                            minVersion
+                    ),
+                    id
+            ))) {
+                getLogger().warning(
+                        name + " plugin is already assigned into the dependencies."
+                );
+            }
+        } catch (NullArgumentException ignored) {
+        } catch (IllegalArgumentException e) {
+            getLogger().warning(
+                    String.format(
+                            "Looks like %1$s plugin is not compatible with Gringotts's code.",
+                            name
+                    )
+            );
+        }
+    }
+
+    /**
+     * Gets dependencies.
+     *
+     * @return the dependencies
+     */
+    public DependencyProvider getDependencies() {
+        return dependencies;
+    }
+
     /**
      * On disable.
      */
     @Override
     public void onDisable() {
+        this.dependencies.onDisable();
+
         // shut down db connection
         try {
             if (dao != null) {
@@ -179,6 +298,9 @@ public class Gringotts extends JavaPlugin {
             int returned = 0;
 
             for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                if (!player.hasPlayedBefore()) {
+                    continue;
+                }
                 if (player.isOp()) {
                     continue;
                 }
@@ -208,12 +330,31 @@ public class Gringotts extends JavaPlugin {
 
             return returned;
         }));
+
+        metrics.addCustomChart(new Metrics.DrilldownPie("dependencies", () -> {
+            Map<String, Map<String, Integer>> returned = new HashMap<>();
+
+            for (Dependency dependency : this.dependencies) {
+                if (dependency.isEnabled()) {
+                    String name = dependency.getName();
+                    String version = dependency.getVersion();
+
+                    if (name != null && version != null) {
+                        returned.put(name, new HashMap<String, Integer>() {{
+                            put(version, 1);
+                        }});
+                    }
+                }
+            }
+
+            return returned;
+        }));
     }
 
     private void registerCommands() {
         registerCommand(new String[]{"balance", "money"}, new MoneyExecutor());
         registerCommand("moneyadmin", new MoneyAdminExecutor());
-        registerCommand("gringotts", new GringottsExecutor());
+        registerCommand("gringotts", new GringottsExecutor(this));
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -258,29 +399,6 @@ public class Gringotts extends JavaPlugin {
     }
 
     /**
-     * Register Gringotts as economy provider for vault/reserve.
-     */
-    private void registerEconomy() {
-        if (DEP.vault.isPresent()) {
-            getServer().getServicesManager().register(Economy.class, new VaultConnector(), this, ServicePriority.Highest);
-
-            getLogger().info("Registered Vault interface.");
-        }
-
-        if (DEP.reserve.isPresent()) {
-            ReserveConnector.registerProviderSafely();
-
-            getLogger().info("Registered Reserve interface.");
-        }
-
-        if (!DEP.vault.isPresent() && !DEP.reserve.isPresent()) {
-            getLogger().info("Neither Vault or Reserve was found. Other plugins may not be able to access Gringotts accounts.");
-
-            Bukkit.getPluginManager().disablePlugin(this);
-        }
-    }
-
-    /**
      * Register an accountholder provider with Gringotts.
      * This is necessary for Gringotts to find and create
      * account holders of any non-player type. Registering
@@ -320,8 +438,9 @@ public class Gringotts extends JavaPlugin {
 
     /**
      * Reload config.
+     * <p>
+     * override to handle custom config logic and language loading
      */
-// override to handle custom config logic and language loading
     @Override
     public void reloadConfig() {
         super.reloadConfig();

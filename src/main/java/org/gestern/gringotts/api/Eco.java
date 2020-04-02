@@ -1,8 +1,12 @@
 package org.gestern.gringotts.api;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * The interface Eco.
+ */
 public interface Eco {
 
     /**
@@ -72,7 +76,7 @@ public interface Eco {
     /**
      * Access a Towny town account with the given id.
      *
-     * @param id/name of a Towny town
+     * @param id /name of a Towny town
      * @return account for a Towny town
      */
     Account town(String id);
@@ -105,4 +109,12 @@ public interface Eco {
      * @return a set of the names of all banks currently registered by the economy.
      */
     Set<String> getBanks();
+
+    /**
+     * Gets account.
+     *
+     * @param id the id
+     * @return the account
+     */
+    Account getAccount(String id);
 }

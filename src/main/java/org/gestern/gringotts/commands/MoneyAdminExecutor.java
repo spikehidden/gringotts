@@ -5,13 +5,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.TransactionResult;
+import org.gestern.gringotts.event.VaultCreationEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,7 +26,7 @@ import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
  * Admin commands for managing ingame aspects.
  */
 public class MoneyAdminExecutor extends GringottsAbstractExecutor {
-    private static final List<String> commands = Arrays.asList("add", "rm", "b");
+    private static final List<String> commands = Arrays.asList("balance", "add", "remove");
 
     /**
      * Executes the given command, returning its success.
@@ -47,101 +51,122 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
             return false;
         }
 
-        String command = args[0];
+        switch (args[0].toLowerCase()) {
+            case "balance":
+            case "bal":
+            case "b": {
+                if (args.length > 2) {
+                    return false;
+                }
 
-        // admin command: x of player / faction
-        if ("b".equalsIgnoreCase(command)) {
-            String targetAccountHolderStr = args[1];
+                String targetAccount = args[1];
 
-            // explicit or automatic account type
-            Account target;
-            if (args.length == 3) {
-                target = eco.custom(args[2], targetAccountHolderStr);
-            } else {
-                target = eco.account(targetAccountHolderStr);
+                Account target = eco.getAccount(targetAccount);
+
+                if (!target.exists()) {
+                    sendInvalidAccountMessage(sender, targetAccount);
+
+                    return false;
+                }
+
+                String formattedBalance = eco.currency().format(target.balance());
+                String senderMessage = LANG.moneyadmin_b
+                        .replace(TAG_BALANCE, formattedBalance)
+                        .replace(TAG_PLAYER, targetAccount);
+
+                sender.sendMessage(senderMessage);
+
+                return true;
             }
+            case "add": {
+                if (args.length != 3) {
+                    return false;
+                }
 
-            if (!target.exists()) {
-                sendInvalidAccountMessage(sender, targetAccountHolderStr);
-                return false;
-            }
+                String targetAccount = args[1];
 
-            String formattedBalance = eco.currency().format(target.balance());
-            String senderMessage = LANG.moneyadmin_b
-                    .replace(TAG_BALANCE, formattedBalance)
-                    .replace(TAG_PLAYER, targetAccountHolderStr);
+                Account target = eco.getAccount(targetAccount);
 
-            sender.sendMessage(senderMessage);
+                if (!target.exists()) {
+                    sendInvalidAccountMessage(sender, targetAccount);
 
-            return true;
-        }
+                    return false;
+                }
 
-        // moneyadmin add/remove
-        if (args.length >= 3) {
-            String amountStr = args[1];
-            double value;
+                double amount;
 
-            try {
-                value = Double.parseDouble(amountStr);
-            } catch (NumberFormatException ignored) {
-                return false;
-            }
+                try {
+                    amount = Double.parseDouble(args[2]);
+                } catch (NumberFormatException e) {
+                    return false;
+                }
 
-            String targetAccountHolderStr = args[2];
-            Account target;
+                String formattedAmount = eco.currency().format(amount);
+                TransactionResult added = target.add(amount);
 
-            if (args.length == 4) {
-                target = eco.custom(args[3], targetAccountHolderStr);
-            } else {
-                target = eco.account(targetAccountHolderStr);
-            }
-
-            if (!target.exists()) {
-                sendInvalidAccountMessage(sender, targetAccountHolderStr);
-
-                return false;
-            }
-
-            String formatValue = eco.currency().format(value);
-
-            if ("add".equalsIgnoreCase(command)) {
-                TransactionResult added = target.add(value);
                 if (added == SUCCESS) {
-                    String senderMessage = LANG.moneyadmin_add_sender.replace(TAG_VALUE, formatValue).replace
-                            (TAG_PLAYER, target.id());
+                    String senderMessage = LANG.moneyadmin_add_sender
+                            .replace(TAG_VALUE, formattedAmount)
+                            .replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(senderMessage);
 
                     String targetMessage = LANG.moneyadmin_add_target
-                            .replace(TAG_VALUE, formatValue);
+                            .replace(TAG_VALUE, formattedAmount);
 
                     target.message(targetMessage);
                 } else {
-                    String errorMessage = LANG.moneyadmin_add_error.replace(TAG_VALUE, formatValue).replace
-                            (TAG_PLAYER, target.id());
+                    String errorMessage = LANG.moneyadmin_add_error
+                            .replace(TAG_VALUE, targetAccount)
+                            .replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(errorMessage);
                 }
 
                 return true;
+            }
+            case "remove":
+            case "rm": {
+                if (args.length != 3) {
+                    return false;
+                }
 
-            } else if ("rm".equalsIgnoreCase(command)) {
-                TransactionResult removed = target.remove(value);
+                String targetAccount = args[1];
+
+                Account target = eco.getAccount(targetAccount);
+
+                if (!target.exists()) {
+                    sendInvalidAccountMessage(sender, targetAccount);
+
+                    return false;
+                }
+
+                double amount;
+
+                try {
+                    amount = Double.parseDouble(args[2]);
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+
+                String formattedAmount = eco.currency().format(amount);
+                TransactionResult removed = target.remove(amount);
+
                 if (removed == SUCCESS) {
                     String senderMessage = LANG.moneyadmin_rm_sender
-                            .replace(TAG_VALUE, formatValue)
-                            .replace(TAG_PLAYER, target.id());
+                            .replace(TAG_VALUE, formattedAmount)
+                            .replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(senderMessage);
 
                     String targetMessage = LANG.moneyadmin_rm_target
-                            .replace(TAG_VALUE, formatValue);
+                            .replace(TAG_VALUE, formattedAmount);
 
                     target.message(targetMessage);
                 } else {
                     String errorMessage = LANG.moneyadmin_rm_error
-                            .replace(TAG_VALUE, formatValue)
-                            .replace(TAG_PLAYER, target.id());
+                            .replace(TAG_VALUE, formattedAmount)
+                            .replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(errorMessage);
                 }
@@ -184,23 +209,39 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                         .collect(Collectors.toList());
             }
             case 2: {
-                if ("b".equals(cmd)) {
-                    return Stream.of(Bukkit.getOfflinePlayers())
-                            .map(OfflinePlayer::getName)
-                            .filter(Objects::nonNull)
-                            .filter(name -> name.startsWith(args[1]))
-                            .collect(Collectors.toList());
-                }
-            }
-            case 3: {
                 switch (cmd) {
+                    case "b":
+                    case "bal":
+                    case "balance":
                     case "add":
+                    case "remove":
                     case "rm": {
-                        return Stream.of(Bukkit.getOfflinePlayers())
-                                .map(OfflinePlayer::getName)
-                                .filter(Objects::nonNull)
-                                .filter(name -> name.startsWith(args[2]))
-                                .collect(Collectors.toList());
+                        String[] steps = (args[1] + " ").split(":");
+
+                        if (steps.length == 1) {
+                            return Stream.of(Bukkit.getOfflinePlayers())
+                                    .map(OfflinePlayer::getName)
+                                    .filter(Objects::nonNull)
+                                    .filter(name -> name.startsWith(args[1]))
+                                    .collect(Collectors.toList());
+                        }
+
+                        try {
+                            VaultCreationEvent.Type type = VaultCreationEvent.Type.valueOf(steps[0].toUpperCase());
+
+                            Optional<AccountHolderProvider> providerOptional = Gringotts.getInstance()
+                                    .getAccountHolderFactory()
+                                    .getProvider(type);
+
+                            if (providerOptional.isPresent()) {
+                                return providerOptional.get().getAccountNames().stream()
+                                        .filter(Objects::nonNull)
+                                        .map(s -> type.getId() + ":" + s)
+                                        .filter(name -> name.startsWith(args[1]))
+                                        .collect(Collectors.toList());
+                            }
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }

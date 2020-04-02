@@ -1,11 +1,23 @@
 package org.gestern.gringotts.commands;
 
 import com.google.common.collect.Lists;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import org.gestern.gringotts.Configuration;
+import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.api.dependency.Dependency;
+import org.gestern.gringotts.currency.Denomination;
+import org.gestern.gringotts.currency.GringottsCurrency;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +27,17 @@ import static org.gestern.gringotts.Language.LANG;
  * Administrative commands not related to ingame money.
  */
 public class GringottsExecutor extends GringottsAbstractExecutor {
-    private static final List<String> commands = Collections.singletonList("reload");
+    private static final List<String> commands = Arrays.asList("reload", "dependencies", "denominations");
+    private final Gringotts gringotts;
+
+    /**
+     * Instantiates a new Gringotts executor.
+     *
+     * @param gringotts the gringotts
+     */
+    public GringottsExecutor(Gringotts gringotts) {
+        this.gringotts = gringotts;
+    }
 
     /**
      * Executes the given command, returning its success.
@@ -36,11 +58,129 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
                              String[] args) {
         testPermission(sender, command, "gringotts.admin");
 
-        if (args.length >= 1 && "reload".equalsIgnoreCase(args[0])) {
-            plugin.reloadConfig();
-            sender.sendMessage(LANG.reload);
+        if (args.length < 1) {
+            return false;
+        }
 
-            return true;
+        switch (args[0].toLowerCase()) {
+            case "reload": {
+                plugin.reloadConfig();
+                sender.sendMessage(LANG.reload);
+
+                return true;
+            }
+            case "deps":
+            case "dependencies": {
+                if (sender instanceof Player) {
+                    ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+
+                    BookMeta meta = (BookMeta) book.getItemMeta();
+
+                    meta.setAuthor("Gringotts");
+                    meta.setTitle("Gringotts Dependencies");
+
+                    ComponentBuilder builder = new ComponentBuilder();
+
+                    builder.append("Gringotts Dependencies")
+                            .bold(true)
+                            .reset()
+                            .append("\n\n");
+
+                    for (Dependency dependency : this.gringotts.getDependencies()) {
+                        builder.reset().append(new ComponentBuilder(" - ").append(
+                                new ComponentBuilder(
+                                        dependency.getName()
+                                ).color(
+                                        dependency.isEnabled() ? ChatColor.DARK_GREEN : ChatColor.RED
+                                ).underlined(true).event(new HoverEvent(
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        new ComponentBuilder(
+                                                "Identification: "
+                                        ).append(new ComponentBuilder(dependency.getId())
+                                                .bold(true)
+                                                .create()
+                                        ).append("\n").reset().append(new ComponentBuilder(
+                                                        "Version: "
+                                                ).append(new ComponentBuilder(dependency.getVersion())
+                                                        .bold(true)
+                                                        .create()
+                                                ).create()
+                                        ).create()
+                                )).create()
+                        ).append("\n").create());
+                    }
+
+                    meta.spigot().addPage(builder.create());
+
+                    book.setItemMeta(meta);
+
+                    ((Player) sender).openBook(book);
+                }
+                break;
+            }
+            case "den":
+            case "denominations": {
+                if (sender instanceof Player) {
+                    ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+
+                    BookMeta meta = (BookMeta) book.getItemMeta();
+
+                    meta.setAuthor("Gringotts");
+                    meta.setTitle("Gringotts Denominations");
+
+                    GringottsCurrency currency = Configuration.CONF.getCurrency();
+
+                    meta.spigot().addPage(new ComponentBuilder().append("Gringotts Denominations")
+                            .bold(true)
+                            .reset()
+                            .append("\n\n")
+                            .append("Singular Name: ")
+                            .append(new ComponentBuilder(currency.getName()).bold(true).create())
+                            .append("\n\n")
+                            .reset()
+                            .append("Plural Name: ")
+                            .append(new ComponentBuilder(currency.getNamePlural()).bold(true).create())
+                            .append("\n\n")
+                            .reset()
+                            .append("Digits: ")
+                            .append(new ComponentBuilder(String.valueOf(currency.getDigits())).bold(true).create())
+                            .append("\n\n")
+                            .create());
+
+                    ComponentBuilder builder = new ComponentBuilder()
+                            .append("Denominations: ")
+                            .append("\n");
+
+                    for (Denomination denomination : currency.getDenominations()) {
+                        builder.reset().append(new ComponentBuilder(" - ").append(
+                                new ComponentBuilder(
+                                        denomination.getUnitName()
+                                ).underlined(true).event(new HoverEvent(
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        new ComponentBuilder(
+                                                "Value: "
+                                        ).append(new ComponentBuilder(String.valueOf(currency.getDisplayValue(
+                                                denomination.getValue()
+                                                ))).bold(true).create()
+                                        ).append("\n").reset().append(new ComponentBuilder(
+                                                        "Material: "
+                                                ).append(new ComponentBuilder(
+                                                        denomination.getKey().type.getType().getKey().toString()
+                                                ).bold(true).create()
+                                                ).create()
+                                        ).create()
+                                )).create()
+                        ).append("\n").create());
+                    }
+
+                    meta.spigot().addPage(builder.create());
+
+                    book.setItemMeta(meta);
+
+                    ((Player) sender).openBook(book);
+                }
+                break;
+            }
         }
 
         return false;

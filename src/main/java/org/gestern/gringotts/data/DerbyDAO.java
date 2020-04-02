@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.gestern.gringotts.*;
 import org.gestern.gringotts.accountholder.AccountHolder;
+import org.gestern.gringotts.event.VaultCreationEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -609,6 +610,27 @@ public class DerbyDAO implements DAO {
         }
 
         return chests;
+    }
+
+    /**
+     * Gets accounts.
+     *
+     * @return the accounts
+     */
+    @Override
+    public List<String> getAccounts() {
+        return null;
+    }
+
+    /**
+     * Gets accounts.
+     *
+     * @param type the type
+     * @return the accounts
+     */
+    @Override
+    public List<String> getAccounts(VaultCreationEvent.Type type) {
+        return null;
     }
 
     /* (non-Javadoc)

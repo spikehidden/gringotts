@@ -13,6 +13,7 @@ import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.Util;
 import org.gestern.gringotts.accountholder.AccountHolder;
+import org.gestern.gringotts.event.VaultCreationEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -20,12 +21,20 @@ import java.util.logging.Logger;
 
 import static org.gestern.gringotts.Configuration.CONF;
 
+/**
+ * The type E bean dao.
+ */
 public class EBeanDAO implements DAO {
 
     private static EBeanDAO dao;
     private final EbeanServer db = Gringotts.getInstance().getDatabase();
     private final Logger log = Gringotts.getInstance().getLogger();
 
+    /**
+     * Gets dao.
+     *
+     * @return the dao
+     */
     public static EBeanDAO getDao() {
         if (dao != null) {
             return dao;
@@ -38,6 +47,8 @@ public class EBeanDAO implements DAO {
 
     /**
      * The classes comprising the DB model, required for the EBean DDL ("data description language").
+     *
+     * @return the database classes
      */
     public static List<Class<?>> getDatabaseClasses() {
         return Arrays.asList(EBeanAccount.class, EBeanAccountChest.class);
@@ -293,6 +304,56 @@ public class EBeanDAO implements DAO {
         }
 
         return chests;
+    }
+
+    /**
+     * Gets accounts.
+     *
+     * @return the accounts
+     */
+    @Override
+    public List<String> getAccounts() {
+        SqlQuery getAccounts = db.createSqlQuery("SELECT type, owner FROM gringotts_account");
+
+        List<String> returned = new LinkedList<>();
+
+        for (SqlRow result : getAccounts.findSet()) {
+            String type = result.getString("type");
+            String owner = result.getString("owner");
+
+            if (type != null && owner != null) {
+                returned.add(type + ":" + owner);
+            }
+        }
+
+        return returned;
+    }
+
+    /**
+     * Gets accounts.
+     *
+     * @param type the type
+     * @return the accounts
+     */
+    @Override
+    public List<String> getAccounts(VaultCreationEvent.Type type) {
+        SqlQuery getAccounts = db.createSqlQuery("SELECT owner FROM gringotts_account WHERE type = :type");
+
+        String typeId = type.getId();
+
+        getAccounts.setParameter("type", typeId);
+
+        List<String> returned = new LinkedList<>();
+
+        for (SqlRow result : getAccounts.findSet()) {
+            String owner = result.getString("owner");
+
+            if (owner != null) {
+                returned.add(typeId + ":" + owner);
+            }
+        }
+
+        return returned;
     }
 
     @Override

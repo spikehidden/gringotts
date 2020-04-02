@@ -2,20 +2,25 @@ package org.gestern.gringotts.accountholder;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.gestern.gringotts.event.VaultCreationEvent;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Manages creating various types of AccountHolder centrally.
  *
  * @author jast
  */
-public class AccountHolderFactory {
+public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
 
     private final Map<String, AccountHolderProvider> accountHolderProviders = new LinkedHashMap<>();
 
+    /**
+     * Instantiates a new Account holder factory.
+     */
     public AccountHolderFactory() {
         // linked HashMap maintains iteration order -> prefer player to be checked first
         accountHolderProviders.put("player", new PlayerAccountHolderProvider());
@@ -63,7 +68,7 @@ public class AccountHolderFactory {
     /**
      * Get an account holder with automatically determined type, based on the owner's id.
      *
-     * @param uuid the user id
+     * @param player the user id
      * @return account holder for the given owner name, or null if none could be determined
      */
     public AccountHolder get(OfflinePlayer player) {
@@ -83,8 +88,7 @@ public class AccountHolderFactory {
      *
      * @param type  type of the account
      * @param owner name of the account holder
-     * @return account holder of given type with given owner name, or null if none could be determined or type is not
-     * supported.
+     * @return account holder of given type with given owner name, or null if none could be determined or type is not supported.
      */
     public AccountHolder get(String type, String owner) {
         AccountHolderProvider provider = accountHolderProviders.get(type);
@@ -97,14 +101,51 @@ public class AccountHolderFactory {
         return accountHolder;
     }
 
+    /**
+     * Register account holder provider.
+     *
+     * @param type     the type
+     * @param provider the provider
+     */
     public void registerAccountHolderProvider(String type, AccountHolderProvider provider) {
         accountHolderProviders.put(type, provider);
+    }
+
+    /**
+     * Gets provider.
+     *
+     * @param type the type
+     * @return the provider
+     */
+    public Optional<AccountHolderProvider> getProvider(VaultCreationEvent.Type type) {
+        return this.getProvider(type.getId());
+    }
+
+    /**
+     * Gets provider.
+     *
+     * @param type the type
+     * @return the provider
+     */
+    public Optional<AccountHolderProvider> getProvider(String type) {
+        return Optional.ofNullable(this.accountHolderProviders.getOrDefault(type, null));
+    }
+
+    /**
+     * Returns an iterator over elements of type {@code T}.
+     *
+     * @return an Iterator.
+     */
+    @NotNull
+    @Override
+    public Iterator<AccountHolderProvider> iterator() {
+        return accountHolderProviders.values().iterator();
     }
 
     private static class PlayerAccountHolderProvider implements AccountHolderProvider {
 
         @Override
-        public AccountHolder getAccountHolder(String uuidOrName) {
+        public AccountHolder getAccountHolder(@NotNull String uuidOrName) {
             if (uuidOrName == null) {
                 return null;
             }
@@ -125,7 +166,7 @@ public class AccountHolderFactory {
         }
 
         @Override
-        public AccountHolder getAccountHolder(UUID uuid) {
+        public AccountHolder getAccountHolder(@NotNull UUID uuid) {
             if (uuid == null) {
                 return null;
             }
@@ -141,7 +182,7 @@ public class AccountHolderFactory {
         }
 
         @Override
-        public AccountHolder getAccountHolder(OfflinePlayer player) {
+        public AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
             if (player == null) {
                 return null;
             }
@@ -152,6 +193,28 @@ public class AccountHolderFactory {
             } else {
                 return null;
             }
+        }
+
+        /**
+         * Gets type.
+         *
+         * @return the type
+         */
+        @Override
+        public VaultCreationEvent.Type getType() {
+            return VaultCreationEvent.Type.PLAYER;
+        }
+
+        /**
+         * Gets account names.
+         *
+         * @return the account names
+         */
+        @Override
+        public Set<String> getAccountNames() {
+            return Stream.of(Bukkit.getOfflinePlayers())
+                    .map(OfflinePlayer::getName)
+                    .collect(Collectors.toSet());
         }
     }
 
