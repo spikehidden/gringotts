@@ -61,6 +61,6 @@ public class TownAccountHolder implements AccountHolder {
      */
     @Override
     public String getId() {
-        return this.town.getUuid().toString();
+        return this.town.getUUID().toString();
     }
 }

@@ -1,7 +1,7 @@
 package org.gestern.gringotts;
 
-import io.papermc.lib.PaperLib;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -10,6 +10,8 @@ import org.bukkit.block.Sign;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+
+import java.util.List;
 
 import static org.gestern.gringotts.Configuration.CONF;
 
@@ -56,10 +58,7 @@ public class AccountChest {
         Block block = Util.chestBlock(sign);
 
         if (block != null) {
-            BlockState blockState = PaperLib.getBlockState(
-                    block,
-                    false
-            ).getState();
+            BlockState blockState = block.getState(false);
 
             if (blockState instanceof InventoryHolder) {
                 return (InventoryHolder) blockState;
@@ -107,16 +106,16 @@ public class AccountChest {
      *
      * @return true if valid, false if not and was removed from storage.
      */
-    private boolean updateValid() {
+    private boolean updateInvalid() {
         if (notValid()) {
             Gringotts.getInstance()
                     .getLogger()
                     .info("Destroying orphaned vault: " + this);
             destroy();
 
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -126,7 +125,7 @@ public class AccountChest {
      * @return balance of this chest
      */
     public long balance() {
-        if (!updateValid()) {
+        if (updateInvalid()) {
             return 0;
         }
 
@@ -147,7 +146,7 @@ public class AccountChest {
      * @return amount actually added
      */
     public long add(long value) {
-        if (!updateValid()) {
+        if (updateInvalid()) {
             return 0;
         }
 
@@ -165,7 +164,7 @@ public class AccountChest {
      * @return amount actually removed from this chest
      */
     public long remove(long value) {
-        if (!updateValid()) {
+        if (updateInvalid()) {
             return 0;
         }
 
@@ -188,13 +187,37 @@ public class AccountChest {
             return true;
         }
 
-        // TODO refactor: common definition of valid vault types
-        String[] lines = sign.getLines();
-        String line0 = lines[0].toLowerCase().trim();
+        List<Component> lines = sign.lines();
 
-        return !line0.matches(CONF.vaultPattern) ||
-                lines[2] == null ||
-                lines[2].length() == 0 || chest() == null;
+        if (lines.size() < 3) {
+            return true;
+        }
+
+        Component line0 = lines.get(0);
+
+        if (line0 == null) {
+            return true;
+        }
+
+        String line0String = PlainTextComponentSerializer.plainText().serialize(line0);
+
+        if (!line0String.matches(CONF.vaultPattern)) {
+            return true;
+        }
+
+        Component line2 = lines.get(2);
+
+        if (line2 == null) {
+            return true;
+        }
+
+        String line2String = PlainTextComponentSerializer.plainText().serialize(line2);
+
+        if (line2String.length() == 0) {
+            return true;
+        }
+
+        return chest() == null;
     }
 
     /**
@@ -308,7 +331,7 @@ public class AccountChest {
      */
     public boolean connected(AccountChest chest) {
         // no valid account chest anymore -> no connection
-        if (!updateValid()) {
+        if (updateInvalid()) {
             return false;
         }
 
@@ -346,7 +369,10 @@ public class AccountChest {
     }
 
     public void updateSign() {
-        this.sign.setLine(2, this.account.owner.getName());
+        this.sign.line(
+                2,
+                Component.text(this.account.owner.getName())
+        );
 
         this.sign.update();
     }

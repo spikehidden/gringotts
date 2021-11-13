@@ -214,7 +214,7 @@ public enum Configuration {
                             Collections.singletonList(denomConf.getString("lore")) :
                             denomConf.getStringList("lore");
 
-                    if (lore != null && !lore.isEmpty()) {
+                    if (!lore.isEmpty()) {
                         List<String> loreTranslated = new ArrayList<>(lore.size());
 
                         for (String l : lore) {
@@ -222,6 +222,10 @@ public enum Configuration {
                         }
 
                         meta.setLore(loreTranslated);
+                    }
+
+                    if (denomConf.contains("custom_model_data") && denomConf.isInt("custom_model_data")) {
+                        meta.setCustomModelData(denomConf.getInt("custom_model_data"));
                     }
 
                     denomType.setItemMeta(meta);

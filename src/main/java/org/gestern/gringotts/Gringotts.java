@@ -12,6 +12,9 @@ import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.AdvancedPie;
+import org.bstats.charts.DrilldownPie;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
@@ -67,9 +70,9 @@ public class Gringotts extends JavaPlugin {
 
     private final AccountHolderFactory accountHolderFactory = new AccountHolderFactory();
     private final DependencyProvider dependencies = new DependencyProviderImpl(this);
+    private final EbeanServer ebean;
     private Accounting accounting;
     private DAO dao;
-    private EbeanServer ebean;
     private Eco eco;
 
     /**
@@ -280,7 +283,7 @@ public class Gringotts extends JavaPlugin {
         Metrics metrics = new Metrics(this, 4998);
 
         // Tracking how many vaults exists.
-        metrics.addCustomChart(new Metrics.SingleLineChart("vaultsChart", () -> {
+        metrics.addCustomChart(new SingleLineChart("vaultsChart", () -> {
             int returned = 0;
 
             for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
@@ -294,7 +297,7 @@ public class Gringotts extends JavaPlugin {
         }));
 
         // Tracking the balance of the users exists.
-        metrics.addCustomChart(new Metrics.SingleLineChart("economyChart", () -> {
+        metrics.addCustomChart(new SingleLineChart("economyChart", () -> {
             int returned = 0;
 
             for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
@@ -315,7 +318,7 @@ public class Gringotts extends JavaPlugin {
         }));
 
         // Tracking the exists denominations.
-        metrics.addCustomChart(new Metrics.AdvancedPie("denominationsChart", () -> {
+        metrics.addCustomChart(new AdvancedPie("denominationsChart", () -> {
             Map<String, Integer> returned = new HashMap<>();
 
             for (Denomination denomination : CONF.getCurrency().getDenominations()) {
@@ -331,7 +334,7 @@ public class Gringotts extends JavaPlugin {
             return returned;
         }));
 
-        metrics.addCustomChart(new Metrics.DrilldownPie("dependencies", () -> {
+        metrics.addCustomChart(new DrilldownPie("dependencies", () -> {
             Map<String, Map<String, Integer>> returned = new HashMap<>();
 
             for (Dependency dependency : this.dependencies) {
@@ -472,8 +475,7 @@ public class Gringotts extends JavaPlugin {
         if (!migration.isDerbyMigrated() && (derbyDAO = DerbyDAO.getDao()) != null) {
             getLogger().info("Derby database detected. Migrating to Bukkit-supported database ...");
 
-            EBeanDAO eBeanDAO = EBeanDAO.getDao();
-            migration.doDerbyMigration(derbyDAO, eBeanDAO);
+            migration.doDerbyMigration(derbyDAO);
         }
 
         if (!migration.isUUIDMigrated()) {
@@ -539,16 +541,6 @@ public class Gringotts extends JavaPlugin {
 
         gen.runScript(false, gen.generateCreateDdl());
     }
-
-//    /**
-//     * Remove ddl.
-//     */
-//    protected void removeDDL() {
-//        SpiEbeanServer server = (SpiEbeanServer) getDatabase();
-//        DdlGenerator gen = server.getDdlGenerator();
-//
-//        gen.runScript(true, gen.generateDropDdl());
-//    }
 
     private String replaceDatabaseString(String input) {
         input = input.replaceAll(

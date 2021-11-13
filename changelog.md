@@ -1,23 +1,44 @@
 Gringotts Changelog
 ===================
 
-v2.11.1
+v2.12.1
 ---
 ###### Upcoming
-* The first out of Snapshot version after a long long time.
-* Update for Spigot v1.14.4-SNAPSHOT.
-* Clean up code.
-* Update Changelog file.
-* Update plugin.yml so can support soft dependencies.
-* Update bstats dependency to v1.5
+* ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
+
+
+v2.12.0
+---
+###### Nov 13 2021
+* Remove Spigot support
+* Support Minecraft 1.17.x
+* Add Paper support for 1.17.1-R0.1-SNAPSHOT
+* Clean up code
+* Update changelog file
+* Add soft dependencies to plugin.yml
+* Update dependencies/plugins
+  * bstats to v2.2.1
+  * Towny to v0.97.2.0
+  * Reserve to v0.1.5.3-SNAPSHOT-4
+  * WorldGuard to v7.0.7-SNAPSHOT
+  * Jetbrains Annotations to v22.0.0
+  * maven-shade-plugin to v3.2.4
+* Remove dependencies/plugins
+  * CustomItemsAPI
+  * junit
+  * buildnumber-maven-plugin
+  * bukkit-migration-tools
+  * worldedit-bukkit
+  * paperlib
+  * derby
+* Implement a local version of UUIDFetcher
 * Track how many vault exists for bstats. https://bstats.org/plugin/bukkit/Gringotts
 * Track the overall economy of the server for bstats. https://bstats.org/plugin/bukkit/Gringotts
-* ! Multiple users per vault.
-* ! Support metadata identification for items. Idea by [killrrkillrr](https://www.spigotmc.org/members/killrrkillrr.633320/) on spigot.org
-* ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
-* ! Configurable tag name for the vault signs. Example: [\<name\>]. Idea by [mc_tech](https://www.spigotmc.org/members/mc_tech.587361/) on spigot.org
-* Better support of UUID system.
-> Yes, version 2.10 got skipped, like Apple skipped iPhone 9.
+* Support metadata identification for items. Idea by [killrrkillrr](https://www.spigotmc.org/members/killrrkillrr.633320/) on spigot.org
+  * custom_model_data support
+  * added examples on config.yml
+* Configurable tag name for the vault signs. Example: [\<name\>]. Idea by [mc_tech](https://www.spigotmc.org/members/mc_tech.587361/) on spigot.org
+* Better implementation of Minecraft's UUID system
 
 v2.11.1-SNAPSHOT
 ---

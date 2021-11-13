@@ -12,7 +12,7 @@ import javax.persistence.UniqueConstraint;
 @UniqueConstraint(columnNames = {"type", "owner"})
 public class EBeanAccount {
     @Id
-    int    id;
+    int id;
     /**
      * Type string.
      */
@@ -27,7 +27,7 @@ public class EBeanAccount {
      * Virtual balance.
      */
     @NotNull
-    long   cents;
+    long cents;
 
     public int getId() {
         return id;

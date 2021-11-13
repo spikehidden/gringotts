@@ -146,10 +146,6 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
 
         @Override
         public AccountHolder getAccountHolder(@NotNull String uuidOrName) {
-            if (uuidOrName == null) {
-                return null;
-            }
-
             try {
                 return getAccountHolder(UUID.fromString(uuidOrName));
             } catch (IllegalArgumentException ignored) {
@@ -167,10 +163,6 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
 
         @Override
         public AccountHolder getAccountHolder(@NotNull UUID uuid) {
-            if (uuid == null) {
-                return null;
-            }
-
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
             //noinspection ConstantConditions
@@ -183,10 +175,6 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
 
         @Override
         public AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
-            if (player == null) {
-                return null;
-            }
-
             // if this player has ever played on the server, they are a legit account holder
             if (player.isOnline() || player.hasPlayedBefore()) {
                 return new PlayerAccountHolder(player);

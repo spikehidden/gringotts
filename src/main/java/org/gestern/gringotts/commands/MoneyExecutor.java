@@ -47,7 +47,7 @@ public class MoneyExecutor extends GringottsAbstractExecutor {
 
         String command = args[0];
 
-        double value = 0;
+        double value;
 
         if (args.length == 2) {
             try {

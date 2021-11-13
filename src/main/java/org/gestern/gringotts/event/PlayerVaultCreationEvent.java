@@ -18,6 +18,11 @@ public class PlayerVaultCreationEvent extends VaultCreationEvent {
         this.cause = cause;
     }
 
+    @SuppressWarnings("unused")
+    public static HandlerList getHandlerList() {
+        return VaultCreationEvent.handlers;
+    }
+
     /**
      * Get the player involved in creating the vault.
      *
@@ -25,12 +30,6 @@ public class PlayerVaultCreationEvent extends VaultCreationEvent {
      */
     public SignChangeEvent getCause() {
         return cause;
-    }
-
-    public static HandlerList getHandlerList() {
-        return VaultCreationEvent.handlers;
-        // TODO ensure we can actually have superclass handle these safely
-        // TODO find out what I meant by that?
     }
 
 }

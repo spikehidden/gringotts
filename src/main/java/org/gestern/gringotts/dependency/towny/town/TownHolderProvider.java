@@ -1,6 +1,7 @@
 package org.gestern.gringotts.dependency.towny.town;
 
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.RenameTownEvent;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -92,13 +93,19 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
     @Override
     public AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
         try {
-            Resident resident = TownyAPI.getInstance().getDataSource().getResident(player.getName());
+            Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
+
+            if (resident == null) {
+                return null;
+            }
+
             Town town = resident.getTown();
 
             return getAccountHolder(town);
         } catch (NotRegisteredException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 

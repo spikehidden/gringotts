@@ -3,6 +3,8 @@ package org.gestern.gringotts.dependency.towny;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -117,11 +119,16 @@ public class TownyDependency implements Dependency, Listener {
             return;
         }
 
-        String ownerName = event.getCause().getLine(2);
+        Component line2 = event.getCause().line(2);
+
+        if (line2 == null) {
+            return;
+        }
+
+        String ownerName = PlainTextComponentSerializer.plainText().serialize(line2);
         Player player = event.getCause().getPlayer();
-        boolean forOther = ownerName != null &&
-                ownerName.length() > 0 &&
-                Permissions.CREATE_VAULT_ADMIN.isAllowed(player);
+
+        boolean forOther = ownerName.length() > 0 && Permissions.CREATE_VAULT_ADMIN.isAllowed(player);
 
         AccountHolder owner;
 

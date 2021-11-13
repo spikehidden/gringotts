@@ -1,6 +1,7 @@
 package org.gestern.gringotts.accountholder;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -26,7 +27,11 @@ public class PlayerAccountHolder implements AccountHolder {
     @Override
     public void sendMessage(String message) {
         if (accountHolder.isOnline()) {
-            accountHolder.getPlayer().sendMessage(message);
+            Player player = accountHolder.getPlayer();
+
+            if (player != null) {
+                player.sendMessage(message);
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package org.gestern.gringotts.commands;
 
 import com.google.common.collect.Lists;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -76,41 +78,34 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
 
                     BookMeta meta = (BookMeta) book.getItemMeta();
 
-                    meta.setAuthor("Gringotts");
-                    meta.setTitle("Gringotts Dependencies");
 
-                    ComponentBuilder builder = new ComponentBuilder();
+                    meta = meta.author(Component.text("Gringotts"))
+                            .title(Component.text("Gringotts Dependencies"));
 
-                    builder.append("Gringotts Dependencies")
-                            .bold(true)
-                            .reset()
-                            .append("\n\n");
+                    Component builder = Component.text("Gringotts Dependencies")
+                            .decorate(TextDecoration.BOLD)
+                            .style(Style.empty())
+                            .append(Component.newline())
+                            .append(Component.newline());
 
                     for (Dependency dependency : this.gringotts.getDependencies()) {
-                        builder.reset().append(new ComponentBuilder(" - ").append(
-                                new ComponentBuilder(
-                                        dependency.getName()
-                                ).color(
-                                        dependency.isEnabled() ? ChatColor.DARK_GREEN : ChatColor.RED
-                                ).underlined(true).event(new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        new ComponentBuilder(
-                                                "Identification: "
-                                        ).append(new ComponentBuilder(dependency.getId())
-                                                .bold(true)
-                                                .create()
-                                        ).append("\n").reset().append(new ComponentBuilder(
-                                                        "Version: "
-                                                ).append(new ComponentBuilder(dependency.getVersion())
-                                                        .bold(true)
-                                                        .create()
-                                                ).create()
-                                        ).create()
-                                )).create()
-                        ).append("\n").create());
+                        builder = builder.style(Style.empty()).append(Component.text(" - ").append(
+                                Component.text(dependency.getName()).color(
+                                        dependency.isEnabled() ? NamedTextColor.DARK_GREEN : NamedTextColor.RED
+                                ).decorate(TextDecoration.UNDERLINED).hoverEvent(HoverEvent.showText(Component.text(
+                                        "Identification: "
+                                ).append(Component.text(dependency.getId())
+                                        .decorate(TextDecoration.BOLD)
+                                ).append(Component.newline()).style(Style.empty()).append(Component.text(
+                                                "Version: "
+                                        ).append(Component.text(dependency.getVersion())
+                                                .decorate(TextDecoration.BOLD)
+                                        )
+                                )))
+                        ).append(Component.newline()));
                     }
 
-                    meta.spigot().addPage(builder.create());
+                    meta.addPages(builder);
 
                     book.setItemMeta(meta);
 
@@ -125,55 +120,59 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
 
                     BookMeta meta = (BookMeta) book.getItemMeta();
 
-                    meta.setAuthor("Gringotts");
-                    meta.setTitle("Gringotts Denominations");
+                    meta = meta.author(Component.text("Gringotts"))
+                            .title(Component.text("Gringotts Denominations"));
 
                     GringottsCurrency currency = Configuration.CONF.getCurrency();
 
-                    meta.spigot().addPage(new ComponentBuilder().append("Gringotts Denominations")
-                            .bold(true)
-                            .reset()
-                            .append("\n\n")
-                            .append("Singular Name: ")
-                            .append(new ComponentBuilder(currency.getName()).bold(true).create())
-                            .append("\n\n")
-                            .reset()
-                            .append("Plural Name: ")
-                            .append(new ComponentBuilder(currency.getNamePlural()).bold(true).create())
-                            .append("\n\n")
-                            .reset()
-                            .append("Digits: ")
-                            .append(new ComponentBuilder(String.valueOf(currency.getDigits())).bold(true).create())
-                            .append("\n\n")
-                            .create());
+                    meta.addPages(Component.text("Gringotts Denominations")
+                            .decorate(TextDecoration.BOLD)
+                            .style(Style.empty())
+                            .append(Component.newline())
+                            .append(Component.newline())
+                            .append(Component.text("Singular Name: "))
+                            .append(Component.text(currency.getName())
+                                    .decorate(TextDecoration.BOLD))
+                            .append(Component.newline())
+                            .append(Component.newline())
+                            .style(Style.empty())
+                            .append(Component.text("Plural Name: "))
+                            .append(Component.text(currency.getNamePlural())
+                                    .decorate(TextDecoration.BOLD))
+                            .append(Component.newline())
+                            .append(Component.newline())
+                            .style(Style.empty())
+                            .append(Component.text("Digits: "))
+                            .append(Component.text(String.valueOf(currency.getDigits()))
+                                    .decorate(TextDecoration.BOLD))
+                            .append(Component.newline())
+                            .append(Component.newline()));
 
-                    ComponentBuilder builder = new ComponentBuilder()
-                            .append("Denominations: ")
-                            .append("\n");
+                    Component builder = Component.text("Denominations: ")
+                            .append(Component.newline());
 
                     for (Denomination denomination : currency.getDenominations()) {
-                        builder.reset().append(new ComponentBuilder(" - ").append(
-                                new ComponentBuilder(
+                        builder = builder.style(Style.empty()).append(Component.text(" - ").append(
+                                Component.text(
                                         denomination.getUnitName()
-                                ).underlined(true).event(new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        new ComponentBuilder(
+                                ).decorate(TextDecoration.UNDERLINED).hoverEvent(HoverEvent.showText(
+                                        Component.text(
                                                 "Value: "
-                                        ).append(new ComponentBuilder(String.valueOf(currency.getDisplayValue(
-                                                denomination.getValue()
-                                                ))).bold(true).create()
-                                        ).append("\n").reset().append(new ComponentBuilder(
+                                        ).append(Component.text(String.valueOf(currency.getDisplayValue(
+                                                        denomination.getValue()
+                                                ))).decorate(TextDecoration.BOLD)
+                                        ).append(Component.newline()).style(Style.empty()).append(Component.text(
                                                         "Material: "
-                                                ).append(new ComponentBuilder(
-                                                        denomination.getKey().type.getType().getKey().toString()
-                                                ).bold(true).create()
-                                                ).create()
-                                        ).create()
-                                )).create()
-                        ).append("\n").create());
+                                                ).append(Component.text(
+                                                                denomination.getKey().type.getType().getKey().toString()
+                                                        ).decorate(TextDecoration.BOLD)
+                                                )
+                                        )
+                                ))
+                        ).append(Component.newline()));
                     }
 
-                    meta.spigot().addPage(builder.create());
+                    meta.addPages(builder);
 
                     book.setItemMeta(meta);
 

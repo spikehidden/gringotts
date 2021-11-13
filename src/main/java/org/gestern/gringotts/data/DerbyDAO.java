@@ -101,7 +101,6 @@ public class DerbyDAO implements DAO {
      * Configure DB for use with gringotts, if it isn't already.
      *
      * @param connection Connection to the db
-     * @throws SQLException
      */
     private void setupDB(Connection connection) throws SQLException {
 
@@ -149,7 +148,6 @@ public class DerbyDAO implements DAO {
     /**
      * Prepare sql statements for use in DAO.
      *
-     * @throws SQLException
      */
     private void prepareStatements() throws SQLException {
 
@@ -381,7 +379,8 @@ public class DerbyDAO implements DAO {
                 if (result != null) {
                     result.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
     }
 
@@ -415,12 +414,14 @@ public class DerbyDAO implements DAO {
                 if (result != null) {
                     result.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
             try {
                 if (stmt != null) {
                     stmt.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
 
         return accounts;
@@ -458,12 +459,14 @@ public class DerbyDAO implements DAO {
                 if (result != null) {
                     result.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
             try {
                 if (stmt != null) {
                     stmt.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
 
         return chests;
@@ -540,7 +543,8 @@ public class DerbyDAO implements DAO {
                 if (result != null) {
                     result.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
 
         return chests;
@@ -606,7 +610,8 @@ public class DerbyDAO implements DAO {
                 if (result != null) {
                     result.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
 
         return chests;
@@ -681,7 +686,8 @@ public class DerbyDAO implements DAO {
                 if (result != null) {
                     result.close();
                 }
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
     }
 

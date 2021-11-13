@@ -1,6 +1,8 @@
 package org.gestern.gringotts.event;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -52,13 +54,17 @@ public class VaultCreator implements Listener {
 
         // check for existence / add to tracking
         if (accounting.addChest(accountChest)) {
-            String firstLine = cause.getLine(0);
+            Component line0 = cause.line(0);
 
-            if (firstLine != null && firstLine.length() <= 16) {
-                cause.setLine(0, " " + ChatColor.BOLD + firstLine + " ");
+            if (line0 != null) {
+                String line0String = PlainTextComponentSerializer.plainText().serialize(line0);
+
+                if (line0String.length() <= 16) {
+                    cause.line(0, Component.text(line0String).decorate(TextDecoration.BOLD));
+                }
             }
 
-            cause.setLine(2, owner.getName());
+            cause.line(2, Component.text(owner.getName()));
             cause.getPlayer().sendMessage(LANG.vault_created);
         } else {
             cause.setCancelled(true);

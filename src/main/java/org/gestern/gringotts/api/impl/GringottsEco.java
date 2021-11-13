@@ -1,7 +1,6 @@
 package org.gestern.gringotts.api.impl;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.gestern.gringotts.AccountInventory;
 import org.gestern.gringotts.Gringotts;
@@ -196,7 +195,7 @@ public class GringottsEco implements Eco {
         return custom(parts[0], parts[1]);
     }
 
-    private class InvalidAccount implements Account, BankAccount, PlayerAccount {
+    private static class InvalidAccount implements Account, BankAccount, PlayerAccount {
 
         private final String type;
         private final String id;
@@ -687,7 +686,7 @@ public class GringottsEco implements Eco {
         }
     }
 
-    private class Curr implements Currency {
+    private static class Curr implements Currency {
 
         /**
          * The Gcurr.

@@ -23,8 +23,24 @@ currency:
   denominations:
     - material: emerald
       value: 1
+#      unit-name: Emeralde
+#      unit-name-plural: Emeraldes
+#      displayname: Emeralde
+#      damage: 10
+#      custom_model_data: 1
+#      lore:
+#        - line1
+#        - line2
     - material: emerald_block
       value: 9
+#      unit-name: Emeralde
+#      unit-name-plural: Emeraldes
+#      displayname: Emeralde
+#      damage: 10
+#      custom_model_data: 1
+#      lore:
+#        - line1
+#        - line2
 
 # tax on /money pay transactions
 transactiontax:

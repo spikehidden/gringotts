@@ -12,17 +12,17 @@ import javax.persistence.UniqueConstraint;
 @UniqueConstraint(columnNames = {"world", "x", "y", "z"})
 public class EBeanAccountChest {
     @Id
-    int    id;
+    int id;
     @NotNull
     String world;
     @NotNull
-    int    x;
+    int x;
     @NotNull
-    int    y;
+    int y;
     @NotNull
-    int    z;
+    int z;
     @NotNull
-    int    account;
+    int account;
 
     public int getId() {
         return id;

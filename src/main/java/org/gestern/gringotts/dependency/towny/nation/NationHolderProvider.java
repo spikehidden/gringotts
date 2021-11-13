@@ -1,6 +1,7 @@
 package org.gestern.gringotts.dependency.towny.nation;
 
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.RenameNationEvent;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Nation;
@@ -93,7 +94,12 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
     @Override
     public AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
         try {
-            Resident resident = TownyAPI.getInstance().getDataSource().getResident(player.getName());
+            Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
+
+            if (resident == null) {
+                return null;
+            }
+
             Town town = resident.getTown();
             Nation nation = town.getNation();
 

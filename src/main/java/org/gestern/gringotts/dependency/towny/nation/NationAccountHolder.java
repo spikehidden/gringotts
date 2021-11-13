@@ -61,6 +61,6 @@ public class NationAccountHolder implements AccountHolder {
      */
     @Override
     public String getId() {
-        return this.nation.getUuid().toString();
+        return this.nation.getUUID().toString();
     }
 }
