@@ -1,8 +1,6 @@
 Gringotts
 =========
 
-[![Jit Pack](https://jitpack.io/v/nikosgram/Gringotts.svg)](https://jitpack.io/#nikosgram/Gringotts) [![Maven Package](https://github.com/nikosgram/Gringotts/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/nikosgram/Gringotts/actions/workflows/maven-publish.yml) [![CodeQL](https://github.com/nikosgram/Gringotts/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/nikosgram/Gringotts/actions/workflows/codeql-analysis.yml)
-
 Gringotts is an item-based economy plugin for the Bukkit Minecraft server platform. Unlike earlier economy plugins, all currency value and money transactions are based on actual items in Minecraft, per default emeralds. The goals are to add a greater level of immersion, a generally more Minecraft-like feeling, and in the case of a PvP environment, making the currency itself vulnerable to raiding.
 
 
