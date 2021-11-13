@@ -21,6 +21,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -181,15 +182,19 @@ public class Gringotts extends JavaPlugin {
     @Override
     public void onLoad() {
         try {
-            if (!this.dependencies.registerDependency(new TownyDependency(
-                    this,
-                    this.dependencies.hookPlugin(
-                            "Towny",
-                            "com.palmergames.bukkit.towny.Towny",
-                            "0.95.0.0"
-                    )
-            ))) {
-                getLogger().warning("Towny plugin is already assigned into the dependencies.");
+            Plugin plugin = this.dependencies.hookPlugin(
+                    "Towny",
+                    "com.palmergames.bukkit.towny.Towny",
+                    "0.97"
+            );
+
+            if (plugin != null) {
+                if (!this.dependencies.registerDependency(new TownyDependency(
+                        this,
+                        plugin
+                ))) {
+                    getLogger().warning("Towny plugin is already assigned into the dependencies.");
+                }
             }
         } catch (NullArgumentException ignored) {
         } catch (IllegalArgumentException e) {
@@ -202,13 +207,13 @@ public class Gringotts extends JavaPlugin {
                 "vault",
                 "Vault",
                 "net.milkbowl.vault.Vault",
-                "1.5.0"
+                "1.7"
         );
         this.registerGenericDependency(
                 "reserve",
                 "Reserve",
                 "net.tnemc.core.Reserve",
-                "0.1.4.6"
+                "0.1.5.0"
         );
 
         this.dependencies.onLoad();
