@@ -117,21 +117,13 @@ public class VaultCreationEvent extends Event {
          */
         PLAYER,
         /**
-         * Faction type.
-         */
-        FACTION,
-        /**
          * Town type.
          */
         TOWN,
         /**
          * Nation type.
          */
-        NATION,
-        /**
-         * Region type.
-         */
-        REGION;
+        NATION;
 
         private final String id;
 

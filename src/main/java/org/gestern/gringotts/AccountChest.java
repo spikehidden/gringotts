@@ -188,32 +188,11 @@ public class AccountChest {
         }
 
         String[] lines = sign.getLines();
+        String line0 = lines[0].toLowerCase().trim();
 
-        if (lines.length < 3) {
-            return true;
-        }
-
-        String line0String = lines[0];
-
-        if (line0String == null) {
-            return true;
-        }
-
-        if (!line0String.matches(CONF.vaultPattern)) {
-            return true;
-        }
-
-        String line2String = lines[2];
-
-        if (line2String == null) {
-            return true;
-        }
-
-        if (line2String.length() == 0) {
-            return true;
-        }
-
-        return chest() == null;
+        return !line0.matches(CONF.vaultPattern) ||
+                lines[2] == null ||
+                lines[2].length() == 0 || chest() == null;
     }
 
     /**
