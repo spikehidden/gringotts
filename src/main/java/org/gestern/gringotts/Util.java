@@ -1,5 +1,6 @@
 package org.gestern.gringotts;
 
+import io.papermc.lib.PaperLib;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,7 +25,10 @@ public final class Util {
      * @return true if the block is a sign or wall sign
      */
     public static boolean isSignBlock(Block block) {
-        BlockState blockState = block.getState(true);
+        BlockState blockState = PaperLib.getBlockState(
+                block,
+                true
+        ).getState();
 
         return blockState instanceof Sign;
     }
@@ -40,7 +44,10 @@ public final class Util {
      * @return the block state as
      */
     public static <T extends BlockState> Optional<T> getBlockStateAs(Block block, Class<T> blockStateClass) {
-        BlockState blockState = block.getState(false);
+        BlockState blockState = PaperLib.getBlockState(
+                block,
+                false
+        ).getState();
 
         if (blockStateClass.isInstance(blockState)) {
             //noinspection unchecked

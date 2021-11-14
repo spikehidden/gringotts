@@ -1,7 +1,5 @@
 package org.gestern.gringotts.event;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,13 +33,11 @@ public class PlayerVaultListener implements Listener {
         }
 
         SignChangeEvent cause = event.getCause();
-        Component line2 = cause.line(2);
+        String line2String = cause.getLine(2);
 
-        if (line2 == null) {
+        if (line2String == null) {
             return;
         }
-
-        String ownerName = PlainTextComponentSerializer.plainText().serialize(line2);
 
         Player player = cause.getPlayer();
 
@@ -53,9 +49,9 @@ public class PlayerVaultListener implements Listener {
 
         AccountHolder owner;
 
-        if (ownerName.length() > 0 && CREATE_VAULT_ADMIN.isAllowed(player)) {
+        if (line2String.length() > 0 && CREATE_VAULT_ADMIN.isAllowed(player)) {
             // attempting to create account for other player
-            owner = Gringotts.getInstance().getAccountHolderFactory().get("player", ownerName);
+            owner = Gringotts.getInstance().getAccountHolderFactory().get("player", line2String);
 
             if (owner == null) {
                 return;

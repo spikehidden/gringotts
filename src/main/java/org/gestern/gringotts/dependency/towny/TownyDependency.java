@@ -3,8 +3,6 @@ package org.gestern.gringotts.dependency.towny;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -119,16 +117,15 @@ public class TownyDependency implements Dependency, Listener {
             return;
         }
 
-        Component line2 = event.getCause().line(2);
+        String line2String = event.getCause().getLine(2);
 
-        if (line2 == null) {
+        if (line2String == null) {
             return;
         }
 
-        String ownerName = PlainTextComponentSerializer.plainText().serialize(line2);
         Player player = event.getCause().getPlayer();
 
-        boolean forOther = ownerName.length() > 0 && Permissions.CREATE_VAULT_ADMIN.isAllowed(player);
+        boolean forOther = line2String.length() > 0 && Permissions.CREATE_VAULT_ADMIN.isAllowed(player);
 
         AccountHolder owner;
 
@@ -143,7 +140,7 @@ public class TownyDependency implements Dependency, Listener {
                 if (forOther) {
                     try {
                         owner = this.townHolderProvider.getAccountHolder(
-                                TownyAPI.getInstance().getDataSource().getTown(ownerName)
+                                TownyAPI.getInstance().getDataSource().getTown(line2String)
                         );
                     } catch (NotRegisteredException e) {
                         return;
@@ -177,7 +174,7 @@ public class TownyDependency implements Dependency, Listener {
                 if (forOther) {
                     try {
                         owner = this.nationHolderProvider.getAccountHolder(
-                                TownyAPI.getInstance().getDataSource().getNation(ownerName)
+                                TownyAPI.getInstance().getDataSource().getNation(line2String)
                         );
                     } catch (NotRegisteredException e) {
                         return;

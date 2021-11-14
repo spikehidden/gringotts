@@ -1,10 +1,23 @@
 Gringotts Changelog
 ===================
 
-v2.12.1
+v2.12.2
 ---
 ###### Upcoming
 * ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
+
+
+v2.12.1
+---
+###### Nov 14 2021
+* Make Gringotts Spigot-compatible again
+* Remove dependencies/plugins
+  * paper-api
+* Add dependencies
+  * spigot-api at v1.17.1-R0.1-SNAPSHOT
+  * paperlib at v1.0.6-SNAPSHOT
+  * json-simple at v1.1.1
+* Shading dependencies with compile scope
 
 
 v2.12.0

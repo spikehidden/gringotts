@@ -60,6 +60,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
      * @param permission the permission
      * @return the boolean
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean testPermission(@NotNull CommandSender sender, @Nullable String permission) {
         if ((permission == null) || (permission.length() == 0)) {
             return true;

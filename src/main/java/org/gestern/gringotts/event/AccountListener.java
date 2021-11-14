@@ -1,7 +1,5 @@
 package org.gestern.gringotts.event;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
@@ -34,13 +32,11 @@ public class AccountListener implements Listener {
      */
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        Component line0 = event.line(0);
+        String line0String = event.getLine(0);
 
-        if (line0 == null) {
+        if (line0String == null) {
             return;
         }
-
-        String line0String = PlainTextComponentSerializer.plainText().serialize(line0);
 
         Matcher match = vaultPattern.matcher(line0String);
 

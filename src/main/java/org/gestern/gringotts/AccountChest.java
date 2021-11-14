@@ -1,7 +1,6 @@
 package org.gestern.gringotts;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -10,8 +9,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
-import java.util.List;
 
 import static org.gestern.gringotts.Configuration.CONF;
 
@@ -58,7 +55,10 @@ public class AccountChest {
         Block block = Util.chestBlock(sign);
 
         if (block != null) {
-            BlockState blockState = block.getState(false);
+            BlockState blockState = PaperLib.getBlockState(
+                    block,
+                    false
+            ).getState();
 
             if (blockState instanceof InventoryHolder) {
                 return (InventoryHolder) blockState;
@@ -187,31 +187,27 @@ public class AccountChest {
             return true;
         }
 
-        List<Component> lines = sign.lines();
+        String[] lines = sign.getLines();
 
-        if (lines.size() < 3) {
+        if (lines.length < 3) {
             return true;
         }
 
-        Component line0 = lines.get(0);
+        String line0String = lines[0];
 
-        if (line0 == null) {
+        if (line0String == null) {
             return true;
         }
-
-        String line0String = PlainTextComponentSerializer.plainText().serialize(line0);
 
         if (!line0String.matches(CONF.vaultPattern)) {
             return true;
         }
 
-        Component line2 = lines.get(2);
+        String line2String = lines[2];
 
-        if (line2 == null) {
+        if (line2String == null) {
             return true;
         }
-
-        String line2String = PlainTextComponentSerializer.plainText().serialize(line2);
 
         if (line2String.length() == 0) {
             return true;
@@ -369,10 +365,7 @@ public class AccountChest {
     }
 
     public void updateSign() {
-        this.sign.line(
-                2,
-                Component.text(this.account.owner.getName())
-        );
+        this.sign.setLine(2, this.account.owner.getName());
 
         this.sign.update();
     }
