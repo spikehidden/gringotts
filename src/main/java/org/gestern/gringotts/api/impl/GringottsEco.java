@@ -195,7 +195,7 @@ public class GringottsEco implements Eco {
         return custom(parts[0], parts[1]);
     }
 
-    private static class InvalidAccount implements Account, BankAccount, PlayerAccount {
+    private static class InvalidAccount implements BankAccount, PlayerAccount {
 
         private final String type;
         private final String id;
