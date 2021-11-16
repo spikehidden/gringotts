@@ -70,7 +70,7 @@ public class Migration {
         for (EBeanAccount account : accounts) {
             String owner = account.getOwner();
             try {
-                UUID ignored = UUID.fromString(owner);
+                UUID.fromString(owner);
             } catch (IllegalArgumentException ignored) {
                 // when owner string is not a valid uuid, do the migration thing
                 String name = account.getOwner();

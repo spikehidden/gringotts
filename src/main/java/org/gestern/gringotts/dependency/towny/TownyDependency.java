@@ -198,6 +198,8 @@ public class TownyDependency implements Dependency, Listener {
 
                 break;
             }
+        default:
+            break;
         }
     }
 }
