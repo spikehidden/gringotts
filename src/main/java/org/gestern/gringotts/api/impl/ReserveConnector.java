@@ -1,6 +1,5 @@
 package org.gestern.gringotts.api.impl;
 
-import com.ibm.icu.util.Currency;
 import net.tnemc.core.Reserve;
 import net.tnemc.core.economy.EconomyAPI;
 import net.tnemc.core.economy.response.*;
