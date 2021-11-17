@@ -3,6 +3,7 @@ package org.gestern.gringotts.api.impl;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.api.Account;
@@ -11,6 +12,7 @@ import org.gestern.gringotts.api.TransactionResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.gestern.gringotts.Language.LANG;
 
@@ -23,7 +25,8 @@ public class VaultConnector implements Economy {
 
     private final Eco eco = Gringotts.getInstance().getEco();
 
-    public VaultConnector() {}
+    public VaultConnector() {
+    }
 
 
     @Override
@@ -63,6 +66,27 @@ public class VaultConnector implements Economy {
 
     @Override
     public boolean hasAccount(String accountId) {
+        OfflinePlayer player = Bukkit.getPlayer(accountId);
+
+        if (player == null) {
+            if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                player = Bukkit.getOfflinePlayer(accountId);
+            } else {
+                try {
+                    UUID targetUuid = UUID.fromString(accountId);
+
+                    if (Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore()) {
+                        player = Bukkit.getOfflinePlayer(targetUuid);
+                    }
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        if (player != null) {
+            return hasAccount(player);
+        }
+
         return eco.account(accountId).exists();
     }
 
@@ -73,6 +97,27 @@ public class VaultConnector implements Economy {
 
     @Override
     public double getBalance(String accountId) {
+        OfflinePlayer player = Bukkit.getPlayer(accountId);
+
+        if (player == null) {
+            if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                player = Bukkit.getOfflinePlayer(accountId);
+            } else {
+                try {
+                    UUID targetUuid = UUID.fromString(accountId);
+
+                    if (Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore()) {
+                        player = Bukkit.getOfflinePlayer(targetUuid);
+                    }
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        if (player != null) {
+            return getBalance(player);
+        }
+
         return eco.account(accountId).balance();
     }
 
@@ -83,6 +128,27 @@ public class VaultConnector implements Economy {
 
     @Override
     public boolean has(String accountId, double amount) {
+        OfflinePlayer player = Bukkit.getPlayer(accountId);
+
+        if (player == null) {
+            if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                player = Bukkit.getOfflinePlayer(accountId);
+            } else {
+                try {
+                    UUID targetUuid = UUID.fromString(accountId);
+
+                    if (Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore()) {
+                        player = Bukkit.getOfflinePlayer(targetUuid);
+                    }
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        if (player != null) {
+            return has(player, amount);
+        }
+
         return eco.account(accountId).has(amount);
     }
 
@@ -92,8 +158,30 @@ public class VaultConnector implements Economy {
     }
 
     @Override
-    public EconomyResponse withdrawPlayer(String playerName, double amount) {
-        Account account = eco.account(playerName);
+    public EconomyResponse withdrawPlayer(String accountId, double amount) {
+        OfflinePlayer player = Bukkit.getPlayer(accountId);
+
+        if (player == null) {
+            if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                player = Bukkit.getOfflinePlayer(accountId);
+            } else {
+                try {
+                    UUID targetUuid = UUID.fromString(accountId);
+
+                    if (Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore()) {
+                        player = Bukkit.getOfflinePlayer(targetUuid);
+                    }
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        if (player != null) {
+            return withdrawPlayer(player, amount);
+        }
+
+        Account account = eco.account(accountId);
+
         return withdrawPlayer(account, amount);
     }
 

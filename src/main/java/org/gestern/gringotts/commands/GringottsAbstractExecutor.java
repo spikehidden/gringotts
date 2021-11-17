@@ -1,5 +1,8 @@
 package org.gestern.gringotts.commands;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
@@ -13,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.Permissions.COMMAND_DEPOSIT;
@@ -78,11 +82,38 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
         String recipientName = args[2];
 
+        OfflinePlayer reciepienPlayer = Bukkit.getPlayer(recipientName);
+
+        if (reciepienPlayer == null) {
+            if (Bukkit.getOfflinePlayer(recipientName).hasPlayedBefore()) {
+                reciepienPlayer = Bukkit.getOfflinePlayer(recipientName);
+            } else {
+                try {
+                    UUID targetUuid = UUID.fromString(recipientName);
+
+                    if (Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore()) {
+                        reciepienPlayer = Bukkit.getOfflinePlayer(targetUuid);
+                    }
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        if (reciepienPlayer == null) {
+            player.spigot().sendMessage(
+                    new ComponentBuilder(
+                            "Player with name `" + recipientName + "` never played in this server before."
+                    ).create()
+            );
+
+            return true;
+        }
+
         PlayerAccount from = eco.player(player.getUniqueId());
         Account to = eco.account(recipientName);
 
         TaxedTransaction transaction = from.send(value).withTaxes();
-        TransactionResult result = transaction.to(eco.player(recipientName));
+        TransactionResult result = transaction.to(eco.player(reciepienPlayer.getUniqueId()));
 
         double tax = transaction.getTax();
         double valueAdded = value + tax;

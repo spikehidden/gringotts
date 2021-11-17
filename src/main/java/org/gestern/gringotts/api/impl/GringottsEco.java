@@ -1,6 +1,7 @@
 package org.gestern.gringotts.api.impl;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.gestern.gringotts.AccountInventory;
 import org.gestern.gringotts.Gringotts;
@@ -46,23 +47,6 @@ public class GringottsEco implements Eco {
         GringottsAccount gAccount = Gringotts.getInstance().getAccounting().getAccount(owner);
 
         return new ValidAccount(gAccount);
-    }
-
-    /**
-     * Player player account.
-     *
-     * @param name the name
-     * @return the player account
-     */
-    @Override
-    public PlayerAccount player(String name) {
-        AccountHolder owner = accountOwners.get(TAG_PLAYER, name);
-
-        if (owner instanceof PlayerAccountHolder) {
-            return new ValidPlayerAccount(Gringotts.getInstance().getAccounting().getAccount(owner));
-        }
-
-        return new InvalidAccount(TAG_PLAYER, name);
     }
 
     /**
@@ -178,7 +162,28 @@ public class GringottsEco implements Eco {
         String[] parts = id.split(":");
 
         if (parts.length == 1) {
-            return player(id);
+            OfflinePlayer player = Bukkit.getPlayer(id);
+
+            if (player == null) {
+                if (Bukkit.getOfflinePlayer(id).hasPlayedBefore()) {
+                    player = Bukkit.getOfflinePlayer(id);
+                } else {
+                    try {
+                        UUID targetUuid = UUID.fromString(id);
+
+                        if (Bukkit.getOfflinePlayer(targetUuid).hasPlayedBefore()) {
+                            player = Bukkit.getOfflinePlayer(targetUuid);
+                        }
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+            }
+
+            if (player != null) {
+                return player(player.getUniqueId());
+            }
+
+            return account(id);
         }
 
         return custom(parts[0], parts[1]);
@@ -247,7 +252,9 @@ public class GringottsEco implements Eco {
          * @return the double
          */
         @Override
-        public double vaultBalance() { return 0; }
+        public double vaultBalance() {
+            return 0;
+        }
 
         /**
          * Inv balance double.
@@ -255,7 +262,9 @@ public class GringottsEco implements Eco {
          * @return the double
          */
         @Override
-        public double invBalance() { return 0; }
+        public double invBalance() {
+            return 0;
+        }
 
         /**
          * Has boolean.
@@ -417,6 +426,69 @@ public class GringottsEco implements Eco {
         @Override
         public boolean canAdd(double value) {
             throw new UnsupportedOperationException("Not implemented");
+        }
+    }
+
+    private static class Curr implements Currency {
+
+        /**
+         * The Gcurr.
+         */
+        final GringottsCurrency gcurr;
+        /**
+         * The Format string.
+         */
+        final String formatString; // TODO this should be configurable
+
+        /**
+         * Instantiates a new Curr.
+         *
+         * @param curr the curr
+         */
+        Curr(GringottsCurrency curr) {
+            this.gcurr = curr;
+            formatString = "%." + curr.getDigits() + "f %s";
+        }
+
+        /**
+         * Gets name.
+         *
+         * @return the name
+         */
+        @Override
+        public String getName() {
+            return gcurr.getName();
+        }
+
+        /**
+         * Gets name plural.
+         *
+         * @return the name plural
+         */
+        @Override
+        public String getNamePlural() {
+            return gcurr.getNamePlural();
+        }
+
+        /**
+         * Format string.
+         *
+         * @param value the value
+         * @return the string
+         */
+        @Override
+        public String format(double value) {
+            return CONF.getCurrency().format(formatString, value);
+        }
+
+        /**
+         * Gets fractional digits.
+         *
+         * @return the fractional digits
+         */
+        @Override
+        public int getFractionalDigits() {
+            return gcurr.getDigits();
         }
     }
 
@@ -672,69 +744,6 @@ public class GringottsEco implements Eco {
         @Override
         public boolean canAdd(double value) {
             throw new UnsupportedOperationException("Not implemented");
-        }
-    }
-
-    private static class Curr implements Currency {
-
-        /**
-         * The Gcurr.
-         */
-        final GringottsCurrency gcurr;
-        /**
-         * The Format string.
-         */
-        final String formatString; // TODO this should be configurable
-
-        /**
-         * Instantiates a new Curr.
-         *
-         * @param curr the curr
-         */
-        Curr(GringottsCurrency curr) {
-            this.gcurr = curr;
-            formatString = "%." + curr.getDigits() + "f %s";
-        }
-
-        /**
-         * Gets name.
-         *
-         * @return the name
-         */
-        @Override
-        public String getName() {
-            return gcurr.getName();
-        }
-
-        /**
-         * Gets name plural.
-         *
-         * @return the name plural
-         */
-        @Override
-        public String getNamePlural() {
-            return gcurr.getNamePlural();
-        }
-
-        /**
-         * Format string.
-         *
-         * @param value the value
-         * @return the string
-         */
-        @Override
-        public String format(double value) {
-            return CONF.getCurrency().format(formatString, value);
-        }
-
-        /**
-         * Gets fractional digits.
-         *
-         * @return the fractional digits
-         */
-        @Override
-        public int getFractionalDigits() {
-            return gcurr.getDigits();
         }
     }
 }
