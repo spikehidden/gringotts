@@ -114,17 +114,6 @@ public class GringottsEco implements Eco {
     }
 
     /**
-     * Faction account.
-     *
-     * @param id the id
-     * @return the account
-     */
-    @Override
-    public Account faction(String id) {
-        return custom("faction", id);
-    }
-
-    /**
      * Town account.
      *
      * @param id the id

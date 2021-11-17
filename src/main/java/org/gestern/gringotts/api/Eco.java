@@ -65,14 +65,6 @@ public interface Eco {
     Account custom(String type, String id);
 
     /**
-     * Access a Factions faction account with the given id.
-     *
-     * @param id faction id
-     * @return the faction's account
-     */
-    Account faction(String id);
-
-    /**
      * Access a Towny town account with the given id.
      *
      * @param id /name of a Towny town

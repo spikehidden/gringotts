@@ -62,8 +62,8 @@ public class VaultConnector implements Economy {
     }
 
     @Override
-    public boolean hasAccount(String playerName) {
-        return eco.account(playerName).exists();
+    public boolean hasAccount(String accountId) {
+        return eco.account(accountId).exists();
     }
 
     @Override
@@ -72,8 +72,8 @@ public class VaultConnector implements Economy {
     }
 
     @Override
-    public double getBalance(String playerName) {
-        return eco.account(playerName).balance();
+    public double getBalance(String accountId) {
+        return eco.account(accountId).balance();
     }
 
     @Override
@@ -82,8 +82,8 @@ public class VaultConnector implements Economy {
     }
 
     @Override
-    public boolean has(String playerName, double amount) {
-        return eco.account(playerName).has(amount);
+    public boolean has(String accountId, double amount) {
+        return eco.account(accountId).has(amount);
     }
 
     @Override
