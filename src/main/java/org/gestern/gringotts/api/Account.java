@@ -3,6 +3,7 @@ package org.gestern.gringotts.api;
 /**
  * Defines actions possible on an account in an economy.
  */
+@SuppressWarnings("unused")
 public interface Account {
 
     /**

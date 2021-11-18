@@ -6,6 +6,7 @@ import java.util.UUID;
 /**
  * The interface Eco.
  */
+@SuppressWarnings("unused")
 public interface Eco {
 
     /**

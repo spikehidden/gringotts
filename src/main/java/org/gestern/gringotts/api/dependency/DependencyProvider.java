@@ -10,6 +10,7 @@ import java.util.Optional;
 /**
  * The interface Dependency provider.
  */
+@SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
 public interface DependencyProvider extends Iterable<Dependency> {
     /**
      * Determines if all packages in a String array are within the Classpath

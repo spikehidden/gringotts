@@ -9,13 +9,6 @@ GringottsConfigurationException extends RuntimeException {
 
     /**
      * Instantiates a new Gringotts configuration exception.
-     */
-    public GringottsConfigurationException() {
-        super();
-    }
-
-    /**
-     * Instantiates a new Gringotts configuration exception.
      *
      * @param message the message
      * @param cause   the cause
@@ -31,14 +24,5 @@ GringottsConfigurationException extends RuntimeException {
      */
     public GringottsConfigurationException(String message) {
         super(message);
-    }
-
-    /**
-     * Instantiates a new Gringotts configuration exception.
-     *
-     * @param cause the cause
-     */
-    public GringottsConfigurationException(Throwable cause) {
-        super(cause);
     }
 }

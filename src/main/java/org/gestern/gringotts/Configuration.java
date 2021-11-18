@@ -74,7 +74,7 @@ public enum Configuration {
     public boolean balanceShowInventory = true;
     /**
      * Disables bstats heavy telemetry gathering.
-     *
+     * <p>
      * It only disables the balance and the amount of vaults
      * Dependencies and denominations are still being part of the
      * telemetry report, as the process of gathering that kind of
@@ -213,6 +213,10 @@ public enum Configuration {
 
                     ItemMeta meta = denomType.getItemMeta();
 
+                    if (meta == null) {
+                        continue;
+                    }
+
                     String name = denomConf.getString("displayname");
 
                     if (name != null && !name.isEmpty()) {
@@ -285,7 +289,7 @@ public enum Configuration {
 
         for (String denomStr : denoms) {
             String[] keyParts = denomStr.split(";");
-            String[] valueParts = denomSection.getString(denomStr).split(";");
+            String[] valueParts = denomSection.getString(denomStr, "").split(";");
 
             String name = "";
 
@@ -308,6 +312,10 @@ public enum Configuration {
 
                 if (!name.isEmpty()) {
                     ItemMeta meta = denomType.getItemMeta();
+
+                    if (meta == null) {
+                        continue;
+                    }
 
                     meta.setDisplayName(name);
                     denomType.setItemMeta(meta);

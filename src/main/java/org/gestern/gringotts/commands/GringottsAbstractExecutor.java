@@ -85,7 +85,9 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
         OfflinePlayer reciepienPlayer = Bukkit.getPlayer(recipientName);
 
         if (reciepienPlayer == null) {
+            //noinspection deprecation
             if (Bukkit.getOfflinePlayer(recipientName).hasPlayedBefore()) {
+                //noinspection deprecation
                 reciepienPlayer = Bukkit.getOfflinePlayer(recipientName);
             } else {
                 try {

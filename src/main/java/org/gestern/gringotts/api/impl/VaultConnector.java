@@ -65,7 +65,9 @@ public class VaultConnector implements Economy {
         OfflinePlayer player = Bukkit.getPlayer(accountId);
 
         if (player == null) {
+            //noinspection deprecation
             if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                //noinspection deprecation
                 player = Bukkit.getOfflinePlayer(accountId);
             } else {
                 try {
@@ -96,7 +98,9 @@ public class VaultConnector implements Economy {
         OfflinePlayer player = Bukkit.getPlayer(accountId);
 
         if (player == null) {
+            //noinspection deprecation
             if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                //noinspection deprecation
                 player = Bukkit.getOfflinePlayer(accountId);
             } else {
                 try {
@@ -127,7 +131,9 @@ public class VaultConnector implements Economy {
         OfflinePlayer player = Bukkit.getPlayer(accountId);
 
         if (player == null) {
+            //noinspection deprecation
             if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                //noinspection deprecation
                 player = Bukkit.getOfflinePlayer(accountId);
             } else {
                 try {
@@ -158,7 +164,9 @@ public class VaultConnector implements Economy {
         OfflinePlayer player = Bukkit.getPlayer(accountId);
 
         if (player == null) {
+            //noinspection deprecation
             if (Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()) {
+                //noinspection deprecation
                 player = Bukkit.getOfflinePlayer(accountId);
             } else {
                 try {

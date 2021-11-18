@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * The interface Dao.
  */
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public interface DAO {
     /**
      * Save an account chest to database.

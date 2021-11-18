@@ -8,13 +8,6 @@ public class GringottsStorageException extends RuntimeException {
 
     /**
      * Instantiates a new Gringotts storage exception.
-     */
-    public GringottsStorageException() {
-        super();
-    }
-
-    /**
-     * Instantiates a new Gringotts storage exception.
      *
      * @param message the message
      * @param cause   the cause
@@ -30,14 +23,5 @@ public class GringottsStorageException extends RuntimeException {
      */
     public GringottsStorageException(String message) {
         super(message);
-    }
-
-    /**
-     * Instantiates a new Gringotts storage exception.
-     *
-     * @param cause the cause
-     */
-    public GringottsStorageException(Throwable cause) {
-        super(cause);
     }
 }

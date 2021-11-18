@@ -1,5 +1,6 @@
 package org.gestern.gringotts.api;
 
+@SuppressWarnings("unused")
 public interface BankAccount extends Account {
 
     /**

@@ -9,14 +9,13 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
-import org.gestern.gringotts.currency.GringottsCurrency;
 
 import java.util.Optional;
 
 /**
  * The type Util.
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess"})
 public final class Util {
     /**
      * Check whether a block is a sign or wall sign type.
@@ -105,19 +104,6 @@ public final class Util {
         }
 
         return parts;
-    }
-
-    /**
-     * Get a formatted currency value. The value display includes the currency name.
-     *
-     * @param value the value in cents
-     * @return formatted currency value
-     */
-    public static String formatCurrency(double value) {
-        GringottsCurrency cur = Configuration.CONF.getCurrency();
-        String formatString = "%." + cur.getDigits() + "f %s";
-
-        return String.format(formatString, value, value == 1.0 ? cur.getName() : cur.getNamePlural());
     }
 
     /**

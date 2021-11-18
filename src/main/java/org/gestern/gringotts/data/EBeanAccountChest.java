@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "gringotts_accountchest")
 @UniqueConstraint(columnNames = {"world", "x", "y", "z"})

@@ -165,7 +165,9 @@ public class GringottsEco implements Eco {
             OfflinePlayer player = Bukkit.getPlayer(id);
 
             if (player == null) {
+                //noinspection deprecation
                 if (Bukkit.getOfflinePlayer(id).hasPlayedBefore()) {
+                    //noinspection deprecation
                     player = Bukkit.getOfflinePlayer(id);
                 } else {
                     try {
@@ -696,6 +698,11 @@ public class GringottsEco implements Eco {
         public TransactionResult deposit(double value) {
             PlayerAccountHolder owner = (PlayerAccountHolder) acc.owner;
             Player player = Bukkit.getPlayer(owner.getUUID());
+
+            if (player == null) {
+                return ERROR;
+            }
+
             AccountInventory playerInventory = new AccountInventory(player.getInventory());
             long centValue = CONF.getCurrency().getCentValue(value);
             long toDeposit = playerInventory.remove(centValue);
@@ -723,6 +730,11 @@ public class GringottsEco implements Eco {
         public TransactionResult withdraw(double value) {
             PlayerAccountHolder owner = (PlayerAccountHolder) acc.owner;
             Player player = Bukkit.getPlayer(owner.getUUID());
+
+            if (player == null) {
+                return ERROR;
+            }
+
             AccountInventory playerInventory = new AccountInventory(player.getInventory());
             long centValue = CONF.getCurrency().getCentValue(value);
             TransactionResult remove = acc.remove(centValue);
