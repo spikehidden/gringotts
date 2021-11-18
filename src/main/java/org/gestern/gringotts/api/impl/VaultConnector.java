@@ -22,21 +22,17 @@ import static org.gestern.gringotts.Language.LANG;
  * @author jast
  */
 public class VaultConnector implements Economy {
-
-    private final Eco eco = Gringotts.getInstance().getEco();
-
-    public VaultConnector() {
-    }
-
+    private static final Gringotts GRINGOTTS = Gringotts.getInstance();
+    private final Eco eco = GRINGOTTS.getEco();
 
     @Override
     public boolean isEnabled() {
-        return Gringotts.getInstance() != null && Gringotts.getInstance().isEnabled();
+        return GRINGOTTS != null && GRINGOTTS.isEnabled();
     }
 
     @Override
     public String getName() {
-        return "Gringotts";
+        return GRINGOTTS.getName();
     }
 
     @Override
@@ -411,5 +407,4 @@ public class VaultConnector implements Economy {
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, String world, double amount) {
         return withdrawPlayer(offlinePlayer, amount); // TODO multiworld-support
     }
-
 }

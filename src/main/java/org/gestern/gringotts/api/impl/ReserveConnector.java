@@ -18,7 +18,8 @@ import java.util.UUID;
  */
 @SuppressWarnings("JavadocReference")
 public class ReserveConnector implements EconomyAPI {
-    private final Eco eco = Gringotts.getInstance().getEco();
+    private static final Gringotts GRINGOTTS = Gringotts.getInstance();
+    private static final Eco eco = GRINGOTTS.getEco();
 
     /**
      * Register provider safely.
@@ -34,7 +35,7 @@ public class ReserveConnector implements EconomyAPI {
      */
     @Override
     public String name() {
-        return "Gringotts";
+        return GRINGOTTS.getName();
     }
 
     /**
@@ -44,7 +45,7 @@ public class ReserveConnector implements EconomyAPI {
      */
     @Override
     public String version() {
-        return "0.1.4.6";
+        return GRINGOTTS.getVersion();
     }
 
     /**
@@ -54,7 +55,7 @@ public class ReserveConnector implements EconomyAPI {
      */
     @Override
     public boolean enabled() {
-        return true;
+        return GRINGOTTS != null && GRINGOTTS.isEnabled();
     }
 
     /**

@@ -111,6 +111,10 @@ public class Gringotts extends JavaPlugin {
         return instance;
     }
 
+    public String getVersion() {
+        return getDescription().getVersion();
+    }
+
     /**
      * On enable.
      */
