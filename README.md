@@ -18,7 +18,8 @@ Features
 * Optional transaction taxes
 * Fractional currency values (fixed decimal digits)
 * Account support for [Towny](https://www.spigotmc.org/resources/towny-advanced.72694/)
-* [Vault](https://www.spigotmc.org/resources/vault.34315/) integration
+* [Vault](https://www.spigotmc.org/resources/vault.34315/)
+  and [Reserve](https://www.spigotmc.org/resources/reserve.50739/) integration
 
 Usage
 -----

@@ -16,6 +16,7 @@ import java.util.UUID;
 /**
  * The type Reserve connector.
  */
+@SuppressWarnings("JavadocReference")
 public class ReserveConnector implements EconomyAPI {
     private final Eco eco = Gringotts.getInstance().getEco();
 
