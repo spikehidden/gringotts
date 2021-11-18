@@ -14,9 +14,7 @@ import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.DrilldownPie;
-import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,7 +23,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderFactory;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Eco;
@@ -290,43 +287,6 @@ public class Gringotts extends JavaPlugin {
     private void registerMetrics() {
         // Setup Metrics support.
         Metrics metrics = new Metrics(this, 4998);
-
-        if (!CONF.disableHeavyBstats) {
-            // Tracking how many vaults exists.
-            metrics.addCustomChart(new SingleLineChart("vaultsChart", () -> {
-                int returned = 0;
-
-                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                    AccountHolder holder = accountHolderFactory.get(player);
-                    GringottsAccount account = accounting.getAccount(holder);
-
-                    returned += Gringotts.getInstance().getDao().retrieveChests(account).size();
-                }
-
-                return returned;
-            }));
-
-            // Tracking the balance of the users exists.
-            metrics.addCustomChart(new SingleLineChart("economyChart", () -> {
-                int returned = 0;
-
-                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                    if (!player.hasPlayedBefore()) {
-                        continue;
-                    }
-                    if (player.isOp()) {
-                        continue;
-                    }
-
-                    AccountHolder holder = accountHolderFactory.get(player);
-                    GringottsAccount account = accounting.getAccount(holder);
-
-                    returned += account.getBalance();
-                }
-
-                return returned;
-            }));
-        }
 
         // Tracking the exists denominations.
         metrics.addCustomChart(new AdvancedPie("denominationsChart", () -> {

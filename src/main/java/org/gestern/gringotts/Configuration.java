@@ -73,15 +73,6 @@ public enum Configuration {
      */
     public boolean balanceShowInventory = true;
     /**
-     * Disables bstats heavy telemetry gathering.
-     * <p>
-     * It only disables the balance and the amount of vaults
-     * Dependencies and denominations are still being part of the
-     * telemetry report, as the process of gathering that kind of
-     * info is not "heavy".
-     */
-    public boolean disableHeavyBstats = false;
-    /**
      * Currency configuration.
      */
     private GringottsCurrency currency;
@@ -175,7 +166,6 @@ public enum Configuration {
         CONF.language = savedConfig.getString("language", "custom");
 
         CONF.vaultPattern = savedConfig.getString("vault_pattern", "[^\\[]*\\[(\\w*) ?vault\\]");
-        CONF.disableHeavyBstats = savedConfig.getBoolean("disable_heavy_bstats", true);
     }
 
     /**
