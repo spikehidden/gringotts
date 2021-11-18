@@ -6,6 +6,7 @@ v2.12.2
 ###### Upcoming
 * ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
 * ! Multiworld support
+* Option to disable heavy bstats telemetry gathering
 
 
 v2.12.1

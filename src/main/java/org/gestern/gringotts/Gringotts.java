@@ -287,40 +287,42 @@ public class Gringotts extends JavaPlugin {
         // Setup Metrics support.
         Metrics metrics = new Metrics(this, 4998);
 
-        // Tracking how many vaults exists.
-        metrics.addCustomChart(new SingleLineChart("vaultsChart", () -> {
-            int returned = 0;
+        if (!CONF.disableHeavyBstats) {
+            // Tracking how many vaults exists.
+            metrics.addCustomChart(new SingleLineChart("vaultsChart", () -> {
+                int returned = 0;
 
-            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                AccountHolder holder = accountHolderFactory.get(player);
-                GringottsAccount account = accounting.getAccount(holder);
+                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                    AccountHolder holder = accountHolderFactory.get(player);
+                    GringottsAccount account = accounting.getAccount(holder);
 
-                returned += Gringotts.getInstance().getDao().retrieveChests(account).size();
-            }
-
-            return returned;
-        }));
-
-        // Tracking the balance of the users exists.
-        metrics.addCustomChart(new SingleLineChart("economyChart", () -> {
-            int returned = 0;
-
-            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                if (!player.hasPlayedBefore()) {
-                    continue;
-                }
-                if (player.isOp()) {
-                    continue;
+                    returned += Gringotts.getInstance().getDao().retrieveChests(account).size();
                 }
 
-                AccountHolder holder = accountHolderFactory.get(player);
-                GringottsAccount account = accounting.getAccount(holder);
+                return returned;
+            }));
 
-                returned += account.getBalance();
-            }
+            // Tracking the balance of the users exists.
+            metrics.addCustomChart(new SingleLineChart("economyChart", () -> {
+                int returned = 0;
 
-            return returned;
-        }));
+                for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                    if (!player.hasPlayedBefore()) {
+                        continue;
+                    }
+                    if (player.isOp()) {
+                        continue;
+                    }
+
+                    AccountHolder holder = accountHolderFactory.get(player);
+                    GringottsAccount account = accounting.getAccount(holder);
+
+                    returned += account.getBalance();
+                }
+
+                return returned;
+            }));
+        }
 
         // Tracking the exists denominations.
         metrics.addCustomChart(new AdvancedPie("denominationsChart", () -> {

@@ -63,3 +63,5 @@ usevault:
 balance:
   show-vault: true
   show-inventory: true
+
+disable_heavy_bstats: true
