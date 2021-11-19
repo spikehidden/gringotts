@@ -190,4 +190,12 @@
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub nikosgram Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/nikosgram/gringotts</url>
+        </repository>
+    </distributionManagement>
 </project>
