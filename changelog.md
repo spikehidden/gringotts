@@ -1,17 +1,24 @@
 Gringotts Changelog
 ===================
 
-v2.12.2
+v2.12.3
 ---
 ###### Upcoming
 * ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
 * ! Multiworld support
-* Remove server balance and vault count from bstats reports
+
+
+v2.12.2
+---
+###### Nov 19, 2021
+* Removes server balance and vault count from bstats reports
+* Improve UUID support
+* Clean up code
 
 
 v2.12.1
 ---
-###### Nov 14 2021
+###### Nov 14, 2021
 * Make Gringotts Spigot-compatible again
 * Remove dependencies/plugins
   * paper-api
@@ -24,7 +31,7 @@ v2.12.1
 
 v2.12.0
 ---
-###### Nov 13 2021
+###### Nov 13, 2021
 * Remove Spigot support
 * Support Minecraft 1.17.x
 * Add Paper support for 1.17.1-R0.1-SNAPSHOT
@@ -57,7 +64,7 @@ v2.12.0
 
 v2.11.1-SNAPSHOT
 ---
-###### Jun 23 2019
+###### Jun 23, 2019
 * Update for Minecraft 1.14+
 
 v2.11.0-SNAPSHOT
