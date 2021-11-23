@@ -12,7 +12,6 @@
                 <directory>${basedir}</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>*.yml</include>
                     <include>LICENSE.txt</include>
                     <include>README.md</include>
                 </includes>
