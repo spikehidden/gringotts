@@ -2,6 +2,7 @@ package org.gestern.gringotts.commands;
 
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -81,35 +82,45 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
                     meta.setAuthor("Gringotts");
                     meta.setTitle("Gringotts Dependencies");
 
-                    ComponentBuilder builder = new ComponentBuilder();
-
-                    builder.append("Gringotts Dependencies")
+                    ComponentBuilder builder = new ComponentBuilder()
+                            .append("Gringotts Dependencies")
                             .bold(true)
                             .reset()
                             .append("\n\n");
 
                     for (Dependency dependency : this.gringotts.getDependencies()) {
-                        builder.reset().append(new ComponentBuilder(" - ").append(
-                                new ComponentBuilder(
-                                        dependency.getName()
-                                ).color(
-                                        dependency.isEnabled() ? ChatColor.DARK_GREEN : ChatColor.RED
-                                ).underlined(true).event(new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        new Text(new ComponentBuilder(
-                                                "Identification: "
-                                        ).append(new ComponentBuilder(dependency.getId())
-                                                .bold(true)
-                                                .create()
-                                        ).append("\n").reset().append(new ComponentBuilder(
-                                                        "Version: "
-                                                ).append(new ComponentBuilder(dependency.getVersion())
-                                                        .bold(true)
-                                                        .create()
-                                                ).create()
-                                        ).create())
-                                )).create()
-                        ).append("\n").create());
+                        BaseComponent[] identificationComponent = new ComponentBuilder(
+                                "Identification: "
+                        ).append(
+                                dependency.getId()
+                        ).bold(true).create();
+                        BaseComponent[] versionComponent = new ComponentBuilder(
+                                "Version: "
+                        ).append(
+                                dependency.getVersion()
+                        ).bold(true).create();
+
+                        builder.reset().append(
+                                new ComponentBuilder(" - ").append(
+                                        new ComponentBuilder(
+                                                dependency.getName()
+                                        ).color(
+                                                dependency.isEnabled() ? ChatColor.DARK_GREEN : ChatColor.RED
+                                        ).underlined(true).event(
+                                                new HoverEvent(
+                                                        HoverEvent.Action.SHOW_TEXT,
+                                                        new Text(
+                                                                new ComponentBuilder()
+                                                                        .append(identificationComponent)
+                                                                        .append("\n")
+                                                                        .reset()
+                                                                        .append(versionComponent)
+                                                                        .create()
+                                                        )
+                                                )
+                                        ).create()
+                                ).append("\n").create()
+                        );
                     }
 
                     meta.spigot().addPage(builder.create());
@@ -133,47 +144,75 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
 
                     GringottsCurrency currency = Configuration.CONF.getCurrency();
 
-                    meta.spigot().addPage(new ComponentBuilder().append("Gringotts Denominations")
-                            .bold(true)
-                            .reset()
-                            .append("\n\n")
-                            .append("Singular Name: ")
-                            .append(new ComponentBuilder(currency.getName()).bold(true).create())
-                            .append("\n\n")
-                            .reset()
-                            .append("Plural Name: ")
-                            .append(new ComponentBuilder(currency.getNamePlural()).bold(true).create())
-                            .append("\n\n")
-                            .reset()
-                            .append("Digits: ")
-                            .append(new ComponentBuilder(String.valueOf(currency.getDigits())).bold(true).create())
-                            .append("\n\n")
-                            .create());
+                    meta.spigot().addPage(
+                            new ComponentBuilder()
+                                    .append("Gringotts Denominations")
+                                    .bold(true)
+                                    .reset()
+                                    .append("\n\n")
+                                    .append("Singular Name: ")
+                                    .append(currency.getName())
+                                    .bold(true)
+                                    .reset()
+                                    .append("\n\n")
+                                    .reset()
+                                    .append("Plural Name: ")
+                                    .append(currency.getNamePlural())
+                                    .bold(true)
+                                    .reset()
+                                    .append("\n\n")
+                                    .reset()
+                                    .append("Digits: ")
+                                    .append(String.valueOf(currency.getDigits()))
+                                    .bold(true)
+                                    .reset()
+                                    .append("\n\n")
+                                    .create()
+                    );
 
                     ComponentBuilder builder = new ComponentBuilder()
                             .append("Denominations: ")
                             .append("\n");
 
                     for (Denomination denomination : currency.getDenominations()) {
-                        builder.reset().append(new ComponentBuilder(" - ").append(
-                                new ComponentBuilder(
-                                        denomination.getUnitName()
-                                ).underlined(true).event(new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        new Text(new ComponentBuilder(
-                                                "Value: "
-                                        ).append(new ComponentBuilder(String.valueOf(currency.getDisplayValue(
-                                                        denomination.getValue()
-                                                ))).bold(true).create()
-                                        ).append("\n").reset().append(new ComponentBuilder(
-                                                        "Material: "
-                                                ).append(new ComponentBuilder(
-                                                                denomination.getKey().type.getType().getKey().toString()
-                                                        ).bold(true).create()
-                                                ).create()
-                                        ).create())
-                                )).create()
-                        ).append("\n").create());
+                        BaseComponent[] valueComponent = new ComponentBuilder(
+                                "Value: "
+                        ).append(
+                                String.valueOf(
+                                        currency.getDisplayValue(
+                                                denomination.getValue()
+                                        )
+                                )
+                        ).bold(true).create();
+                        BaseComponent[] materialComponent = new ComponentBuilder(
+                                "Material: "
+                        ).append(
+                                denomination.getKey()
+                                        .type
+                                        .getType()
+                                        .getKey()
+                                        .toString()
+                        ).bold(true).create();
+
+                        builder.reset().append(
+                                new ComponentBuilder(" - ").append(
+                                        new ComponentBuilder(
+                                                denomination.getUnitName()
+                                        ).underlined(true).event(
+                                                new HoverEvent(
+                                                        HoverEvent.Action.SHOW_TEXT,
+                                                        new Text(
+                                                                new ComponentBuilder()
+                                                                        .append(valueComponent)
+                                                                        .append("\n")
+                                                                        .reset()
+                                                                        .append(materialComponent)
+                                                                        .create()
+                                                        )
+                                                )
+                                        ).create()
+                                ).append("\n").create()
+                        );
                     }
 
                     meta.spigot().addPage(builder.create());
