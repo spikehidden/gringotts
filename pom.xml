@@ -12,6 +12,7 @@
                 <directory>${basedir}</directory>
                 <filtering>true</filtering>
                 <includes>
+                    <include>CHANGELOG.md</include>
                     <include>LICENSE.txt</include>
                     <include>README.md</include>
                     <include>SECURITY.md</include>
