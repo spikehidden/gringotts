@@ -6,6 +6,10 @@ language: custom
 # regex that create a vault if matches with a sign
 vault_pattern: '[^\[]*\[(\w*) ?vault\]'
 
+# If this is set to true, when the user receives an amount of money
+# exceeding the inventory capacity, drop items that didn't fit.
+drop-overflowing-item: false
+
 # currency name and value config
 currency:
   # currency name to use in messages

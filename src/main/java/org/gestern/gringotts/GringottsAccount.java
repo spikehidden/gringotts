@@ -3,12 +3,14 @@ package org.gestern.gringotts;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.PlayerAccountHolder;
 import org.gestern.gringotts.api.TransactionResult;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.data.DAO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -158,8 +160,23 @@ public class GringottsAccount {
             if (remaining == 0) {
                 return SUCCESS;
             } else {
-                // failed, remove the stuff added so far
-                remove(amount - remaining);
+
+                if (CONF.dropOverflowingItem) {
+                    for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+                        if (denomination.getValue() <= remaining) {
+                            ItemStack stack = new ItemStack(denomination.getKey().type);
+                            int stackSize = stack.getMaxStackSize();
+                            long denItemCount = denomination.getValue() > 0 ? remaining / denomination.getValue() : 0;
+                            while (denItemCount > 0) {
+                                int remainderStackSize = denItemCount > stackSize ? stackSize : (int) denItemCount;
+                                stack.setAmount(remainderStackSize);
+                                denItemCount -= remainderStackSize;
+                                remaining -= remainderStackSize * denomination.getValue();
+                                playerOpt.get().getWorld().dropItem(playerOpt.get().getLocation(), stack);
+                            }
+                        }
+                    }
+                }
 
                 return INSUFFICIENT_SPACE;
             }
