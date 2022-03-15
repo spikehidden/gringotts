@@ -1,10 +1,13 @@
 package org.gestern.gringotts.commands;
 
+import com.google.common.collect.Lists;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.gestern.gringotts.Language.LANG;
 
@@ -12,6 +15,7 @@ import static org.gestern.gringotts.Language.LANG;
  * Player commands.
  */
 public class MoneyExecutor extends GringottsAbstractExecutor {
+    private static final List<String> commands = Arrays.asList("", "withdraw", "deposit", "send");
 
     /**
      * Executes the given command, returning its success.
@@ -112,6 +116,26 @@ public class MoneyExecutor extends GringottsAbstractExecutor {
                                       Command command,
                                       String alias,
                                       String[] args) {
-        return null;
+        String cmd = args[0].toLowerCase();
+
+        switch (args.length) {
+            case 1: {
+                return commands.stream()
+                        .filter(com -> com.startsWith(args[0]))
+                        .collect(Collectors.toList());
+            }
+            case 2: {
+                if ("send".equals(cmd)) {
+                    return suggestAccounts(args[1]);
+                }
+            }
+            case 3: {
+                if ("pay".equals(cmd)) {
+                    return suggestAccounts(args[2]);
+                }
+            }
+        }
+
+        return Lists.newArrayList();
     }
 }

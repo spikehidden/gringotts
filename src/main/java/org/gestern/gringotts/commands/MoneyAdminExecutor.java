@@ -1,22 +1,14 @@
 package org.gestern.gringotts.commands;
 
 import com.google.common.collect.Lists;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.gestern.gringotts.Gringotts;
-import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.TransactionResult;
-import org.gestern.gringotts.event.VaultCreationEvent;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
@@ -215,32 +207,7 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                     case "add":
                     case "remove":
                     case "rm": {
-                        String[] steps = (args[1] + " ").split(":");
-
-                        if (steps.length == 1) {
-                            return Stream.of(Bukkit.getOfflinePlayers())
-                                    .map(OfflinePlayer::getName)
-                                    .filter(Objects::nonNull)
-                                    .filter(name -> name.startsWith(args[1]))
-                                    .collect(Collectors.toList());
-                        }
-
-                        try {
-                            VaultCreationEvent.Type type = VaultCreationEvent.Type.valueOf(steps[0].toUpperCase());
-
-                            Optional<AccountHolderProvider> providerOptional = Gringotts.getInstance()
-                                    .getAccountHolderFactory()
-                                    .getProvider(type);
-
-                            if (providerOptional.isPresent()) {
-                                return providerOptional.get().getAccountNames().stream()
-                                        .filter(Objects::nonNull)
-                                        .map(s -> type.getId() + ":" + s)
-                                        .filter(name -> name.startsWith(args[1]))
-                                        .collect(Collectors.toList());
-                            }
-                        } catch (Exception ignored) {
-                        }
+                        return suggestAccounts(args[1]);
                     }
                 }
             }

@@ -25,6 +25,7 @@ commands:
     description: Money actions
     usage: |
       /money
+      /money stack
       /money widthrow <amount>
       /money deposit <amount>
       /money send <account> <amount>

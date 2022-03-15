@@ -1,5 +1,6 @@
 package org.gestern.gringotts.commands;
 
+import com.google.common.collect.Lists;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -11,10 +12,13 @@ import org.bukkit.entity.Player;
 import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.Permissions;
+import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.*;
+import org.gestern.gringotts.event.VaultCreationEvent;
 
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.gestern.gringotts.Language.LANG;
 import static org.gestern.gringotts.Permissions.COMMAND_DEPOSIT;
@@ -29,7 +33,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     static final String TAG_VALUE = "%value";
 
     final Gringotts plugin = Gringotts.getInstance();
-    final Eco eco = plugin.getEco();
+    final Eco       eco    = plugin.getEco();
 
     static void sendInvalidAccountMessage(CommandSender sender, String accountName) {
         sender.sendMessage(LANG.invalid_account.replace(TAG_PLAYER, accountName));
@@ -108,18 +112,18 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
         }
 
         PlayerAccount from = eco.player(player.getUniqueId());
-        Account to = eco.account(recipientName);
+        Account       to   = eco.account(recipientName);
 
-        TaxedTransaction transaction = from.send(value).withTaxes();
-        TransactionResult result = transaction.to(eco.player(reciepienPlayer.getUniqueId()));
+        TaxedTransaction  transaction = from.send(value).withTaxes();
+        TransactionResult result      = transaction.to(eco.player(reciepienPlayer.getUniqueId()));
 
-        double tax = transaction.getTax();
+        double tax        = transaction.getTax();
         double valueAdded = value + tax;
 
-        String formattedBalance = eco.currency().format(from.balance());
-        String formattedValue = eco.currency().format(value);
+        String formattedBalance      = eco.currency().format(from.balance());
+        String formattedValue        = eco.currency().format(value);
         String formattedValuePlusTax = eco.currency().format(valueAdded);
-        String formattedTax = eco.currency().format(tax);
+        String formattedTax          = eco.currency().format(tax);
 
         switch (result) {
             case SUCCESS:
@@ -170,8 +174,8 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
     void deposit(Player player, double value) {
         if (COMMAND_DEPOSIT.isAllowed(player)) {
-            TransactionResult result = eco.player(player.getUniqueId()).deposit(value);
-            String formattedValue = eco.currency().format(value);
+            TransactionResult result         = eco.player(player.getUniqueId()).deposit(value);
+            String            formattedValue = eco.currency().format(value);
 
             if (result == SUCCESS) {
                 String success = LANG.deposit_success.replace(TAG_VALUE, formattedValue);
@@ -187,8 +191,8 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
     void withdraw(Player player, double value) {
         if (COMMAND_WITHDRAW.isAllowed(player)) {
-            TransactionResult result = eco.player(player.getUniqueId()).withdraw(value);
-            String formattedValue = eco.currency().format(value);
+            TransactionResult result         = eco.player(player.getUniqueId()).withdraw(value);
+            String            formattedValue = eco.currency().format(value);
 
             if (result == SUCCESS) {
                 String success = LANG.withdraw_success.replace(TAG_VALUE, formattedValue);
@@ -212,5 +216,36 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
         if (Configuration.CONF.balanceShowInventory) {
             account.message(LANG.inv_balance.replace(TAG_BALANCE, eco.currency().format(account.invBalance())));
         }
+    }
+
+    public List<String> suggestAccounts(String arg) {
+        String[] steps = (arg + " ").split(":");
+
+        if (steps.length == 1) {
+            return Stream.of(Bukkit.getOfflinePlayers())
+                    .map(OfflinePlayer::getName)
+                    .filter(Objects::nonNull)
+                    .filter(name -> name.startsWith(arg))
+                    .collect(Collectors.toList());
+        }
+
+        try {
+            VaultCreationEvent.Type type = VaultCreationEvent.Type.valueOf(steps[0].toUpperCase());
+
+            Optional<AccountHolderProvider> providerOptional = Gringotts.getInstance()
+                    .getAccountHolderFactory()
+                    .getProvider(type);
+
+            if (providerOptional.isPresent()) {
+                return providerOptional.get().getAccountNames().stream()
+                        .filter(Objects::nonNull)
+                        .map(s -> type.getId() + ":" + s)
+                        .filter(name -> name.startsWith(arg))
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception ignored) {
+        }
+
+        return Lists.newArrayList();
     }
 }
