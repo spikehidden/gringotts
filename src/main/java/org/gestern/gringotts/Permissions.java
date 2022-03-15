@@ -23,10 +23,6 @@ public enum Permissions {
      */
     CREATE_VAULT_PLAYER("gringotts.createvault.player"),
     /**
-     * Create vault faction permissions.
-     */
-    CREATE_VAULT_FACTION("gringotts.createvault.faction"),
-    /**
      * Create vault town permissions.
      */
     CREATE_VAULT_TOWN("gringotts.createvault.town"),
@@ -34,10 +30,6 @@ public enum Permissions {
      * Create vault nation permissions.
      */
     CREATE_VAULT_NATION("gringotts.createvault.nation"),
-    /**
-     * Create vault worldguard permissions.
-     */
-    CREATE_VAULT_WORLDGUARD("gringotts.createvault.worldguard"),
     /**
      * Transfer permissions.
      */

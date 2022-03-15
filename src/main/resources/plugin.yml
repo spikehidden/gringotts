@@ -48,7 +48,6 @@ permissions:
     default: true
     children:
       gringotts.createvault.player: true
-      gringotts.createvault.faction: true
       gringotts.createvault.town: true
       gringotts.createvault.nation: true
 
@@ -58,17 +57,11 @@ permissions:
   gringotts.createvault.player:
     description: Create player vaults
     default: true
-  gringotts.createvault.faction:
-    description: Create faction vaults (Factions only)
-    default: true
   gringotts.createvault.town:
     description: Create town vaults (Towny only)
     default: true
   gringotts.createvault.nation:
     description: Create nation vaults (Towny only)
-    default: true
-  gringotts.createvault.worldguard:
-    description: Create region vaults (WorldGuard only)
     default: true
 
   gringotts.usevault:
