@@ -196,7 +196,7 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
         switch (args.length) {
             case 1: {
                 return commands.stream()
-                        .filter(com -> com.startsWith(args[0]))
+                        .filter(com -> startsWithIgnoreCase(com, args[0]))
                         .collect(Collectors.toList());
             }
             case 2: {
@@ -210,6 +210,7 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                         return suggestAccounts(args[1]);
                     }
                 }
+                break;
             }
         }
 

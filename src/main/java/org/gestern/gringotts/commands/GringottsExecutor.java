@@ -251,7 +251,7 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
 
         if (args.length == 1) {
             return commands.stream()
-                    .filter(com -> com.startsWith(args[0]))
+                    .filter(com -> startsWithIgnoreCase(com, args[0]))
                     .collect(Collectors.toList());
         }
 

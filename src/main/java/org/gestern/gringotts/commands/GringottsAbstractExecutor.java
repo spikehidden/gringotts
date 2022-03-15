@@ -225,7 +225,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
             return Stream.of(Bukkit.getOfflinePlayers())
                     .map(OfflinePlayer::getName)
                     .filter(Objects::nonNull)
-                    .filter(name -> name.startsWith(arg))
+                    .filter(name -> startsWithIgnoreCase(name, arg))
                     .collect(Collectors.toList());
         }
 
@@ -240,12 +240,16 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
                 return providerOptional.get().getAccountNames().stream()
                         .filter(Objects::nonNull)
                         .map(s -> type.getId() + ":" + s)
-                        .filter(name -> name.startsWith(arg))
+                        .filter(name -> startsWithIgnoreCase(name, arg))
                         .collect(Collectors.toList());
             }
         } catch (Exception ignored) {
         }
 
         return Lists.newArrayList();
+    }
+
+    public boolean startsWithIgnoreCase(String source, String target) {
+        return source.substring(0, target.length()).equalsIgnoreCase(target);
     }
 }
