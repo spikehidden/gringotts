@@ -1,8 +1,7 @@
 package org.gestern.gringotts.dependency.towny;
 
 import com.palmergames.bukkit.towny.Towny;
-import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,10 +23,10 @@ import org.gestern.gringotts.event.VaultCreationEvent;
  */
 public class TownyDependency implements Dependency, Listener {
     private final NationHolderProvider nationHolderProvider;
-    private final TownHolderProvider townHolderProvider;
-    private final Gringotts gringotts;
-    private final Towny plugin;
-    private final String id;
+    private final TownHolderProvider   townHolderProvider;
+    private final Gringotts            gringotts;
+    private final Towny                plugin;
+    private final String               id;
 
     /**
      * Instantiates a new Towny dependency.
@@ -48,11 +47,11 @@ public class TownyDependency implements Dependency, Listener {
         }
 
         this.gringotts = gringotts;
-        this.plugin = (Towny) plugin;
-        this.id = "towny";
+        this.plugin    = (Towny) plugin;
+        this.id        = "towny";
 
         this.nationHolderProvider = new NationHolderProvider(gringotts);
-        this.townHolderProvider = new TownHolderProvider(gringotts);
+        this.townHolderProvider   = new TownHolderProvider(gringotts);
     }
 
     /**
@@ -136,13 +135,9 @@ public class TownyDependency implements Dependency, Listener {
                 }
 
                 if (forOther) {
-                    try {
-                        owner = this.townHolderProvider.getAccountHolder(
-                                TownyAPI.getInstance().getDataSource().getTown(line2String)
-                        );
-                    } catch (NotRegisteredException e) {
-                        return;
-                    }
+                    owner = this.townHolderProvider.getAccountHolder(
+                            TownyUniverse.getInstance().getTown(line2String)
+                    );
 
                     if (owner == null) {
                         return;
@@ -170,13 +165,9 @@ public class TownyDependency implements Dependency, Listener {
                 }
 
                 if (forOther) {
-                    try {
-                        owner = this.nationHolderProvider.getAccountHolder(
-                                TownyAPI.getInstance().getDataSource().getNation(line2String)
-                        );
-                    } catch (NotRegisteredException e) {
-                        return;
-                    }
+                    owner = this.nationHolderProvider.getAccountHolder(
+                            TownyUniverse.getInstance().getNation(line2String)
+                    );
 
                     if (owner == null) {
                         return;
@@ -196,8 +187,8 @@ public class TownyDependency implements Dependency, Listener {
 
                 break;
             }
-        default:
-            break;
+            default:
+                break;
         }
     }
 }

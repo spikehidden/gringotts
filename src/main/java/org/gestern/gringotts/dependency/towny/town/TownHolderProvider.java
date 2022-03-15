@@ -1,6 +1,5 @@
 package org.gestern.gringotts.dependency.towny.town;
 
-import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.RenameTownEvent;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
@@ -48,23 +47,11 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
             return getAccountHolder(UUID.fromString(id));
         } catch (IllegalArgumentException ignored) {
             if (id.startsWith(VaultCreationEvent.Type.TOWN.getId() + "-")) {
-                try {
-                    return getAccountHolder(
-                            TownyAPI.getInstance()
-                                    .getDataSource()
-                                    .getTown(id.substring(5))
-                    );
-                } catch (NotRegisteredException ignored1) {
-                }
-            } else {
-                try {
-                    return getAccountHolder(TownyAPI.getInstance().getDataSource().getTown(id));
-                } catch (NotRegisteredException ignored1) {
-                }
+                return getAccountHolder(TownyUniverse.getInstance().getTown(id.substring(5)));
             }
         }
 
-        return null;
+        return getAccountHolder(TownyUniverse.getInstance().getTown(id));
     }
 
     /**
@@ -75,12 +62,7 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      */
     @Override
     public AccountHolder getAccountHolder(UUID uuid) {
-        try {
-            return getAccountHolder(TownyAPI.getInstance().getDataSource().getTown(uuid));
-        } catch (NotRegisteredException ignored) {
-        }
-
-        return null;
+        return getAccountHolder(TownyUniverse.getInstance().getTown(uuid));
     }
 
     /**
@@ -125,8 +107,7 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      */
     @Override
     public Set<String> getAccountNames() {
-        return TownyAPI.getInstance()
-                .getDataSource()
+        return TownyUniverse.getInstance()
                 .getTowns()
                 .stream()
                 .map(TownyObject::getName)

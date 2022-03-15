@@ -1,6 +1,5 @@
 package org.gestern.gringotts.dependency.towny.nation;
 
-import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.RenameNationEvent;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
@@ -49,23 +48,13 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
             return getAccountHolder(UUID.fromString(id));
         } catch (IllegalArgumentException ignored) {
             if (id.startsWith(VaultCreationEvent.Type.NATION.getId() + "-")) {
-                try {
-                    return getAccountHolder(
-                            TownyAPI.getInstance()
-                                    .getDataSource()
-                                    .getNation(id.substring(7))
-                    );
-                } catch (NotRegisteredException ignored1) {
-                }
-            } else {
-                try {
-                    return getAccountHolder(TownyAPI.getInstance().getDataSource().getNation(id));
-                } catch (NotRegisteredException ignored1) {
-                }
+                return getAccountHolder(
+                        TownyUniverse.getInstance().getNation(id.substring(7))
+                );
             }
         }
 
-        return null;
+        return getAccountHolder(TownyUniverse.getInstance().getNation(id));
     }
 
     /**
@@ -76,12 +65,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      */
     @Override
     public AccountHolder getAccountHolder(UUID uuid) {
-        try {
-            return getAccountHolder(TownyAPI.getInstance().getDataSource().getNation(uuid));
-        } catch (NotRegisteredException ignored) {
-        }
-
-        return null;
+        return getAccountHolder(TownyUniverse.getInstance().getNation(uuid));
     }
 
     /**
@@ -99,7 +83,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
                 return null;
             }
 
-            Town town = resident.getTown();
+            Town   town   = resident.getTown();
             Nation nation = town.getNation();
 
             return getAccountHolder(nation);
@@ -126,8 +110,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      */
     @Override
     public Set<String> getAccountNames() {
-        return TownyAPI.getInstance()
-                .getDataSource()
+        return TownyUniverse.getInstance()
                 .getNations()
                 .stream()
                 .map(TownyObject::getName)
