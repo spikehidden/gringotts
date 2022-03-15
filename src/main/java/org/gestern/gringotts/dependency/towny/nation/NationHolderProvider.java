@@ -17,7 +17,6 @@ import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.UUID;
@@ -34,7 +33,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      *
      * @param gringotts the gringotts
      */
-    public NationHolderProvider(@NotNull Gringotts gringotts) {
+    public NationHolderProvider(Gringotts gringotts) {
         this.gringotts = gringotts;
     }
 
@@ -45,7 +44,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return account holder for id
      */
     @Override
-    public AccountHolder getAccountHolder(@NotNull String id) {
+    public AccountHolder getAccountHolder(String id) {
         try {
             return getAccountHolder(UUID.fromString(id));
         } catch (IllegalArgumentException ignored) {
@@ -76,7 +75,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return account holder for id
      */
     @Override
-    public AccountHolder getAccountHolder(@NotNull UUID uuid) {
+    public AccountHolder getAccountHolder(UUID uuid) {
         try {
             return getAccountHolder(TownyAPI.getInstance().getDataSource().getNation(uuid));
         } catch (NotRegisteredException ignored) {
@@ -92,7 +91,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return TownyAccountHolder for the nation of which player is a resident, if any. null otherwise.
      */
     @Override
-    public AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
+    public AccountHolder getAccountHolder(OfflinePlayer player) {
         try {
             Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
 

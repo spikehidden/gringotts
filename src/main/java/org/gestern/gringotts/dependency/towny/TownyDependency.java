@@ -18,8 +18,6 @@ import org.gestern.gringotts.dependency.towny.nation.NationHolderProvider;
 import org.gestern.gringotts.dependency.towny.town.TownHolderProvider;
 import org.gestern.gringotts.event.PlayerVaultCreationEvent;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The type Towny dependency.
@@ -37,8 +35,8 @@ public class TownyDependency implements Dependency, Listener {
      * @param gringotts the gringotts
      * @param plugin    the plugin
      */
-    public TownyDependency(@NotNull Gringotts gringotts,
-                           @Nullable Plugin plugin) {
+    public TownyDependency(Gringotts gringotts,
+                           Plugin plugin) {
         if (plugin == null) {
             throw new NullArgumentException("'plugin' is null");
         }

@@ -3,7 +3,6 @@ package org.gestern.gringotts.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -27,10 +26,10 @@ public class MoneyExecutor extends GringottsAbstractExecutor {
      * @return true if a valid command, otherwise false
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull Command cmd,
-                             @NotNull String commandLabel,
-                             @NotNull String[] args) {
+    public boolean onCommand(CommandSender sender,
+                             Command cmd,
+                             String commandLabel,
+                             String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(LANG.playerOnly);
             return false;
@@ -93,10 +92,10 @@ public class MoneyExecutor extends GringottsAbstractExecutor {
      * to default to the command executor
      */
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender,
-                                      @NotNull Command command,
-                                      @NotNull String alias,
-                                      @NotNull String[] args) {
+    public List<String> onTabComplete(CommandSender sender,
+                                      Command command,
+                                      String alias,
+                                      String[] args) {
         return null;
     }
 }

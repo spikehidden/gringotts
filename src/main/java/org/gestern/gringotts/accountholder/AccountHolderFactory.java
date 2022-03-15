@@ -3,7 +3,6 @@ package org.gestern.gringotts.accountholder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -136,7 +135,6 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
      *
      * @return an Iterator.
      */
-    @NotNull
     @Override
     public Iterator<AccountHolderProvider> iterator() {
         return accountHolderProviders.values().iterator();
@@ -145,7 +143,7 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
     private static class PlayerAccountHolderProvider implements AccountHolderProvider {
 
         @Override
-        public AccountHolder getAccountHolder(@NotNull String uuidOrName) {
+        public AccountHolder getAccountHolder(String uuidOrName) {
             try {
                 return getAccountHolder(UUID.fromString(uuidOrName));
             } catch (IllegalArgumentException ignored) {
@@ -162,7 +160,7 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
         }
 
         @Override
-        public AccountHolder getAccountHolder(@NotNull UUID uuid) {
+        public AccountHolder getAccountHolder(UUID uuid) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
             //noinspection ConstantConditions
@@ -174,7 +172,7 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
         }
 
         @Override
-        public AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
+        public AccountHolder getAccountHolder(OfflinePlayer player) {
             // if this player has ever played on the server, they are a legit account holder
             if (player.isOnline() || player.hasPlayedBefore()) {
                 return new PlayerAccountHolder(player);

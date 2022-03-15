@@ -12,8 +12,6 @@ import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.Permissions;
 import org.gestern.gringotts.api.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -44,9 +42,9 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
      * @param command    the command
      * @param permission the permission
      */
-    public static void testPermission(@NotNull CommandSender sender,
-                                      @NotNull Command command,
-                                      @NotNull String permission) {
+    public static void testPermission(CommandSender sender,
+                                      Command command,
+                                      String permission) {
         if (!testPermission(sender, permission)) {
             if (command.getPermissionMessage() == null) {
                 throw new CommandException("I'm sorry, but you do not have permission to perform this command. " +
@@ -65,7 +63,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
      * @return the boolean
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean testPermission(@NotNull CommandSender sender, @Nullable String permission) {
+    public static boolean testPermission(CommandSender sender, String permission) {
         if ((permission == null) || (permission.length() == 0)) {
             return true;
         }

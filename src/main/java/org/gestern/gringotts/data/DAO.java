@@ -5,7 +5,6 @@ import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.GringottsStorageException;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -55,7 +54,7 @@ public interface DAO {
      * @param newName the new name
      * @return the boolean
      */
-    boolean renameAccount(String type, @NotNull AccountHolder holder, String newName);
+    boolean renameAccount(String type, AccountHolder holder, String newName);
 
     /**
      * Rename account boolean.

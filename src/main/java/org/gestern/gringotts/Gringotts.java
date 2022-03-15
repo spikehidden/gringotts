@@ -45,7 +45,6 @@ import org.gestern.gringotts.dependency.towny.TownyDependency;
 import org.gestern.gringotts.event.AccountListener;
 import org.gestern.gringotts.event.PlayerVaultListener;
 import org.gestern.gringotts.event.VaultCreator;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.InputStream;
@@ -228,10 +227,10 @@ public class Gringotts extends JavaPlugin {
      * @param classPath  the class path
      * @param minVersion the min version
      */
-    private void registerGenericDependency(@NotNull String id,
-                                           @NotNull String name,
-                                           @NotNull String classPath,
-                                           @NotNull String minVersion) {
+    private void registerGenericDependency(String id,
+                                           String name,
+                                           String classPath,
+                                           String minVersion) {
         try {
             if (!this.dependencies.registerDependency(new GenericDependency(
                     this.dependencies.hookPlugin(
@@ -332,7 +331,7 @@ public class Gringotts extends JavaPlugin {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    private boolean registerCommand(@NotNull String[] names, @NotNull TabExecutor executor) {
+    private boolean registerCommand(String[] names, TabExecutor executor) {
         boolean returned = true;
 
         for (String name : names) {
@@ -344,7 +343,7 @@ public class Gringotts extends JavaPlugin {
         return returned;
     }
 
-    private boolean registerCommand(@NotNull String name, @NotNull TabExecutor executor) {
+    private boolean registerCommand(String name, TabExecutor executor) {
         PluginCommand pluginCommand = getCommand(name);
 
         if (pluginCommand == null) {

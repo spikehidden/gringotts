@@ -10,7 +10,6 @@ import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.TransactionResult;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +40,9 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
      * @return true if a valid command, otherwise false
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull Command cmd,
-                             @NotNull String commandLabel,
+    public boolean onCommand(CommandSender sender,
+                             Command cmd,
+                             String commandLabel,
                              String[] args) {
         testPermission(sender, cmd, "gringotts.admin");
 
@@ -192,10 +191,10 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
      * to default to the command executor
      */
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender,
-                                      @NotNull Command command,
-                                      @NotNull String alias,
-                                      @NotNull String[] args) {
+    public List<String> onTabComplete(CommandSender sender,
+                                      Command command,
+                                      String alias,
+                                      String[] args) {
         if (!testPermission(sender, "gringotts.admin")) {
             return Lists.newArrayList();
         }

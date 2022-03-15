@@ -3,7 +3,6 @@ package org.gestern.gringotts.dependency;
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.plugin.Plugin;
 import org.gestern.gringotts.api.dependency.Dependency;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The type Generic dependency.
@@ -19,7 +18,7 @@ public class GenericDependency implements Dependency {
      * @param id     the id
      */
     public GenericDependency(Plugin plugin,
-                             @NotNull String id) {
+                             String id) {
         if (plugin == null) {
             throw new NullArgumentException(
                     "The 'plugin' is null"

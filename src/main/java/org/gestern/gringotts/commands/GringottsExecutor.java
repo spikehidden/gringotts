@@ -17,7 +17,6 @@ import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.api.dependency.Dependency;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.currency.GringottsCurrency;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,9 +53,9 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
      * @return true if a valid command, otherwise false
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull Command command,
-                             @NotNull String label,
+    public boolean onCommand(CommandSender sender,
+                             Command command,
+                             String label,
                              String[] args) {
         testPermission(sender, command, "gringotts.admin");
 
@@ -242,10 +241,10 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
      * to default to the command executor
      */
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender,
-                                      @NotNull Command command,
-                                      @NotNull String alias,
-                                      @NotNull String[] args) {
+    public List<String> onTabComplete(CommandSender sender,
+                                      Command command,
+                                      String alias,
+                                      String[] args) {
         if (!testPermission(sender, "gringotts.admin")) {
             return Lists.newArrayList();
         }

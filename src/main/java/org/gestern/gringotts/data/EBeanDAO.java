@@ -14,7 +14,6 @@ import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.Util;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -242,7 +241,7 @@ public class EBeanDAO implements DAO {
      * @return the boolean
      */
     @Override
-    public boolean renameAccount(String type, @NotNull AccountHolder holder, String newName) {
+    public boolean renameAccount(String type, AccountHolder holder, String newName) {
         return renameAccount(type, holder.getId(), newName);
     }
 

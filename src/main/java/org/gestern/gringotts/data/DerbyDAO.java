@@ -8,7 +8,6 @@ import org.bukkit.block.Sign;
 import org.gestern.gringotts.*;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.event.VaultCreationEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -243,15 +242,15 @@ public class DerbyDAO implements DAO {
         }
     }
 
-    public synchronized boolean renameAccount(@NotNull String type,
-                                              @NotNull AccountHolder holder,
-                                              @NotNull String newName) {
+    public synchronized boolean renameAccount(String type,
+                                              AccountHolder holder,
+                                              String newName) {
         return renameAccount(type, holder.getId(), newName);
     }
 
-    public synchronized boolean renameAccount(@NotNull String type,
-                                              @NotNull String oldName,
-                                              @NotNull String newName) {
+    public synchronized boolean renameAccount(String type,
+                                              String oldName,
+                                              String newName) {
         try {
             renameAccount.setString(1, newName);
             renameAccount.setString(2, type);

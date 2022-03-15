@@ -1,7 +1,6 @@
 package org.gestern.gringotts.api.dependency;
 
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -96,7 +95,6 @@ public interface DependencyProvider extends Iterable<Dependency> {
      *
      * @return an Iterator.
      */
-    @NotNull
     @Override
     default Iterator<Dependency> iterator() {
         return getDependencies().iterator();
