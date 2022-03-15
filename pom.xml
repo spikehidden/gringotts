@@ -57,10 +57,6 @@
                             <pattern>io.papermc</pattern>
                             <shadedPattern>org.gestern.gringotts</shadedPattern>
                         </relocation>
-                        <relocation>
-                            <pattern>org.jetbrains</pattern>
-                            <shadedPattern>org.gestern.gringotts</shadedPattern>
-                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
