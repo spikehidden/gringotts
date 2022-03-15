@@ -1,11 +1,23 @@
 Gringotts Changelog
 ===================
 
-v2.12.3
+v2.12.4
 ---
 ###### Upcoming
 * ! Custom item texture by NBT Tag 'Item Texture'. Idea by [jeannen](https://www.spigotmc.org/members/jeannen.44475/) on spigot.org
 * ! Multiworld support
+
+
+v2.12.3
+---
+###### Upcoming
+* Update dependencies
+  * spigot-api to v1.18.2-R0.1-SNAPSHOT
+  * bstats-bukkit to v3.0.0
+  * towny to v0.98.0.0
+* Remove dependencies/plugins
+  * jetbrains's annotations
+* remove WorldGuard as softdepend fixes #84
 
 
 v2.12.2
