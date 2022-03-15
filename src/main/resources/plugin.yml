@@ -25,7 +25,9 @@ commands:
     description: Money actions
     usage: |
       /money
-      /money pay <account> <amount>
+      /money widthrow <amount>
+      /money deposit <amount>
+      /money send <account> <amount>
   moneyadmin:
     aliases: [moneyadm, mad]
     description: Gringotts admin actions

@@ -71,14 +71,12 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
         return Arrays.stream(permission.split(";")).anyMatch(sender::hasPermission);
     }
 
-    boolean pay(Player player, double value, String[] args) {
+    boolean pay(Player player, double value, String recipientName) {
         if (!Permissions.TRANSFER.isAllowed(player)) {
             player.sendMessage(LANG.noperm);
 
             return true;
         }
-
-        String recipientName = args[2];
 
         OfflinePlayer reciepienPlayer = Bukkit.getPlayer(recipientName);
 

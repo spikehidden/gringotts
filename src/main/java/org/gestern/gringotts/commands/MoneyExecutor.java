@@ -46,33 +46,49 @@ public class MoneyExecutor extends GringottsAbstractExecutor {
 
         String command = args[0];
 
-        double value;
+        switch (command.toLowerCase()) {
+            case "withdraw": {
+                try {
+                    double value = Double.parseDouble(args[1]);
 
-        if (args.length == 2) {
-            try {
-                value = Double.parseDouble(args[1]);
-            } catch (NumberFormatException ignored) {
-                return false;
+                    withdraw(player, value);
+
+                    return true;
+                } catch (NumberFormatException ignored) {
+                    return false;
+                }
             }
+            case "deposit": {
+                try {
+                    double value = Double.parseDouble(args[1]);
 
-            if ("withdraw".equals(command)) {
-                withdraw(player, value);
+                    deposit(player, value);
 
-                return true;
-            } else if ("deposit".equals(command)) {
-                deposit(player, value);
-
-                return true;
+                    return true;
+                } catch (NumberFormatException ignored) {
+                    return false;
+                }
             }
-        } else if (args.length == 3 && "pay".equals(command)) {
-            try {
-                value = Double.parseDouble(args[1]);
-            } catch (NumberFormatException ignored) {
-                return false;
-            }
+            case "send": {
+                try {
+                    double value = Double.parseDouble(args[2]);
 
-            // money pay <amount> <player>
-            return pay(player, value, args);
+                    // money send <player> <amount>
+                    return pay(player, value, args[1]);
+                } catch (NumberFormatException ignored) {
+                    return false;
+                }
+            }
+            case "pay": {
+                try {
+                    double value = Double.parseDouble(args[1]);
+
+                    // money pay <amount> <player>
+                    return pay(player, value, args[2]);
+                } catch (NumberFormatException ignored) {
+                    return false;
+                }
+            }
         }
 
         return false;
