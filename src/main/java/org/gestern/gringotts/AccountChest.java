@@ -51,7 +51,7 @@ public class AccountChest {
      *
      * @return InventoryHolder for this account chest
      */
-    private InventoryHolder chest() {
+    public InventoryHolder chest() {
         Block block = Util.chestBlock(sign);
 
         if (block != null) {

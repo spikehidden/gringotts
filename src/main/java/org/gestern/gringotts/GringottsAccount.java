@@ -1,18 +1,20 @@
 package org.gestern.gringotts;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.PlayerAccountHolder;
 import org.gestern.gringotts.api.TransactionResult;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.data.DAO;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static org.gestern.gringotts.Configuration.CONF;
@@ -27,8 +29,8 @@ import static org.gestern.gringotts.api.TransactionResult.*;
  * @author jast
  */
 public class GringottsAccount {
-    public final AccountHolder owner;
-    private final DAO dao = Gringotts.getInstance().getDao();
+    public final  AccountHolder owner;
+    private final DAO           dao = Gringotts.getInstance().getDao();
 
     public GringottsAccount(AccountHolder owner) {
         if (owner == null) {
@@ -70,9 +72,9 @@ public class GringottsAccount {
      * @return current balance of this account in cents
      */
     public long getBalance() {
-        CompletableFuture<Long> cents = getCents();
+        CompletableFuture<Long> cents     = getCents();
         CompletableFuture<Long> playerInv = countPlayerInventory();
-        CompletableFuture<Long> chestInv = countChestInventories();
+        CompletableFuture<Long> chestInv  = countChestInventories();
 
         // order of combination is important, because chestInv/playerInv might have to run on main thread
         CompletableFuture<Long> f = chestInv
@@ -97,9 +99,9 @@ public class GringottsAccount {
      * @return current balance this account has in inventory in cents
      */
     public long getInvBalance() {
-        CompletableFuture<Long> cents = getCents();
+        CompletableFuture<Long> cents     = getCents();
         CompletableFuture<Long> playerInv = countPlayerInventory();
-        CompletableFuture<Long> f = cents.thenCombine(playerInv, Long::sum);
+        CompletableFuture<Long> f         = cents.thenCombine(playerInv, Long::sum);
 
         return getTimeout(f);
     }
@@ -129,6 +131,10 @@ public class GringottsAccount {
                     if (remaining <= 0) {
                         break;
                     }
+
+                    if (CONF.includeShulkerBoxes) {
+                        remaining = addToShulkerBox(remaining, chest.chest().getInventory());
+                    }
                 }
             }
 
@@ -138,19 +144,27 @@ public class GringottsAccount {
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
 
-                if (USE_VAULT_INVENTORY.isAllowed(player)) {
+                if (remaining > 0 && USE_VAULT_INVENTORY.isAllowed(player)) {
                     remaining -= new AccountInventory(player.getInventory()).add(remaining);
+
+                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                        remaining = addToShulkerBox(remaining, player.getInventory());
+                    }
                 }
-                if (CONF.usevaultEnderchest && USE_VAULT_ENDERCHEST.isAllowed(player)) {
+                if (remaining > 0 && CONF.usevaultEnderchest && USE_VAULT_ENDERCHEST.isAllowed(player)) {
                     remaining -= new AccountInventory(player.getEnderChest()).add(remaining);
+
+                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                        remaining = addToShulkerBox(remaining, player.getEnderChest());
+                    }
                 }
             }
 
             // allow smallest denom value as threshold for available space
             // TODO make maximum virtual amount configurable
             // this is under the assumption that there is always at least 1 denomination
-            List<Denomination> denoms = CONF.getCurrency().getDenominations();
-            long smallestDenomValue = denoms.get(denoms.size() - 1).getValue();
+            List<Denomination> denoms             = CONF.getCurrency().getDenominations();
+            long               smallestDenomValue = denoms.get(denoms.size() - 1).getValue();
 
             if (remaining < smallestDenomValue) {
                 dao.storeCents(this, remaining);
@@ -160,13 +174,12 @@ public class GringottsAccount {
             if (remaining == 0) {
                 return SUCCESS;
             } else {
-
                 if (CONF.dropOverflowingItem) {
                     for (Denomination denomination : CONF.getCurrency().getDenominations()) {
                         if (denomination.getValue() <= remaining) {
-                            ItemStack stack = new ItemStack(denomination.getKey().type);
-                            int stackSize = stack.getMaxStackSize();
-                            long denItemCount = denomination.getValue() > 0 ? remaining / denomination.getValue() : 0;
+                            ItemStack stack        = new ItemStack(denomination.getKey().type);
+                            int       stackSize    = stack.getMaxStackSize();
+                            long      denItemCount = denomination.getValue() > 0 ? remaining / denomination.getValue() : 0;
                             while (denItemCount > 0) {
                                 int remainderStackSize = denItemCount > stackSize ? stackSize : (int) denItemCount;
                                 stack.setAmount(remainderStackSize);
@@ -210,6 +223,14 @@ public class GringottsAccount {
             if (CONF.usevaultContainer) {
                 for (AccountChest chest : dao.retrieveChests(this)) {
                     remaining -= chest.remove(remaining);
+
+                    if (remaining <= 0) {
+                        break;
+                    }
+
+                    if (CONF.includeShulkerBoxes) {
+                        remaining = removeFromShulkerBox(remaining, chest.chest().getInventory());
+                    }
                 }
             }
 
@@ -218,11 +239,19 @@ public class GringottsAccount {
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
 
-                if (USE_VAULT_INVENTORY.isAllowed(player)) {
+                if (USE_VAULT_INVENTORY.isAllowed(player) && remaining > 0) {
                     remaining -= new AccountInventory(player.getInventory()).remove(remaining);
+
+                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                        remaining = removeFromShulkerBox(remaining, player.getInventory());
+                    }
                 }
-                if (CONF.usevaultEnderchest && USE_VAULT_ENDERCHEST.isAllowed(player)) {
+                if (CONF.usevaultEnderchest && remaining > 0) {
                     remaining -= new AccountInventory(player.getEnderChest()).remove(remaining);
+
+                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                        remaining = removeFromShulkerBox(remaining, player.getEnderChest());
+                    }
                 }
             }
 
@@ -240,6 +269,52 @@ public class GringottsAccount {
         };
 
         return getTimeout(callSync(callMe));
+    }
+
+    public long addToShulkerBox(long remaining, Inventory inventory) {
+        for (ItemStack itemStack : inventory.all(Material.SHULKER_BOX).values()) {
+            if (itemStack.getItemMeta() instanceof BlockStateMeta) {
+                BlockStateMeta blockState = (BlockStateMeta) itemStack.getItemMeta();
+                if (blockState.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulkerBox = (ShulkerBox) blockState.getBlockState();
+
+                    remaining -= new AccountInventory(shulkerBox.getInventory()).add(remaining);
+
+                    shulkerBox.update();
+                    blockState.setBlockState(shulkerBox);
+                    itemStack.setItemMeta(blockState);
+
+                    if (remaining <= 0) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return remaining;
+    }
+
+    public long removeFromShulkerBox(long remaining, Inventory inventory) {
+        for (ItemStack itemStack : inventory.all(Material.SHULKER_BOX).values()) {
+            if (itemStack.getItemMeta() instanceof BlockStateMeta) {
+                BlockStateMeta blockState = (BlockStateMeta) itemStack.getItemMeta();
+                if (blockState.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulkerBox = (ShulkerBox) blockState.getBlockState();
+
+                    remaining -= new AccountInventory(shulkerBox.getInventory()).remove(remaining);
+
+                    shulkerBox.update();
+                    blockState.setBlockState(shulkerBox);
+                    itemStack.setItemMeta(blockState);
+
+                    if (remaining <= 0) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return remaining;
     }
 
     @Override
@@ -265,8 +340,8 @@ public class GringottsAccount {
 
     private CompletableFuture<Long> countChestInventories() {
         Callable<Long> callMe = () -> {
-            List<AccountChest> chests = dao.retrieveChests(this);
-            long balance = 0;
+            List<AccountChest> chests  = dao.retrieveChests(this);
+            long               balance = 0;
 
             if (CONF.usevaultContainer) {
                 for (AccountChest chest : chests) {

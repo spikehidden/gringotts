@@ -2,7 +2,10 @@ package org.gestern.gringotts.currency;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.gestern.gringotts.Configuration;
 
 import java.util.*;
 
@@ -91,6 +94,22 @@ public class GringottsCurrency {
     public long getValue(ItemStack stack) {
         if (stack == null || stack.getType() == Material.AIR) {
             return 0;
+        }
+
+        if (Configuration.CONF.includeShulkerBoxes && stack.getType() == Material.SHULKER_BOX) {
+            if (stack.getItemMeta() instanceof BlockStateMeta) {
+                BlockStateMeta blockState = (BlockStateMeta) stack.getItemMeta();
+                if (blockState.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulker       = (ShulkerBox) blockState.getBlockState();
+                    long       returnedValue = 0;
+
+                    for (ItemStack content : shulker.getInventory().getContents()) {
+                        returnedValue += getValue(content);
+                    }
+
+                    return returnedValue;
+                }
+            }
         }
 
         Denomination d = getDenominationOf(stack);

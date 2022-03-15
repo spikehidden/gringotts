@@ -76,6 +76,10 @@ public enum Configuration {
      */
     public boolean balanceShowInventory = true;
     /**
+     * if true, the denomination finding process will include shulker boxes
+     */
+    public boolean includeShulkerBoxes = true;
+    /**
      * Currency configuration.
      */
     private GringottsCurrency currency;
@@ -164,6 +168,7 @@ public enum Configuration {
         CONF.startBalanceNation = savedConfig.getLong("startingbalance.nation", 0);
 
         CONF.usevaultContainer = savedConfig.getBoolean("usevault.container", true);
+        CONF.includeShulkerBoxes = savedConfig.getBoolean("usevault.include-shulker-boxes", true);
 
         CONF.balanceShowInventory = savedConfig.getBoolean("balance.show-inventory", true);
         CONF.balanceShowVault = savedConfig.getBoolean("balance.show-vault", true);
