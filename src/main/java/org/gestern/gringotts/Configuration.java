@@ -40,6 +40,9 @@ public enum Configuration {
      * If a language is not supported by Gringotts, use user-configured or default (English) messages.
      */
     public String language = "custom";
+
+    public boolean dropOverflowingItem = false;
+
     /**
      * Flat tax on every player-to-player transaction. This is a value in currency units.
      */
@@ -149,6 +152,8 @@ public enum Configuration {
         // regular currency configuration (multi-denomination)
         ConfigurationSection denomSection = savedConfig.getConfigurationSection("currency.denominations");
         parseCurrency(denomSection, savedConfig);
+
+        CONF.dropOverflowingItem = savedConfig.getBoolean("drop-overflowing-item", false);
 
         CONF.transactionTaxFlat = savedConfig.getDouble("transactiontax.flat", 0);
         CONF.transactionTaxRate = savedConfig.getDouble("transactiontax.rate", 0);
