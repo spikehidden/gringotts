@@ -26,7 +26,7 @@ commands:
     usage: |
       /money
       /money stack
-      /money widthrow <amount>
+      /money withdraw <amount>
       /money deposit <amount>
       /money send <account> <amount>
   moneyadmin:
