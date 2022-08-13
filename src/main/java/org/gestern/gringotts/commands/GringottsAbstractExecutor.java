@@ -250,6 +250,6 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     public boolean startsWithIgnoreCase(String source, String target) {
-        return source.substring(0, target.length()).equalsIgnoreCase(target);
+        return source.toLowerCase().startsWith(target.toLowerCase());
     }
 }
