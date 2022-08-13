@@ -2,7 +2,6 @@ package org.gestern.gringotts.dependency.towny;
 
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyUniverse;
-import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,7 +36,7 @@ public class TownyDependency implements Dependency, Listener {
     public TownyDependency(Gringotts gringotts,
                            Plugin plugin) {
         if (plugin == null) {
-            throw new NullArgumentException("'plugin' is null");
+            throw new NullPointerException("'plugin' is null");
         }
 
         if (!(plugin instanceof Towny)) {

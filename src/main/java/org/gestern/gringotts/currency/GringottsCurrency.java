@@ -1,6 +1,5 @@
 package org.gestern.gringotts.currency;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.ItemStack;
@@ -8,6 +7,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.gestern.gringotts.Configuration;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Representation of a currency. This contains information about the currency's denominations and their values.
@@ -208,7 +208,7 @@ public class GringottsCurrency {
      */
     @Override
     public String toString() {
-        return StringUtils.join(sortedDenoms, '\n');
+        return String.join("\n", sortedDenoms.stream().map(Denomination::toString).collect(Collectors.toSet()));
     }
 
     /**

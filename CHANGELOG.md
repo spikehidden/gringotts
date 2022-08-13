@@ -12,7 +12,7 @@ v2.12.3
 ---
 ###### Upcoming
 * Update dependencies
-  * spigot-api to v1.18.2-R0.1-SNAPSHOT
+  * spigot-api to v1.19.2-R0.1-SNAPSHOT
   * bstats-bukkit to v3.0.0
   * towny to v0.98.0.0
 * Remove dependencies/plugins

@@ -5,12 +5,11 @@ import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
+import com.avaje.ebean.validation.NotNull;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.milkbowl.vault.economy.Economy;
-import org.apache.commons.lang.NullArgumentException;
-import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.DrilldownPie;
@@ -196,7 +195,6 @@ public class Gringotts extends JavaPlugin {
                     getLogger().warning("Towny plugin is already assigned into the dependencies.");
                 }
             }
-        } catch (NullArgumentException ignored) {
         } catch (IllegalArgumentException e) {
             getLogger().warning(
                     "Looks like Towny plugin is not compatible with Gringotts's code."
@@ -244,7 +242,6 @@ public class Gringotts extends JavaPlugin {
                         name + " plugin is already assigned into the dependencies."
                 );
             }
-        } catch (NullArgumentException ignored) {
         } catch (IllegalArgumentException e) {
             getLogger().warning(
                     String.format(
@@ -529,8 +526,6 @@ public class Gringotts extends JavaPlugin {
      * @param config the config
      */
     public void configureDbConfig(ServerConfig config) {
-        Validate.notNull(config, "Config cannot be null");
-
         DataSourceConfig ds = new DataSourceConfig();
         ds.setDriver("org.sqlite.JDBC");
         ds.setUrl("jdbc:sqlite:{DIR}{NAME}.db");
