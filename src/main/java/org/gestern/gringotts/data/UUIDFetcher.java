@@ -1,9 +1,7 @@
 package org.gestern.gringotts.data;
 
 import com.google.common.collect.ImmutableList;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.*;
 
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,14 +14,14 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 public class UUIDFetcher implements Callable<Map<String, UUID>> {
-    private static final double PROFILES_PER_REQUEST = 100;
-    private static final String PROFILE_URL = "https://api.mojang.com/profiles/minecraft";
-    private final JSONParser jsonParser = new JSONParser();
-    private final List<String> names;
-    private final boolean rateLimiting;
+    private static final double       PROFILES_PER_REQUEST = 100;
+    private static final String       PROFILE_URL          = "https://api.mojang.com/profiles/minecraft";
+    private static final Gson         GSON                 = new GsonBuilder().create();
+    private final        List<String> names;
+    private final        boolean      rateLimiting;
 
     public UUIDFetcher(List<String> names, boolean rateLimiting) {
-        this.names = ImmutableList.copyOf(names);
+        this.names        = ImmutableList.copyOf(names);
         this.rateLimiting = rateLimiting;
     }
 
@@ -64,15 +62,15 @@ public class UUIDFetcher implements Callable<Map<String, UUID>> {
 
         for (int i = 0; i < requests; i++) {
             HttpURLConnection connection = createConnection();
-            String body = JSONArray.toJSONString(names.subList(i * 100, Math.min((i + 1) * 100, names.size())));
+            String            body       = GSON.toJson(names.subList(i * 100, Math.min((i + 1) * 100, names.size())));
             writeBody(connection, body);
-            JSONArray array = (JSONArray) jsonParser.parse(new InputStreamReader(connection.getInputStream()));
+            JsonArray array = (JsonArray) JsonParser.parseReader(new InputStreamReader(connection.getInputStream()));
 
             for (Object profile : array) {
-                JSONObject jsonProfile = (JSONObject) profile;
-                String id = (String) jsonProfile.get("id");
-                String name = (String) jsonProfile.get("name");
-                UUID uuid = UUIDFetcher.getUUID(id);
+                JsonObject jsonProfile = (JsonObject) profile;
+                String     id          = jsonProfile.get("id").getAsString();
+                String     name        = jsonProfile.get("name").getAsString();
+                UUID       uuid        = UUIDFetcher.getUUID(id);
                 uuidMap.put(name, uuid);
             }
 

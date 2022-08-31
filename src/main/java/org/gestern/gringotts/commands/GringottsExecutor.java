@@ -64,7 +64,7 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
 
         switch (args[0].toLowerCase()) {
             case "reload": {
-                plugin.reloadConfig();
+                Gringotts.instance.reloadConfig();
                 sender.sendMessage(Language.LANG.reload);
 
                 return true;
