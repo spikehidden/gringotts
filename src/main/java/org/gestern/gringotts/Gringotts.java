@@ -188,7 +188,7 @@ public class Gringotts extends JavaPlugin {
             }
         } catch (IllegalArgumentException e) {
             getLogger().warning(
-                    "Looks like Towny plugin is not compatible with Gringotts's code."
+                    "Looks like Towny plugin is not compatible with Gringotts"
             );
         }
 
@@ -206,7 +206,7 @@ public class Gringotts extends JavaPlugin {
             }
         } catch (IllegalArgumentException e) {
             getLogger().warning(
-                    "Looks like PlaceholderAPI plugin is not compatible with Gringotts's code."
+                    "Looks like PlaceholderAPI plugin is not compatible with Gringotts"
             );
         }
 

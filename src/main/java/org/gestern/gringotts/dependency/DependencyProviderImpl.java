@@ -45,10 +45,6 @@ public class DependencyProviderImpl implements DependencyProvider {
             Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin(name);
 
             if (plugin == null) {
-                this.gringotts.getLogger().warning(
-                        "Unable to hook plugin " + name
-                );
-
                 return null;
             }
 
@@ -72,10 +68,6 @@ public class DependencyProviderImpl implements DependencyProvider {
 
             return plugin;
         } else {
-            this.gringotts.getLogger().warning(
-                    "Unable to hook plugin " + name
-            );
-
             return null;
         }
     }
