@@ -15,6 +15,8 @@ import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.event.VaultCreationEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.UUID;
@@ -24,17 +26,6 @@ import java.util.stream.Collectors;
  * The type Town holder provider.
  */
 public class TownHolderProvider implements AccountHolderProvider, Listener {
-    private final Gringotts gringotts;
-
-    /**
-     * Instantiates a new Town holder provider.
-     *
-     * @param gringotts the gringotts
-     */
-    public TownHolderProvider(Gringotts gringotts) {
-        this.gringotts = gringotts;
-    }
-
     /**
      * Get the AccountHolder object mapped to the given id for this provider.
      *
@@ -42,20 +33,24 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      * @return account holder for id
      */
     @Override
-    public AccountHolder getAccountHolder(String id) {
+    public @Nullable AccountHolder getAccountHolder(@NotNull String id) {
         try {
-            return getAccountHolder(UUID.fromString(id));
-        } catch (IllegalArgumentException ignored) {
-            if (id.startsWith(VaultCreationEvent.Type.TOWN.getId() + "-")) {
-                return TownyUniverse.getInstance().getTown(id.substring(5)) != null
-                        ? getAccountHolder(TownyUniverse.getInstance().getTown(id.substring(5)))
-                        : null;
-            }
+            UUID targetUuid = UUID.fromString(id);
+
+            return getAccountHolder(targetUuid);
+        } catch (IllegalArgumentException ignored) {}
+
+        String vaultPrefix = VaultCreationEvent.Type.TOWN.getId() + "-";
+
+        Town town;
+
+        if (id.startsWith(vaultPrefix)) {
+            town = TownyUniverse.getInstance().getTown(id.substring(vaultPrefix.length()));
+        } else {
+            town = TownyUniverse.getInstance().getTown(id);
         }
 
-        return TownyUniverse.getInstance().getTown(id) != null
-                ? getAccountHolder(TownyUniverse.getInstance().getTown(id))
-                : null;
+        return getAccountHolder(town);
     }
 
     /**
@@ -65,10 +60,10 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      * @return account holder for id
      */
     @Override
-    public AccountHolder getAccountHolder(UUID uuid) {
-        return TownyUniverse.getInstance().getTown(uuid) != null
-                ? getAccountHolder(TownyUniverse.getInstance().getTown(uuid))
-                : null;
+    public @Nullable AccountHolder getAccountHolder(@NotNull UUID uuid) {
+        Town town = TownyUniverse.getInstance().getTown(uuid);
+
+        return getAccountHolder(town);
     }
 
     /**
@@ -76,10 +71,10 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      *
      * @param player player to get town for
      * @return TownyAccountHolder for the town of which player is a resident, if
-     *         any. null otherwise.
+     * any. null otherwise.
      */
     @Override
-    public AccountHolder getAccountHolder(OfflinePlayer player) {
+    public @Nullable AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
         try {
             Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
 
@@ -103,7 +98,7 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      * @return the type
      */
     @Override
-    public VaultCreationEvent.Type getType() {
+    public @NotNull VaultCreationEvent.Type getType() {
         return VaultCreationEvent.Type.TOWN;
     }
 
@@ -113,12 +108,8 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      * @return the account names
      */
     @Override
-    public Set<String> getAccountNames() {
-        return TownyUniverse.getInstance()
-                .getTowns()
-                .stream()
-                .map(TownyObject::getName)
-                .collect(Collectors.toSet());
+    public @NotNull Set<String> getAccountNames() {
+        return TownyUniverse.getInstance().getTowns().stream().map(TownyObject::getName).collect(Collectors.toSet());
     }
 
     /**
@@ -127,7 +118,11 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
      * @param town the town
      * @return the account holder
      */
-    public AccountHolder getAccountHolder(Town town) {
+    public @Nullable AccountHolder getAccountHolder(@Nullable Town town) {
+        if (town == null) {
+            return null;
+        }
+
         return new TownAccountHolder(town);
     }
 
@@ -140,10 +135,18 @@ public class TownHolderProvider implements AccountHolderProvider, Listener {
     public void renameTown(RenameTownEvent event) {
         Town town = event.getTown();
 
-        AccountHolder holder = this.getAccountHolder(town);
+        AccountHolder holder = getAccountHolder(town);
 
-        GringottsAccount account = this.gringotts.getAccounting().getAccount(holder);
+        if (holder == null) {
+            return;
+        }
 
-        this.gringotts.getDao().retrieveChests(account).forEach(AccountChest::updateSign);
+        GringottsAccount account = Gringotts.instance.getAccounting().getAccount(holder);
+
+        if (account == null) {
+            return;
+        }
+
+        Gringotts.instance.getDao().retrieveChests(account).forEach(AccountChest::updateSign);
     }
 }

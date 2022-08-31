@@ -16,6 +16,8 @@ import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.event.VaultCreationEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.UUID;
@@ -25,17 +27,6 @@ import java.util.stream.Collectors;
  * The type Nation holder provider.
  */
 public class NationHolderProvider implements AccountHolderProvider, Listener {
-    private final Gringotts gringotts;
-
-    /**
-     * Instantiates a new Nation holder provider.
-     *
-     * @param gringotts the gringotts
-     */
-    public NationHolderProvider(Gringotts gringotts) {
-        this.gringotts = gringotts;
-    }
-
     /**
      * Get the AccountHolder object mapped to the given id for this provider.
      *
@@ -43,20 +34,24 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return account holder for id
      */
     @Override
-    public AccountHolder getAccountHolder(String id) {
+    public @Nullable AccountHolder getAccountHolder(@NotNull String id) {
         try {
-            return getAccountHolder(UUID.fromString(id));
-        } catch (IllegalArgumentException ignored) {
-            if (id.startsWith(VaultCreationEvent.Type.NATION.getId() + "-")) {
-                return TownyUniverse.getInstance().getNation(id.substring(7)) != null
-                        ? getAccountHolder(TownyUniverse.getInstance().getNation(id.substring(7)))
-                        : null;
-            }
+            UUID targetUuid = UUID.fromString(id);
+
+            return getAccountHolder(targetUuid);
+        } catch (IllegalArgumentException ignored) {}
+
+        String vaultPrefix = VaultCreationEvent.Type.TOWN.getId() + "-";
+
+        Nation nation;
+
+        if (id.startsWith(vaultPrefix)) {
+            nation = TownyUniverse.getInstance().getNation(id.substring(vaultPrefix.length()));
+        } else {
+            nation = TownyUniverse.getInstance().getNation(id);
         }
 
-        return TownyUniverse.getInstance().getNation(id) != null
-                ? getAccountHolder(TownyUniverse.getInstance().getNation(id))
-                : null;
+        return getAccountHolder(nation);
     }
 
     /**
@@ -66,10 +61,10 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return account holder for id
      */
     @Override
-    public AccountHolder getAccountHolder(UUID uuid) {
-        return TownyUniverse.getInstance().getNation(uuid) != null
-                ? getAccountHolder(TownyUniverse.getInstance().getNation(uuid))
-                : null;
+    public @Nullable AccountHolder getAccountHolder(@NotNull UUID uuid) {
+        Nation nation = TownyUniverse.getInstance().getNation(uuid);
+
+        return getAccountHolder(nation);
     }
 
     /**
@@ -78,10 +73,10 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      *
      * @param player player to get nation for
      * @return TownyAccountHolder for the nation of which player is a resident, if
-     *         any. null otherwise.
+     * any. null otherwise.
      */
     @Override
-    public AccountHolder getAccountHolder(OfflinePlayer player) {
+    public @Nullable AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
         try {
             Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
 
@@ -89,12 +84,11 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
                 return null;
             }
 
-            Town town = resident.getTown();
+            Town   town   = resident.getTown();
             Nation nation = town.getNation();
 
             return getAccountHolder(nation);
-        } catch (NotRegisteredException ignored) {
-        }
+        } catch (NotRegisteredException ignored) {}
 
         return null;
     }
@@ -105,7 +99,7 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return the type
      */
     @Override
-    public VaultCreationEvent.Type getType() {
+    public @NotNull VaultCreationEvent.Type getType() {
         return VaultCreationEvent.Type.NATION;
     }
 
@@ -115,12 +109,8 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @return the account names
      */
     @Override
-    public Set<String> getAccountNames() {
-        return TownyUniverse.getInstance()
-                .getNations()
-                .stream()
-                .map(TownyObject::getName)
-                .collect(Collectors.toSet());
+    public @NotNull Set<String> getAccountNames() {
+        return TownyUniverse.getInstance().getNations().stream().map(TownyObject::getName).collect(Collectors.toSet());
     }
 
     /**
@@ -129,7 +119,11 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
      * @param nation the nation
      * @return the account holder
      */
-    public AccountHolder getAccountHolder(Nation nation) {
+    public @Nullable AccountHolder getAccountHolder(@Nullable Nation nation) {
+        if (nation == null) {
+            return null;
+        }
+
         return new NationAccountHolder(nation);
     }
 
@@ -144,8 +138,16 @@ public class NationHolderProvider implements AccountHolderProvider, Listener {
 
         AccountHolder holder = this.getAccountHolder(nation);
 
-        GringottsAccount account = this.gringotts.getAccounting().getAccount(holder);
+        if (holder != null) {
+            return;
+        }
 
-        this.gringotts.getDao().retrieveChests(account).forEach(AccountChest::updateSign);
+        GringottsAccount account = Gringotts.instance.getAccounting().getAccount(holder);
+
+        if (account != null) {
+            return;
+        }
+
+        Gringotts.instance.getDao().retrieveChests(account).forEach(AccountChest::updateSign);
     }
 }

@@ -49,8 +49,8 @@ public class TownyDependency implements Dependency, Listener {
         this.plugin    = (Towny) plugin;
         this.id        = "towny";
 
-        this.nationHolderProvider = new NationHolderProvider(gringotts);
-        this.townHolderProvider   = new TownHolderProvider(gringotts);
+        this.nationHolderProvider = new NationHolderProvider();
+        this.townHolderProvider   = new TownHolderProvider();
     }
 
     /**

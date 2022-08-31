@@ -3,6 +3,8 @@ package org.gestern.gringotts.accountholder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.gestern.gringotts.event.VaultCreationEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,13 +93,12 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
      */
     public AccountHolder get(String type, String owner) {
         AccountHolderProvider provider = accountHolderProviders.get(type);
-        AccountHolder accountHolder = null;
 
         if (provider != null) {
-            accountHolder = provider.getAccountHolder(owner);
+            return provider.getAccountHolder(owner);
         }
 
-        return accountHolder;
+        return null;
     }
 
     /**
@@ -141,44 +142,45 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
     }
 
     private static class PlayerAccountHolderProvider implements AccountHolderProvider {
-
         @Override
-        public AccountHolder getAccountHolder(String uuidOrName) {
+        public @Nullable AccountHolder getAccountHolder(@NotNull String uuidOrName) {
             try {
-                return getAccountHolder(UUID.fromString(uuidOrName));
-            } catch (IllegalArgumentException ignored) {
-                // don't use getOfflinePlayer(String) because that will do a blocking web request
-                // rather iterate this array, should be quick enough
-                for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
-                    if (uuidOrName.equals(p.getName())) {
-                        return getAccountHolder(p);
-                    }
-                }
+                UUID targetUuid = UUID.fromString(uuidOrName);
 
-                return null;
+                return getAccountHolder(targetUuid);
+            } catch (IllegalArgumentException ignored) {}
+
+            // don't use getOfflinePlayer(String) because that will do a blocking web request
+            // rather iterate this array, should be quick enough
+            for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
+                if (uuidOrName.equals(p.getName())) {
+                    return getAccountHolder(p);
+                }
             }
+
+            return null;
         }
 
         @Override
-        public AccountHolder getAccountHolder(UUID uuid) {
+        public @Nullable AccountHolder getAccountHolder(@NotNull UUID uuid) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
             //noinspection ConstantConditions
             if (player != null) {
                 return getAccountHolder(player);
-            } else {
-                return null;
             }
+
+            return null;
         }
 
         @Override
-        public AccountHolder getAccountHolder(OfflinePlayer player) {
+        public @Nullable AccountHolder getAccountHolder(@NotNull OfflinePlayer player) {
             // if this player has ever played on the server, they are a legit account holder
             if (player.isOnline() || player.hasPlayedBefore()) {
                 return new PlayerAccountHolder(player);
-            } else {
-                return null;
             }
+
+            return null;
         }
 
         /**
@@ -187,7 +189,7 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
          * @return the type
          */
         @Override
-        public VaultCreationEvent.Type getType() {
+        public @NotNull VaultCreationEvent.Type getType() {
             return VaultCreationEvent.Type.PLAYER;
         }
 
@@ -197,11 +199,8 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
          * @return the account names
          */
         @Override
-        public Set<String> getAccountNames() {
-            return Stream.of(Bukkit.getOfflinePlayers())
-                    .map(OfflinePlayer::getName)
-                    .collect(Collectors.toSet());
+        public @NotNull Set<String> getAccountNames() {
+            return Stream.of(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).collect(Collectors.toSet());
         }
     }
-
 }
