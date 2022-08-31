@@ -11,16 +11,19 @@ v2.12.4
 v2.12.3
 ---
 ###### Upcoming
-* Update dependencies
+* update dependencies
   * spigot-api to v1.19.2-R0.1-SNAPSHOT
   * bstats-bukkit to v3.0.0
-  * towny to v0.98.0.0
-* Remove dependencies/plugins
-  * jetbrains's annotations
+  * towny to v0.98.1.0
+  * paperlib to 1.0.8-SNAPSHOT
+* remove dependencies/plugins
+  * simplejson
 * remove WorldGuard as softdepend fixes #84 
 * denomination items located in shulker boxes will be included to the denomination finding process if enabled in config 
 * cleanup relocations
-* Placeholder support
+* placeholder support
+* add towny sign vault names configuration
+
 
 v2.12.2
 ---
