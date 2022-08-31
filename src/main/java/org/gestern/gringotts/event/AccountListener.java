@@ -49,10 +49,16 @@ public class AccountListener implements Listener {
         if (typeStr.isEmpty()) {
             type = VaultCreationEvent.Type.PLAYER;
         } else {
-            try {
-                type = VaultCreationEvent.Type.valueOf(typeStr);
-            } catch (IllegalArgumentException notFound) {
-                return;
+            if (Configuration.CONF.townSignVaultName.equals(typeStr)) {
+                type = VaultCreationEvent.Type.TOWN;
+            } else if (Configuration.CONF.nationSignVaultName.equals(typeStr)) {
+                type = VaultCreationEvent.Type.NATION;
+            } else {
+                try {
+                    type = VaultCreationEvent.Type.valueOf(typeStr);
+                } catch (IllegalArgumentException notFound) {
+                    return;
+                }
             }
         }
 

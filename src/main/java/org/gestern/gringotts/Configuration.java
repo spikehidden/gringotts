@@ -29,15 +29,17 @@ public enum Configuration {
     private final Logger log = Gringotts.instance.getLogger();
 
     /**
-     * Regular expression defining what patterns on a sign will create a valid vault. Subpattern 1 denotes the type
-     * of the vault.
+     * Regular expression defining what patterns on a sign will create a valid vault.
+     * Subpattern 1 denotes the type of the vault.
      */
-    public String vaultPattern = "[^\\[]*\\[(\\w*) ?vault\\]";
+    public String vaultPattern        = "[^\\[]*\\[(\\w*) ?vault\\]";
+    public String townSignVaultName   = "town";
+    public String nationSignVaultName = "nation";
     /**
      * Language to be used for messages. Should be an ISO 639-1 (alpha-2) code.
      * If a language is not supported by Gringotts, use user-configured or default (English) messages.
      */
-    public String language = "custom";
+    public String language            = "custom";
 
     public boolean dropOverflowingItem = false;
 
@@ -160,20 +162,22 @@ public enum Configuration {
         CONF.transactionTaxFlat = savedConfig.getDouble("transactiontax.flat", 0);
         CONF.transactionTaxRate = savedConfig.getDouble("transactiontax.rate", 0);
 
-        CONF.startBalancePlayer = savedConfig.getLong("startingbalance.player", 0);
+        CONF.startBalancePlayer  = savedConfig.getLong("startingbalance.player", 0);
         CONF.startBalanceFaction = savedConfig.getLong("startingbalance.faction", 0);
-        CONF.startBalanceTown = savedConfig.getLong("startingbalance.town", 0);
-        CONF.startBalanceNation = savedConfig.getLong("startingbalance.nation", 0);
+        CONF.startBalanceTown    = savedConfig.getLong("startingbalance.town", 0);
+        CONF.startBalanceNation  = savedConfig.getLong("startingbalance.nation", 0);
 
-        CONF.usevaultContainer = savedConfig.getBoolean("usevault.container", true);
+        CONF.usevaultContainer   = savedConfig.getBoolean("usevault.container", true);
         CONF.includeShulkerBoxes = savedConfig.getBoolean("usevault.include-shulker-boxes", true);
 
         CONF.balanceShowInventory = savedConfig.getBoolean("balance.show-inventory", true);
-        CONF.balanceShowVault = savedConfig.getBoolean("balance.show-vault", true);
+        CONF.balanceShowVault     = savedConfig.getBoolean("balance.show-vault", true);
 
         CONF.language = savedConfig.getString("language", "custom");
 
-        CONF.vaultPattern = savedConfig.getString("vault_pattern", "[^\\[]*\\[(\\w*) ?vault\\]");
+        CONF.vaultPattern        = savedConfig.getString("vault_pattern", "[^\\[]*\\[(\\w*) ?vault\\]");
+        CONF.townSignVaultName   = savedConfig.getString("towny.town_sign_vault_name", "town");
+        CONF.nationSignVaultName = savedConfig.getString("towny.nation_sign_vault_name", "nation");
     }
 
     /**
