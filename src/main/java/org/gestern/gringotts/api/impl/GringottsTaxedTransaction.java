@@ -4,8 +4,6 @@ import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.TaxedTransaction;
 import org.gestern.gringotts.api.TransactionResult;
 
-import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
-
 /**
  * The type Gringotts taxed transaction.
  */
@@ -41,14 +39,14 @@ public class GringottsTaxedTransaction extends GringottsTransaction implements T
     public TransactionResult to(Account recipient) {
         TransactionResult taxResult = from.remove(taxes);
 
-        if (taxResult != SUCCESS) {
+        if (taxResult != TransactionResult.SUCCESS) {
             return taxResult;
         }
 
         TransactionResult result = super.to(recipient);
 
         // undo taxing if transaction failed
-        if (result != SUCCESS) {
+        if (result != TransactionResult.SUCCESS) {
             from.add(taxes);
         } else {
             if (collector != null) {

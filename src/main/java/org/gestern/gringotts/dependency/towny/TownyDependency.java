@@ -91,14 +91,8 @@ public class TownyDependency implements Dependency, Listener {
                 this.gringotts
         );
 
-        Gringotts.getInstance().registerAccountHolderProvider(
-                VaultCreationEvent.Type.TOWN.getId(),
-                this.townHolderProvider
-        );
-        Gringotts.getInstance().registerAccountHolderProvider(
-                VaultCreationEvent.Type.NATION.getId(),
-                this.nationHolderProvider
-        );
+        Gringotts.instance.registerAccountHolderProvider(VaultCreationEvent.Type.TOWN.getId(), this.townHolderProvider);
+        Gringotts.instance.registerAccountHolderProvider(VaultCreationEvent.Type.NATION.getId(), this.nationHolderProvider);
     }
 
     /**

@@ -8,8 +8,6 @@ import org.gestern.gringotts.currency.GringottsCurrency;
 import java.util.List;
 import java.util.ListIterator;
 
-import static org.gestern.gringotts.Configuration.CONF;
-
 /**
  * Account inventories define operations that can be used on all inventories belonging to an account.
  *
@@ -28,7 +26,7 @@ public class AccountInventory {
      * @return current balance of this inventory in cents
      */
     public long balance() {
-        GringottsCurrency cur = CONF.getCurrency();
+        GringottsCurrency cur = Configuration.CONF.getCurrency();
         long count = 0;
 
         for (ItemStack stack : inventory) {
@@ -50,7 +48,7 @@ public class AccountInventory {
         long remaining = value;
 
         // try denominations from largest to smallest
-        for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+        for (Denomination denomination : Configuration.CONF.getCurrency().getDenominations()) {
             if (denomination.getValue() <= remaining) {
                 ItemStack stack = new ItemStack(denomination.getKey().type);
                 int stackSize = stack.getMaxStackSize();
@@ -96,7 +94,7 @@ public class AccountInventory {
             return 0;
         }
 
-        GringottsCurrency cur = CONF.getCurrency();
+        GringottsCurrency cur = Configuration.CONF.getCurrency();
         long remaining = value;
 
         // try denominations from smallest to largest

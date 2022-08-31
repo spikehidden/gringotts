@@ -13,8 +13,6 @@ import org.gestern.gringotts.currency.GringottsCurrency;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static org.gestern.gringotts.Util.translateColors;
-
 /**
  * Singleton for global configuration information.
  * Values are initialized when the plugin is enabled.
@@ -28,7 +26,7 @@ public enum Configuration {
      */
     CONF;
 
-    private final Logger log = Gringotts.getInstance().getLogger();
+    private final Logger log = Gringotts.instance.getLogger();
 
     /**
      * Regular expression defining what patterns on a sign will create a valid vault. Subpattern 1 denotes the type
@@ -149,9 +147,9 @@ public enum Configuration {
         boolean namedDenominations = savedConfig.getBoolean("currency.named-denominations", false);
 
         String currencyNameSingular, currencyNamePlural;
-        currencyNameSingular = translateColors(savedConfig.getString("currency.name.singular", "Emerald"));
-        currencyNamePlural = translateColors(savedConfig.getString("currency.name.plural", currencyNameSingular + "s"));
-        currency = new GringottsCurrency(currencyNameSingular, currencyNamePlural, digits, namedDenominations);
+        currencyNameSingular = Util.translateColors(savedConfig.getString("currency.name.singular", "Emerald"));
+        currencyNamePlural   = Util.translateColors(savedConfig.getString("currency.name.plural", currencyNameSingular + "s"));
+        currency             = new GringottsCurrency(currencyNameSingular, currencyNamePlural, digits, namedDenominations);
 
         // regular currency configuration (multi-denomination)
         ConfigurationSection denomSection = savedConfig.getConfigurationSection("currency.denominations");
@@ -220,7 +218,7 @@ public enum Configuration {
                     String name = denomConf.getString("displayname");
 
                     if (name != null && !name.isEmpty()) {
-                        meta.setDisplayName(translateColors(name));
+                        meta.setDisplayName(Util.translateColors(name));
                     }
 
                     List<String> lore = denomConf.isString("lore") ?
@@ -232,7 +230,7 @@ public enum Configuration {
                         List<String> loreTranslated = new ArrayList<>(lore.size());
 
                         for (String l : lore) {
-                            loreTranslated.add(translateColors(l));
+                            loreTranslated.add(Util.translateColors(l));
                         }
 
                         meta.setLore(loreTranslated);
@@ -254,8 +252,7 @@ public enum Configuration {
                             denomConf.getString("unit-name-plural") :
                             unitName + "s";
 
-                    currency.addDenomination(denomType, value, translateColors(unitName), translateColors
-                            (unitNamePlural));
+                    currency.addDenomination(denomType, value, Util.translateColors(unitName), Util.translateColors(unitNamePlural));
 
                 } catch (GringottsConfigurationException e) {
                     throw e;
@@ -329,8 +326,8 @@ public enum Configuration {
                 currency.addDenomination(
                         denomType,
                         value,
-                        translateColors(unitName),
-                        translateColors(unitNamePlural)
+                        Util.translateColors(unitName),
+                        Util.translateColors(unitNamePlural)
                 );
 
             } catch (Exception e) {

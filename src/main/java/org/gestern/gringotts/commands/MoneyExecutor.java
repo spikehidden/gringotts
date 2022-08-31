@@ -4,12 +4,11 @@ import com.google.common.collect.Lists;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.gestern.gringotts.Language;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.gestern.gringotts.Language.LANG;
 
 /**
  * Player commands.
@@ -35,7 +34,7 @@ public class MoneyExecutor extends GringottsAbstractExecutor {
                              String commandLabel,
                              String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(LANG.playerOnly);
+            sender.sendMessage(Language.LANG.playerOnly);
             return false;
         }
 

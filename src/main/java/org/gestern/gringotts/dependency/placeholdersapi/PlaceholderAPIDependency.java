@@ -8,19 +8,15 @@ import org.gestern.gringotts.api.dependency.Dependency;
 import org.gestern.gringotts.dependency.placeholdersapi.placeholders.PlaceholdersRegister;
 
 public class PlaceholderAPIDependency implements Dependency, Listener {
-
-    private final Gringotts                 gringotts;
-    private final PlaceholderAPIPlugin      plugin;
-    private final String                    id;
+    private final PlaceholderAPIPlugin plugin;
+    private final String               id;
 
     /**
      * Instantiates a new PlaceholderAPI dependency.
      *
-     * @param gringotts the gringotts
-     * @param plugin    the plugin
+     * @param plugin the plugin
      */
-    public PlaceholderAPIDependency(Gringotts gringotts,
-                                    Plugin plugin) {
+    public PlaceholderAPIDependency(Plugin plugin) {
         if (plugin == null) {
             throw new NullPointerException("'plugin' is null");
         }
@@ -31,9 +27,8 @@ public class PlaceholderAPIDependency implements Dependency, Listener {
             );
         }
 
-        this.gringotts = gringotts;
-        this.plugin    = (PlaceholderAPIPlugin) plugin;
-        this.id        = "placeholderapi";
+        this.plugin = (PlaceholderAPIPlugin) plugin;
+        this.id     = "placeholderapi";
     }
 
 
@@ -59,6 +54,6 @@ public class PlaceholderAPIDependency implements Dependency, Listener {
 
     @Override
     public void onEnable() {
-        new PlaceholdersRegister(gringotts).register();
+        new PlaceholdersRegister(Gringotts.instance).register();
     }
 }

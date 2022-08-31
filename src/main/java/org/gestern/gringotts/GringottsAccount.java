@@ -15,13 +15,9 @@ import org.gestern.gringotts.api.TransactionResult;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.data.DAO;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
-
-import static org.gestern.gringotts.Configuration.CONF;
-import static org.gestern.gringotts.Permissions.USE_VAULT_ENDERCHEST;
-import static org.gestern.gringotts.Permissions.USE_VAULT_INVENTORY;
-import static org.gestern.gringotts.api.TransactionResult.*;
 
 /**
  * Implementation of inventory-based accounts with a virtual overflow capacity.
@@ -31,7 +27,7 @@ import static org.gestern.gringotts.api.TransactionResult.*;
  */
 public class GringottsAccount {
     public final  AccountHolder owner;
-    private final DAO           dao = Gringotts.getInstance().getDao();
+    private final DAO           dao = Gringotts.instance.getDao();
 
     public GringottsAccount(AccountHolder owner) {
         if (owner == null) {
@@ -61,7 +57,7 @@ public class GringottsAccount {
         if (Bukkit.isPrimaryThread()) {
             runMe.run();
         } else {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Gringotts.getInstance(), runMe);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Gringotts.instance, runMe);
         }
 
         return f;
@@ -144,7 +140,7 @@ public class GringottsAccount {
         Callable<TransactionResult> callMe = () -> {
             // Cannot add negative amount
             if (amount < 0) {
-                return ERROR;
+                return TransactionResult.ERROR;
             }
 
             long centsStored = dao.retrieveCents(this);
@@ -152,7 +148,7 @@ public class GringottsAccount {
             long remaining = amount + centsStored;
 
             // add currency to account's vaults
-            if (CONF.usevaultContainer) {
+            if (Configuration.CONF.usevaultContainer) {
                 for (AccountChest chest : dao.retrieveChests(this)) {
                     remaining -= chest.add(remaining);
 
@@ -160,7 +156,7 @@ public class GringottsAccount {
                         break;
                     }
 
-                    if (CONF.includeShulkerBoxes) {
+                    if (Configuration.CONF.includeShulkerBoxes) {
                         remaining = addToShulkerBox(remaining, chest.chest().getInventory());
                     }
                 }
@@ -172,17 +168,17 @@ public class GringottsAccount {
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
 
-                if (remaining > 0 && USE_VAULT_INVENTORY.isAllowed(player)) {
+                if (remaining > 0 && Permissions.USE_VAULT_INVENTORY.isAllowed(player)) {
                     remaining -= new AccountInventory(player.getInventory()).add(remaining);
 
-                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                    if (Configuration.CONF.includeShulkerBoxes && remaining > 0) {
                         remaining = addToShulkerBox(remaining, player.getInventory());
                     }
                 }
-                if (remaining > 0 && CONF.usevaultEnderchest && USE_VAULT_ENDERCHEST.isAllowed(player)) {
+                if (remaining > 0 && Configuration.CONF.usevaultEnderchest && Permissions.USE_VAULT_ENDERCHEST.isAllowed(player)) {
                     remaining -= new AccountInventory(player.getEnderChest()).add(remaining);
 
-                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                    if (Configuration.CONF.includeShulkerBoxes && remaining > 0) {
                         remaining = addToShulkerBox(remaining, player.getEnderChest());
                     }
                 }
@@ -191,7 +187,7 @@ public class GringottsAccount {
             // allow smallest denom value as threshold for available space
             // TODO make maximum virtual amount configurable
             // this is under the assumption that there is always at least 1 denomination
-            List<Denomination> denoms             = CONF.getCurrency().getDenominations();
+            List<Denomination> denoms             = Configuration.CONF.getCurrency().getDenominations();
             long               smallestDenomValue = denoms.get(denoms.size() - 1).getValue();
 
             if (remaining < smallestDenomValue) {
@@ -200,10 +196,10 @@ public class GringottsAccount {
             }
 
             if (remaining == 0) {
-                return SUCCESS;
+                return TransactionResult.SUCCESS;
             } else {
-                if (CONF.dropOverflowingItem) {
-                    for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+                if (Configuration.CONF.dropOverflowingItem) {
+                    for (Denomination denomination : Configuration.CONF.getCurrency().getDenominations()) {
                         if (denomination.getValue() <= remaining) {
                             ItemStack stack        = new ItemStack(denomination.getKey().type);
                             int       stackSize    = stack.getMaxStackSize();
@@ -219,7 +215,7 @@ public class GringottsAccount {
                     }
                 }
 
-                return INSUFFICIENT_SPACE;
+                return TransactionResult.INSUFFICIENT_SPACE;
             }
         };
 
@@ -237,18 +233,18 @@ public class GringottsAccount {
         Callable<TransactionResult> callMe = () -> {
             // Cannot remove negative amount
             if (amount < 0) {
-                return ERROR;
+                return TransactionResult.ERROR;
             }
 
             // Make sure we have enough to remove
             if (getBalance() < amount) {
-                return INSUFFICIENT_FUNDS;
+                return TransactionResult.INSUFFICIENT_FUNDS;
             }
 
             long remaining = amount;
 
             // Now remove the physical amount left
-            if (CONF.usevaultContainer) {
+            if (Configuration.CONF.usevaultContainer) {
                 for (AccountChest chest : dao.retrieveChests(this)) {
                     remaining -= chest.remove(remaining);
 
@@ -256,7 +252,7 @@ public class GringottsAccount {
                         break;
                     }
 
-                    if (CONF.includeShulkerBoxes) {
+                    if (Configuration.CONF.includeShulkerBoxes) {
                         remaining = removeFromShulkerBox(remaining, chest.chest().getInventory());
                     }
                 }
@@ -267,17 +263,17 @@ public class GringottsAccount {
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
 
-                if (USE_VAULT_INVENTORY.isAllowed(player) && remaining > 0) {
+                if (Permissions.USE_VAULT_INVENTORY.isAllowed(player) && remaining > 0) {
                     remaining -= new AccountInventory(player.getInventory()).remove(remaining);
 
-                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                    if (Configuration.CONF.includeShulkerBoxes && remaining > 0) {
                         remaining = removeFromShulkerBox(remaining, player.getInventory());
                     }
                 }
-                if (CONF.usevaultEnderchest && remaining > 0) {
+                if (Configuration.CONF.usevaultEnderchest && remaining > 0) {
                     remaining -= new AccountInventory(player.getEnderChest()).remove(remaining);
 
-                    if (CONF.includeShulkerBoxes && remaining > 0) {
+                    if (Configuration.CONF.includeShulkerBoxes && remaining > 0) {
                         remaining = removeFromShulkerBox(remaining, player.getEnderChest());
                     }
                 }
@@ -293,7 +289,7 @@ public class GringottsAccount {
                 dao.storeCents(this, cents - remaining);
             }
 
-            return SUCCESS;
+            return TransactionResult.SUCCESS;
         };
 
         return getTimeout(callSync(callMe));
@@ -371,7 +367,7 @@ public class GringottsAccount {
             List<AccountChest> chests  = dao.retrieveChests(this);
             long               balance = 0;
 
-            if (CONF.usevaultContainer) {
+            if (Configuration.CONF.usevaultContainer) {
                 for (AccountChest chest : chests) {
                     balance += chest.balance();
                 }
@@ -381,7 +377,7 @@ public class GringottsAccount {
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
 
-                if (CONF.usevaultEnderchest && USE_VAULT_ENDERCHEST.isAllowed(player)) {
+                if (Configuration.CONF.usevaultEnderchest && Permissions.USE_VAULT_ENDERCHEST.isAllowed(player)) {
                     balance += new AccountInventory(player.getEnderChest()).balance();
                 }
             }
@@ -395,7 +391,7 @@ public class GringottsAccount {
         Callable<Long> callMe = () -> {
             List<AccountChest> chests  = dao.retrieveChests(this);
 
-            if (CONF.usevaultContainer && index < chests.size() && index >= 0) {
+            if (Configuration.CONF.usevaultContainer && index < chests.size() && index >= 0) {
                 return chests.get(index).balance();
             }
 
@@ -403,7 +399,7 @@ public class GringottsAccount {
             if (playerOpt.isPresent()) {
                 Player player = playerOpt.get();
 
-                if (CONF.usevaultEnderchest && USE_VAULT_ENDERCHEST.isAllowed(player) && index == -1) {
+                if (Configuration.CONF.usevaultEnderchest && Permissions.USE_VAULT_ENDERCHEST.isAllowed(player) && index == -1) {
                     return new AccountInventory(player.getEnderChest()).balance();
                 }
             }
@@ -417,7 +413,7 @@ public class GringottsAccount {
         Callable<Location> callMe = () -> {
             List<AccountChest> chests  = dao.retrieveChests(this);
 
-            if (CONF.usevaultContainer && index < chests.size() && index >= 0) {
+            if (Configuration.CONF.usevaultContainer && index < chests.size() && index >= 0) {
                 return chests.get(index).chestLocation();
             }
             return null;
@@ -435,7 +431,7 @@ public class GringottsAccount {
             long balance = 0;
 
             Optional<Player> playerOpt = playerOwner();
-            if (playerOpt.isPresent() && USE_VAULT_INVENTORY.isAllowed(playerOpt.get())) {
+            if (playerOpt.isPresent() && Permissions.USE_VAULT_INVENTORY.isAllowed(playerOpt.get())) {
                 Player player = playerOpt.get();
 
                 balance += new AccountInventory(player.getInventory()).balance();

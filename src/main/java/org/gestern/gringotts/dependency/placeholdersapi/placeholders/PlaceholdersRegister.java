@@ -8,7 +8,7 @@ import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.impl.GringottsEco;
 import org.jetbrains.annotations.NotNull;
 
-public class PlaceholdersRegister extends PlaceholderExpansion  {
+public class PlaceholdersRegister extends PlaceholderExpansion {
 
     private final GringottsEco eco;
 
@@ -33,10 +33,10 @@ public class PlaceholdersRegister extends PlaceholderExpansion  {
 
     @Override
     public String onRequest(OfflinePlayer player, String paramString) {
-        String[] params = paramString.split("_");
-        Account account = eco.player(player.getUniqueId());
+        String[] params  = paramString.split("_");
+        Account  account = eco.player(player.getUniqueId());
 
-        if(params[0].equalsIgnoreCase("balance") || params[0].equalsIgnoreCase("money")) {
+        if (params[0].equalsIgnoreCase("balance") || params[0].equalsIgnoreCase("money")) {
 
             if (params.length == 2) {
                 if (params[1].equalsIgnoreCase("vault")) {
@@ -45,19 +45,17 @@ public class PlaceholdersRegister extends PlaceholderExpansion  {
                 if (params[1].equalsIgnoreCase("inventory")) {
                     return String.valueOf(account.invBalance());
                 }
-            }
-            else if (params.length == 1) {
+            } else if (params.length == 1) {
                 return String.valueOf(account.balance());
             }
-        }
-        else if (params[0].equalsIgnoreCase("vault") && params.length >= 2) {
+        } else if (params[0].equalsIgnoreCase("vault") && params.length >= 2) {
 
             if (params[1].equalsIgnoreCase("count")) {
                 return String.valueOf(account.vaultCount());
-            }
-            else if (params.length == 3) {
+            } else if (params.length == 3) {
                 try {
                     int index = Integer.parseInt(params[1]);
+
                     if (index >= account.vaultCount()) {
                         return "out of bounds";
                     }
@@ -69,9 +67,9 @@ public class PlaceholdersRegister extends PlaceholderExpansion  {
                             return null;
                         }
                         if (loc.getWorld() == null) {
-                            return (int)loc.getX() + ", " + (int)loc.getY() + ", " + (int)loc.getZ();
+                            return (int) loc.getX() + ", " + (int) loc.getY() + ", " + (int) loc.getZ();
                         }
-                        return loc.getWorld().getName() + ", " + (int)loc.getX() + ", " + (int)loc.getY() + ", " + (int)loc.getZ();
+                        return loc.getWorld().getName() + ", " + (int) loc.getX() + ", " + (int) loc.getY() + ", " + (int) loc.getZ();
                     }
 
                     if (params[2].equalsIgnoreCase("balance")) {

@@ -20,6 +20,7 @@ v2.12.3
 * remove WorldGuard as softdepend fixes #84 
 * denomination items located in shulker boxes will be included to the denomination finding process if enabled in config 
 * cleanup relocations
+* Placeholder support
 
 v2.12.2
 ---

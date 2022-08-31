@@ -11,6 +11,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.Language;
 import org.gestern.gringotts.Permissions;
 import org.gestern.gringotts.accountholder.AccountHolderProvider;
 import org.gestern.gringotts.api.*;
@@ -20,11 +21,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.gestern.gringotts.Language.LANG;
-import static org.gestern.gringotts.Permissions.COMMAND_DEPOSIT;
-import static org.gestern.gringotts.Permissions.COMMAND_WITHDRAW;
-import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
-
 public abstract class GringottsAbstractExecutor implements TabExecutor {
     static final String TAG_BALANCE = "%balance";
 
@@ -32,11 +28,10 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
     static final String TAG_VALUE = "%value";
 
-    final Gringotts plugin = Gringotts.getInstance();
-    final Eco       eco    = plugin.getEco();
+    final Eco eco = Gringotts.instance.getEco();
 
     static void sendInvalidAccountMessage(CommandSender sender, String accountName) {
-        sender.sendMessage(LANG.invalid_account.replace(TAG_PLAYER, accountName));
+        sender.sendMessage(Language.LANG.invalid_account.replace(TAG_PLAYER, accountName));
     }
 
     /**
@@ -77,7 +72,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
     boolean pay(Player player, double value, String recipientName) {
         if (!Permissions.TRANSFER.isAllowed(player)) {
-            player.sendMessage(LANG.noperm);
+            player.sendMessage(Language.LANG.noperm);
 
             return true;
         }
@@ -127,44 +122,34 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
 
         switch (result) {
             case SUCCESS:
-                String succTaxMessage = LANG.pay_success_tax.replace(TAG_VALUE, formattedTax);
-                String succSentMessage = LANG.pay_success_sender.replace(TAG_VALUE, formattedValue).replace
-                        (TAG_PLAYER, recipientName);
+                String succTaxMessage = Language.LANG.pay_success_tax.replace(TAG_VALUE, formattedTax);
+                String succSentMessage = Language.LANG.pay_success_sender.replace(TAG_VALUE, formattedValue).replace(TAG_PLAYER, recipientName);
 
                 from.message(succSentMessage + (tax > 0 ? succTaxMessage : ""));
 
-                String succReceivedMessage = LANG.pay_success_target.replace(TAG_VALUE, formattedValue).replace
-                        (TAG_PLAYER, player.getName());
+                String succReceivedMessage = Language.LANG.pay_success_target.replace(TAG_VALUE, formattedValue).replace(TAG_PLAYER, player.getName());
 
                 to.message(succReceivedMessage);
 
                 return true;
             case INSUFFICIENT_FUNDS:
-                String insFMessage = LANG.pay_insufficientFunds
-                        .replace(TAG_BALANCE, formattedBalance)
-                        .replace(TAG_VALUE, formattedValuePlusTax);
+                String insFMessage = Language.LANG.pay_insufficientFunds.replace(TAG_BALANCE, formattedBalance).replace(TAG_VALUE, formattedValuePlusTax);
 
                 from.message(insFMessage);
 
                 return true;
             case INSUFFICIENT_SPACE:
-                String insSSentMessage = LANG.pay_insS_sender
-                        .replace(TAG_PLAYER, recipientName)
-                        .replace(TAG_VALUE, formattedValue);
+                String insSSentMessage = Language.LANG.pay_insS_sender.replace(TAG_PLAYER, recipientName).replace(TAG_VALUE, formattedValue);
 
                 from.message(insSSentMessage);
 
-                String insSReceiveMessage = LANG.pay_insS_target
-                        .replace(TAG_PLAYER, from.id())
-                        .replace(TAG_VALUE, formattedValue);
+                String insSReceiveMessage = Language.LANG.pay_insS_target.replace(TAG_PLAYER, from.id()).replace(TAG_VALUE, formattedValue);
 
                 to.message(insSReceiveMessage);
 
                 return true;
             default:
-                String error = LANG.pay_error
-                        .replace(TAG_VALUE, formattedValue)
-                        .replace(TAG_PLAYER, recipientName);
+                String error = Language.LANG.pay_error.replace(TAG_VALUE, formattedValue).replace(TAG_PLAYER, recipientName);
 
                 from.message(error);
 
@@ -173,16 +158,16 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     void deposit(Player player, double value) {
-        if (COMMAND_DEPOSIT.isAllowed(player)) {
+        if (Permissions.COMMAND_DEPOSIT.isAllowed(player)) {
             TransactionResult result         = eco.player(player.getUniqueId()).deposit(value);
             String            formattedValue = eco.currency().format(value);
 
-            if (result == SUCCESS) {
-                String success = LANG.deposit_success.replace(TAG_VALUE, formattedValue);
+            if (result == TransactionResult.SUCCESS) {
+                String success = Language.LANG.deposit_success.replace(TAG_VALUE, formattedValue);
 
                 player.sendMessage(success);
             } else {
-                String error = LANG.deposit_error.replace(TAG_VALUE, formattedValue);
+                String error = Language.LANG.deposit_error.replace(TAG_VALUE, formattedValue);
 
                 player.sendMessage(error);
             }
@@ -190,16 +175,16 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     void withdraw(Player player, double value) {
-        if (COMMAND_WITHDRAW.isAllowed(player)) {
+        if (Permissions.COMMAND_WITHDRAW.isAllowed(player)) {
             TransactionResult result         = eco.player(player.getUniqueId()).withdraw(value);
             String            formattedValue = eco.currency().format(value);
 
-            if (result == SUCCESS) {
-                String success = LANG.withdraw_success.replace(TAG_VALUE, formattedValue);
+            if (result == TransactionResult.SUCCESS) {
+                String success = Language.LANG.withdraw_success.replace(TAG_VALUE, formattedValue);
 
                 player.sendMessage(success);
             } else {
-                String error = LANG.withdraw_error.replace(TAG_VALUE, formattedValue);
+                String error = Language.LANG.withdraw_error.replace(TAG_VALUE, formattedValue);
 
                 player.sendMessage(error);
             }
@@ -207,14 +192,14 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
     }
 
     void sendBalanceMessage(Account account) {
-        account.message(LANG.balance.replace(TAG_BALANCE, eco.currency().format(account.balance())));
+        account.message(Language.LANG.balance.replace(TAG_BALANCE, eco.currency().format(account.balance())));
 
         if (Configuration.CONF.balanceShowVault) {
-            account.message(LANG.vault_balance.replace(TAG_BALANCE, eco.currency().format(account.vaultBalance())));
+            account.message(Language.LANG.vault_balance.replace(TAG_BALANCE, eco.currency().format(account.vaultBalance())));
         }
 
         if (Configuration.CONF.balanceShowInventory) {
-            account.message(LANG.inv_balance.replace(TAG_BALANCE, eco.currency().format(account.invBalance())));
+            account.message(Language.LANG.inv_balance.replace(TAG_BALANCE, eco.currency().format(account.invBalance())));
         }
     }
 
@@ -232,9 +217,7 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
         try {
             VaultCreationEvent.Type type = VaultCreationEvent.Type.valueOf(steps[0].toUpperCase());
 
-            Optional<AccountHolderProvider> providerOptional = Gringotts.getInstance()
-                    .getAccountHolderFactory()
-                    .getProvider(type);
+            Optional<AccountHolderProvider> providerOptional = Gringotts.instance.getAccountHolderFactory().getProvider(type);
 
             if (providerOptional.isPresent()) {
                 return providerOptional.get().getAccountNames().stream()

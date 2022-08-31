@@ -1,13 +1,10 @@
 package org.gestern.gringotts.api.impl;
 
+import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.TaxedTransaction;
 import org.gestern.gringotts.api.Transaction;
 import org.gestern.gringotts.api.TransactionResult;
-
-import static org.gestern.gringotts.Configuration.CONF;
-import static org.gestern.gringotts.api.TransactionResult.ERROR;
-import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
 
 public class GringottsTransaction implements Transaction {
 
@@ -45,15 +42,15 @@ public class GringottsTransaction implements Transaction {
     @Override
     public TransactionResult to(Account to) {
         if (value < 0) {
-            return ERROR;
+            return TransactionResult.ERROR;
         }
 
         TransactionResult removed = from.remove(value);
 
-        if (removed == SUCCESS) {
+        if (removed == TransactionResult.SUCCESS) {
             TransactionResult added = to.add(value);
 
-            if (added != SUCCESS) {
+            if (added != TransactionResult.SUCCESS) {
                 // adding failed, refund source
                 from.add(value);
             }
@@ -68,7 +65,7 @@ public class GringottsTransaction implements Transaction {
 
     @Override
     public TaxedTransaction withTaxes() {
-        double tax = CONF.transactionTaxFlat + value * CONF.transactionTaxRate;
+        double tax = Configuration.CONF.transactionTaxFlat + value * Configuration.CONF.transactionTaxRate;
         return new GringottsTaxedTransaction(this, tax);
     }
 }

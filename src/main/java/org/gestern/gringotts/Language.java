@@ -4,8 +4,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.function.BiFunction;
 
-import static org.gestern.gringotts.Util.translateColors;
-
 /**
  * Deals with all the language Strings.
  * <p>
@@ -70,7 +68,7 @@ public enum Language {
 
     public void readLanguage(FileConfiguration savedLanguage) {
         BiFunction<String, String, String> translator =
-                (path, def) -> translateColors(savedLanguage.getString(path, def));
+                (path, def) -> Util.translateColors(savedLanguage.getString(path, def));
 
         //global
         LANG.noperm = translator.apply(

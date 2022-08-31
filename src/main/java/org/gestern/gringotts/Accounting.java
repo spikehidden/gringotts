@@ -4,8 +4,6 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 
 import java.util.List;
 
-import static org.gestern.gringotts.Gringotts.getInstance;
-
 /**
  * Manages accounts.
  *
@@ -22,7 +20,7 @@ public class Accounting {
     public GringottsAccount getAccount(AccountHolder owner) {
         GringottsAccount account = new GringottsAccount(owner);
 
-        getInstance().getDao().storeAccount(account);
+        Gringotts.instance.getDao().storeAccount(account);
 
         return account;
     }
@@ -56,12 +54,12 @@ public class Accounting {
      */
     public boolean addChest(AccountChest chest) {
         // TODO refactor to do a more intelligent/quick query
-        List<AccountChest> allChests = getInstance().getDao().retrieveChests();
+        List<AccountChest> allChests = Gringotts.instance.getDao().retrieveChests();
 
         // if there is an invalid stored chest on location of new chest, remove it from storage.
         if (allChests.contains(chest)) {
-            getInstance().getLogger().info("removing orphaned vault: " + chest);
-            getInstance().getDao().deleteAccountChest(chest);
+            Gringotts.instance.getLogger().info("removing orphaned vault: " + chest);
+            Gringotts.instance.getDao().deleteAccountChest(chest);
             allChests.remove(chest);
         }
 
@@ -69,7 +67,7 @@ public class Accounting {
             return false;
         }
 
-        if (!getInstance().getDao().storeAccountChest(chest)) {
+        if (!Gringotts.instance.getDao().storeAccountChest(chest)) {
             throw new GringottsStorageException("Could not save account chest: " + chest);
         }
 

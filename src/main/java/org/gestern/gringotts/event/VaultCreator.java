@@ -11,10 +11,8 @@ import org.gestern.gringotts.accountholder.AccountHolder;
 
 import java.util.Optional;
 
-import static org.gestern.gringotts.Language.LANG;
-
 public class VaultCreator implements Listener {
-    private final Accounting accounting = Gringotts.getInstance().getAccounting();
+    private final Accounting accounting = Gringotts.instance.getAccounting();
 
     /**
      * If the vault creation event was properly handled and an AccountHolder supplied, it will be created here.
@@ -58,10 +56,10 @@ public class VaultCreator implements Listener {
             }
 
             cause.setLine(2, owner.getName());
-            cause.getPlayer().sendMessage(LANG.vault_created);
+            cause.getPlayer().sendMessage(Language.LANG.vault_created);
         } else {
             cause.setCancelled(true);
-            cause.getPlayer().sendMessage(LANG.vault_error);
+            cause.getPlayer().sendMessage(Language.LANG.vault_error);
         }
     }
 }

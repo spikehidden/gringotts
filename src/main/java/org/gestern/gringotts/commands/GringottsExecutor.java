@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.Language;
 import org.gestern.gringotts.api.dependency.Dependency;
 import org.gestern.gringotts.currency.Denomination;
 import org.gestern.gringotts.currency.GringottsCurrency;
@@ -21,8 +22,6 @@ import org.gestern.gringotts.currency.GringottsCurrency;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.gestern.gringotts.Language.LANG;
 
 /**
  * Administrative commands not related to ingame money.
@@ -66,7 +65,7 @@ public class GringottsExecutor extends GringottsAbstractExecutor {
         switch (args[0].toLowerCase()) {
             case "reload": {
                 plugin.reloadConfig();
-                sender.sendMessage(LANG.reload);
+                sender.sendMessage(Language.LANG.reload);
 
                 return true;
             }

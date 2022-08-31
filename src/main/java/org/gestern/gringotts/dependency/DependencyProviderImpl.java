@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.Util;
 import org.gestern.gringotts.api.dependency.Dependency;
 import org.gestern.gringotts.api.dependency.DependencyProvider;
 
@@ -11,8 +12,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static org.gestern.gringotts.Util.versionAtLeast;
 
 /**
  * The type Dependency provider.
@@ -60,7 +59,7 @@ public class DependencyProviderImpl implements DependencyProvider {
             PluginDescriptionFile desc = plugin.getDescription();
             String version = desc.getVersion();
 
-            if (!versionAtLeast(version, minVersion)) {
+            if (!Util.versionAtLeast(version, minVersion)) {
                 this.gringotts.getLogger().warning(String.format(
                         "Plugin dependency %1$s is version %2$s. Expected at least %3$s -- Errors may occur.",
                         name,

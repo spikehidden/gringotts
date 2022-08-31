@@ -5,13 +5,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.gestern.gringotts.Gringotts;
+import org.gestern.gringotts.Language;
+import org.gestern.gringotts.Permissions;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.accountholder.PlayerAccountHolder;
-
-import static org.gestern.gringotts.Language.LANG;
-import static org.gestern.gringotts.Permissions.CREATE_VAULT_ADMIN;
-import static org.gestern.gringotts.Permissions.CREATE_VAULT_PLAYER;
-import static org.gestern.gringotts.event.VaultCreationEvent.Type;
 
 /**
  * This Vault listener handles vault creation events for player vaults.
@@ -28,12 +25,12 @@ public class PlayerVaultListener implements Listener {
         }
 
         // only interested in player vaults
-        if (event.getType() != Type.PLAYER) {
+        if (event.getType() != VaultCreationEvent.Type.PLAYER) {
             return;
         }
 
-        SignChangeEvent cause = event.getCause();
-        String line2String = cause.getLine(2);
+        SignChangeEvent cause       = event.getCause();
+        String          line2String = cause.getLine(2);
 
         if (line2String == null) {
             return;
@@ -41,17 +38,17 @@ public class PlayerVaultListener implements Listener {
 
         Player player = cause.getPlayer();
 
-        if (!CREATE_VAULT_PLAYER.isAllowed(player)) {
-            player.sendMessage(LANG.vault_noVaultPerm);
+        if (!Permissions.CREATE_VAULT_PLAYER.isAllowed(player)) {
+            player.sendMessage(Language.LANG.vault_noVaultPerm);
 
             return;
         }
 
         AccountHolder owner;
 
-        if (line2String.length() > 0 && CREATE_VAULT_ADMIN.isAllowed(player)) {
+        if (line2String.length() > 0 && Permissions.CREATE_VAULT_ADMIN.isAllowed(player)) {
             // attempting to create account for other player
-            owner = Gringotts.getInstance().getAccountHolderFactory().get("player", line2String);
+            owner = Gringotts.instance.getAccountHolderFactory().get("player", line2String);
 
             if (owner == null) {
                 return;

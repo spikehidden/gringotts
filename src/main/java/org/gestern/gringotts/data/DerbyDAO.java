@@ -16,8 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import static org.gestern.gringotts.Configuration.CONF;
-
 /**
  * The Data Access Object provides access to the datastore.
  * This implementation uses the Apache Derby embedded DB.
@@ -26,38 +24,28 @@ import static org.gestern.gringotts.Configuration.CONF;
  */
 public class DerbyDAO implements DAO {
 
-    private static final String DB_NAME = "GringottsDB";
+    private static final String            DB_NAME = "GringottsDB";
     /**
      * Singleton DAO instance.
      */
-    private static DerbyDAO dao;
-    private final Logger log = Gringotts.getInstance().getLogger();
-    private final Driver driver;
+    private static       DerbyDAO          dao;
+    private final        Logger            log     = Gringotts.instance.getLogger();
+    private final        Driver            driver;
     /**
      * Full connection string for database, without connect options.
      */
-    private final String dbString;
-    private Connection connection;
-    private PreparedStatement storeAccountChest,
-            deleteAccountChest,
-            storeAccount,
-            retrieveAccount,
-            retrieveChests,
-            retrieveChestsForAccount,
-            retrieveCents,
-            renameAccount,
-            deleteAccount,
-            deleteAccountChests,
-            storeCents;
+    private final        String            dbString;
+    private              Connection        connection;
+    private              PreparedStatement storeAccountChest, deleteAccountChest, storeAccount, retrieveAccount, retrieveChests, retrieveChestsForAccount, retrieveCents, renameAccount, deleteAccount, deleteAccountChests, storeCents;
 
     private DerbyDAO() {
 
-        String dbPath = Gringotts.getInstance().getDataFolder().getAbsolutePath();
+        String dbPath = Gringotts.instance.getDataFolder().getAbsolutePath();
         dbString = "jdbc:derby:" + dbPath + "/" + DB_NAME;
         String connectString = dbString + ";create=true";
 
         try {
-            driver = DriverManager.getDriver(connectString);
+            driver     = DriverManager.getDriver(connectString);
             connection = driver.connect(connectString, null);
 
             checkConnection();
@@ -332,20 +320,20 @@ public class DerbyDAO implements DAO {
 
             switch (type) {
                 case "player":
-                    value = CONF.startBalancePlayer;
+                    value = Configuration.CONF.startBalancePlayer;
                     break;
                 case "faction":
-                    value = CONF.startBalanceFaction;
+                    value = Configuration.CONF.startBalanceFaction;
                     break;
                 case "town":
-                    value = CONF.startBalanceTown;
+                    value = Configuration.CONF.startBalanceTown;
                     break;
                 case "nation":
-                    value = CONF.startBalanceNation;
+                    value = Configuration.CONF.startBalanceNation;
                     break;
             }
 
-            storeAccount.setLong(3, CONF.getCurrency().getCentValue(value));
+            storeAccount.setLong(3, Configuration.CONF.getCurrency().getCentValue(value));
 
             int updated = storeAccount.executeUpdate();
 
@@ -496,8 +484,7 @@ public class DerbyDAO implements DAO {
                 World world = Bukkit.getWorld(worldName);
 
                 if (world == null) {
-                    Gringotts.getInstance().getLogger().warning(
-                            "Vault " + type + ":" + ownerId + " located on a non-existent world. Skipping.");
+                    Gringotts.instance.getLogger().warning("Vault " + type + ":" + ownerId + " located on a non-existent world. Skipping.");
 
                     continue;
                 }
@@ -509,7 +496,7 @@ public class DerbyDAO implements DAO {
                 );
 
                 if (optionalSign.isPresent()) {
-                    AccountHolder owner = Gringotts.getInstance().getAccountHolderFactory().get(type, ownerId);
+                    AccountHolder owner = Gringotts.instance.getAccountHolderFactory().get(type, ownerId);
 
                     if (owner == null) {
                         // FIXME this logic really doesn't belong in DAO, I think?
@@ -576,11 +563,7 @@ public class DerbyDAO implements DAO {
                 if (world == null) {
                     deleteAccountChest(worldName, x, y, x); // FIXME: Isn't actually removing the non-existent vaults..
 
-                    Gringotts.getInstance().getLogger().severe(String.format(
-                            "Vault of %s located on a non-existent world. Deleting Vault on world %s",
-                            owner.getName(),
-                            worldName
-                    ));
+                    Gringotts.instance.getLogger().severe(String.format("Vault of %s located on a non-existent world. Deleting Vault on world %s", owner.getName(), worldName));
 
                     continue;
                 }

@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.gestern.gringotts.AccountInventory;
+import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.Gringotts;
 import org.gestern.gringotts.GringottsAccount;
 import org.gestern.gringotts.accountholder.AccountHolder;
@@ -18,18 +19,14 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.gestern.gringotts.Configuration.CONF;
-import static org.gestern.gringotts.api.TransactionResult.ERROR;
-import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
-
 /**
  * The type Gringotts eco.
  */
 public class GringottsEco implements Eco {
 
-    private static final String TAG_PLAYER = "player";
-    private final AccountHolderFactory accountOwners = Gringotts.getInstance().getAccountHolderFactory();
-    private final DAO dao = Gringotts.getInstance().getDao();
+    private static final String               TAG_PLAYER    = "player";
+    private final        AccountHolderFactory accountOwners = Gringotts.instance.getAccountHolderFactory();
+    private final        DAO                  dao           = Gringotts.instance.getDao();
 
     /**
      * Account account.
@@ -45,7 +42,7 @@ public class GringottsEco implements Eco {
             return new InvalidAccount("virtual", id);
         }
 
-        GringottsAccount gAccount = Gringotts.getInstance().getAccounting().getAccount(owner);
+        GringottsAccount gAccount = Gringotts.instance.getAccounting().getAccount(owner);
 
         return new ValidAccount(gAccount);
     }
@@ -61,7 +58,7 @@ public class GringottsEco implements Eco {
         AccountHolder owner = accountOwners.get(TAG_PLAYER, id.toString());
 
         if (owner instanceof PlayerAccountHolder) {
-            return new ValidPlayerAccount(Gringotts.getInstance().getAccounting().getAccount(owner));
+            return new ValidPlayerAccount(Gringotts.instance.getAccounting().getAccount(owner));
         }
 
         return new InvalidAccount(TAG_PLAYER, id.toString());
@@ -128,7 +125,7 @@ public class GringottsEco implements Eco {
      */
     @Override
     public Currency currency() {
-        return new Curr(CONF.getCurrency());
+        return new Curr(Configuration.CONF.getCurrency());
     }
 
     /**
@@ -318,7 +315,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public TransactionResult setBalance(double newBalance) {
-            return ERROR;
+            return TransactionResult.ERROR;
         }
 
         /**
@@ -329,7 +326,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public TransactionResult add(double value) {
-            return ERROR;
+            return TransactionResult.ERROR;
         }
 
         /**
@@ -340,7 +337,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public TransactionResult remove(double value) {
-            return ERROR;
+            return TransactionResult.ERROR;
         }
 
         /**
@@ -436,7 +433,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public TransactionResult deposit(double value) {
-            return ERROR;
+            return TransactionResult.ERROR;
         }
 
         /**
@@ -447,7 +444,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public TransactionResult withdraw(double value) {
-            return ERROR;
+            return TransactionResult.ERROR;
         }
 
         /**
@@ -511,7 +508,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public String format(double value) {
-            return CONF.getCurrency().format(formatString, value);
+            return Configuration.CONF.getCurrency().format(formatString, value);
         }
 
         /**
@@ -580,7 +577,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public double balance() {
-            return CONF.getCurrency().getDisplayValue(acc.getBalance());
+            return Configuration.CONF.getCurrency().getDisplayValue(acc.getBalance());
         }
 
         /**
@@ -590,7 +587,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public double vaultBalance() {
-            return CONF.getCurrency().getDisplayValue(acc.getVaultBalance());
+            return Configuration.CONF.getCurrency().getDisplayValue(acc.getVaultBalance());
         }
 
         /**
@@ -600,7 +597,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public double vaultBalance(int index) {
-            return CONF.getCurrency().getDisplayValue(acc.getVaultBalance(index));
+            return Configuration.CONF.getCurrency().getDisplayValue(acc.getVaultBalance(index));
         }
 
         /**
@@ -630,7 +627,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public double invBalance() {
-            return CONF.getCurrency().getDisplayValue(acc.getInvBalance());
+            return Configuration.CONF.getCurrency().getDisplayValue(acc.getInvBalance());
         }
 
         /**
@@ -641,7 +638,7 @@ public class GringottsEco implements Eco {
          */
         @Override
         public boolean has(double value) {
-            return acc.getBalance() >= CONF.getCurrency().getCentValue(value);
+            return acc.getBalance() >= Configuration.CONF.getCurrency().getCentValue(value);
         }
 
         /**
@@ -667,7 +664,7 @@ public class GringottsEco implements Eco {
                 return remove(-value);
             }
 
-            return acc.add(CONF.getCurrency().getCentValue(value));
+            return acc.add(Configuration.CONF.getCurrency().getCentValue(value));
         }
 
         /**
@@ -682,7 +679,7 @@ public class GringottsEco implements Eco {
                 return add(-value);
             }
 
-            return acc.remove(CONF.getCurrency().getCentValue(value));
+            return acc.remove(Configuration.CONF.getCurrency().getCentValue(value));
         }
 
         /**
@@ -761,20 +758,20 @@ public class GringottsEco implements Eco {
             Player player = Bukkit.getPlayer(owner.getUUID());
 
             if (player == null) {
-                return ERROR;
+                return TransactionResult.ERROR;
             }
 
             AccountInventory playerInventory = new AccountInventory(player.getInventory());
-            long centValue = CONF.getCurrency().getCentValue(value);
-            long toDeposit = playerInventory.remove(centValue);
+            long             centValue       = Configuration.CONF.getCurrency().getCentValue(value);
+            long             toDeposit       = playerInventory.remove(centValue);
 
             if (toDeposit > centValue) {
                 toDeposit -= playerInventory.add(toDeposit - centValue);
             }
 
-            TransactionResult result = player(player.getUniqueId()).add(CONF.getCurrency().getDisplayValue(toDeposit));
+            TransactionResult result = player(player.getUniqueId()).add(Configuration.CONF.getCurrency().getDisplayValue(toDeposit));
 
-            if (result != SUCCESS) {
+            if (result != TransactionResult.SUCCESS) {
                 playerInventory.add(toDeposit);
             }
 
@@ -793,14 +790,14 @@ public class GringottsEco implements Eco {
             Player player = Bukkit.getPlayer(owner.getUUID());
 
             if (player == null) {
-                return ERROR;
+                return TransactionResult.ERROR;
             }
 
-            AccountInventory playerInventory = new AccountInventory(player.getInventory());
-            long centValue = CONF.getCurrency().getCentValue(value);
-            TransactionResult remove = acc.remove(centValue);
+            AccountInventory  playerInventory = new AccountInventory(player.getInventory());
+            long              centValue       = Configuration.CONF.getCurrency().getCentValue(value);
+            TransactionResult remove          = acc.remove(centValue);
 
-            if (remove == SUCCESS) {
+            if (remove == TransactionResult.SUCCESS) {
                 long withdrawn = playerInventory.add(centValue);
                 return acc.add(centValue - withdrawn); // add possible leftovers back to account
             }

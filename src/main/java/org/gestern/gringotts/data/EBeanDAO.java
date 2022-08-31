@@ -8,26 +8,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.gestern.gringotts.AccountChest;
-import org.gestern.gringotts.Gringotts;
-import org.gestern.gringotts.GringottsAccount;
-import org.gestern.gringotts.Util;
+import org.gestern.gringotts.*;
 import org.gestern.gringotts.accountholder.AccountHolder;
 import org.gestern.gringotts.event.VaultCreationEvent;
 
 import java.util.*;
 import java.util.logging.Logger;
 
-import static org.gestern.gringotts.Configuration.CONF;
-
 /**
  * The type E bean dao.
  */
 public class EBeanDAO implements DAO {
-
-    private static EBeanDAO dao;
-    private final EbeanServer db = Gringotts.getInstance().getDatabase();
-    private final Logger log = Gringotts.getInstance().getLogger();
+    private static EBeanDAO    dao;
+    private final  EbeanServer db  = Gringotts.instance.getDatabase();
+    private final  Logger      log = Gringotts.instance.getLogger();
 
     /**
      * Gets dao.
@@ -130,20 +124,20 @@ public class EBeanDAO implements DAO {
 
         switch (type) {
             case "player":
-                startValue = CONF.startBalancePlayer;
+                startValue = Configuration.CONF.startBalancePlayer;
                 break;
             case "faction":
-                startValue = CONF.startBalanceFaction;
+                startValue = Configuration.CONF.startBalanceFaction;
                 break;
             case "town":
-                startValue = CONF.startBalanceTown;
+                startValue = Configuration.CONF.startBalanceTown;
                 break;
             case "nation":
-                startValue = CONF.startBalanceNation;
+                startValue = Configuration.CONF.startBalanceNation;
                 break;
         }
 
-        acc.setCents(CONF.getCurrency().getCentValue(startValue));
+        acc.setCents(Configuration.CONF.getCurrency().getCentValue(startValue));
         db.save(acc);
 
         return true;
@@ -189,7 +183,7 @@ public class EBeanDAO implements DAO {
             );
 
             if (optionalSign.isPresent()) {
-                AccountHolder owner = Gringotts.getInstance().getAccountHolderFactory().get(type, ownerId);
+                AccountHolder owner = Gringotts.instance.getAccountHolderFactory().get(type, ownerId);
 
                 if (owner == null) {
                     log.info(String.format(

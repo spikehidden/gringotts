@@ -10,8 +10,6 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import static org.gestern.gringotts.Configuration.CONF;
-
 /**
  * Represents a storage unit for an account.
  *
@@ -21,7 +19,7 @@ public class AccountChest {
     /**
      * Sign marking the chest as an account chest.
      */
-    public final Sign sign;
+    public final Sign             sign;
     /**
      * Account this chest belongs to.
      */
@@ -42,7 +40,7 @@ public class AccountChest {
             ));
         }
 
-        this.sign = sign;
+        this.sign    = sign;
         this.account = account;
     }
 
@@ -108,9 +106,7 @@ public class AccountChest {
      */
     private boolean updateInvalid() {
         if (notValid()) {
-            Gringotts.getInstance()
-                    .getLogger()
-                    .info("Destroying orphaned vault: " + this);
+            Gringotts.instance.getLogger().info("Destroying orphaned vault: " + this);
             destroy();
 
             return true;
@@ -188,20 +184,16 @@ public class AccountChest {
         }
 
         String[] lines = sign.getLines();
-        String line0 = lines[0].toLowerCase().trim();
+        String   line0 = lines[0].toLowerCase().trim();
 
-        return !line0.matches(CONF.vaultPattern) ||
-                lines[2] == null ||
-                lines[2].length() == 0 || chest() == null;
+        return !line0.matches(Configuration.CONF.vaultPattern) || lines[2] == null || lines[2].length() == 0 || chest() == null;
     }
 
     /**
      * Triggered on destruction of physical chest or sign.
      */
     void destroy() {
-        Gringotts.getInstance()
-                .getDao()
-                .deleteAccountChest(this);
+        Gringotts.instance.getDao().deleteAccountChest(this);
 
         sign.getBlock().breakNaturally();
     }
@@ -236,8 +228,8 @@ public class AccountChest {
 
         if (inventory instanceof DoubleChestInventory) {
             DoubleChestInventory chestInventory = (DoubleChestInventory) inventory;
-            Chest left = (Chest) (chestInventory.getLeftSide().getHolder());
-            Chest right = (Chest) (chestInventory.getRightSide().getHolder());
+            Chest                left           = (Chest) (chestInventory.getLeftSide().getHolder());
+            Chest                right          = (Chest) (chestInventory.getRightSide().getHolder());
 
             return new Chest[]{left, right};
         } else {
@@ -261,14 +253,13 @@ public class AccountChest {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
+        final int prime  = 31;
+        int       result = 1;
 
         result = prime * result + sign.getLocation().hashCode();
 
         return result;
     }
-
 
     /**
      * Equals boolean.

@@ -3,15 +3,13 @@ package org.gestern.gringotts.commands;
 import com.google.common.collect.Lists;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.gestern.gringotts.Language;
 import org.gestern.gringotts.api.Account;
 import org.gestern.gringotts.api.TransactionResult;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.gestern.gringotts.Language.LANG;
-import static org.gestern.gringotts.api.TransactionResult.SUCCESS;
 
 /**
  * Admin commands for managing ingame aspects.
@@ -61,9 +59,7 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                 }
 
                 String formattedBalance = eco.currency().format(target.balance());
-                String senderMessage = LANG.moneyadmin_b
-                        .replace(TAG_BALANCE, formattedBalance)
-                        .replace(TAG_PLAYER, targetAccount);
+                String senderMessage = Language.LANG.moneyadmin_b.replace(TAG_BALANCE, formattedBalance).replace(TAG_PLAYER, targetAccount);
 
                 sender.sendMessage(senderMessage);
 
@@ -92,24 +88,19 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                     return false;
                 }
 
-                String formattedAmount = eco.currency().format(amount);
-                TransactionResult added = target.add(amount);
+                String            formattedAmount = eco.currency().format(amount);
+                TransactionResult added           = target.add(amount);
 
-                if (added == SUCCESS) {
-                    String senderMessage = LANG.moneyadmin_add_sender
-                            .replace(TAG_VALUE, formattedAmount)
-                            .replace(TAG_PLAYER, targetAccount);
+                if (added == TransactionResult.SUCCESS) {
+                    String senderMessage = Language.LANG.moneyadmin_add_sender.replace(TAG_VALUE, formattedAmount).replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(senderMessage);
 
-                    String targetMessage = LANG.moneyadmin_add_target
-                            .replace(TAG_VALUE, formattedAmount);
+                    String targetMessage = Language.LANG.moneyadmin_add_target.replace(TAG_VALUE, formattedAmount);
 
                     target.message(targetMessage);
                 } else {
-                    String errorMessage = LANG.moneyadmin_add_error
-                            .replace(TAG_VALUE, targetAccount)
-                            .replace(TAG_PLAYER, targetAccount);
+                    String errorMessage = Language.LANG.moneyadmin_add_error.replace(TAG_VALUE, targetAccount).replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(errorMessage);
                 }
@@ -140,24 +131,19 @@ public class MoneyAdminExecutor extends GringottsAbstractExecutor {
                     return false;
                 }
 
-                String formattedAmount = eco.currency().format(amount);
-                TransactionResult removed = target.remove(amount);
+                String            formattedAmount = eco.currency().format(amount);
+                TransactionResult removed         = target.remove(amount);
 
-                if (removed == SUCCESS) {
-                    String senderMessage = LANG.moneyadmin_rm_sender
-                            .replace(TAG_VALUE, formattedAmount)
-                            .replace(TAG_PLAYER, targetAccount);
+                if (removed == TransactionResult.SUCCESS) {
+                    String senderMessage = Language.LANG.moneyadmin_rm_sender.replace(TAG_VALUE, formattedAmount).replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(senderMessage);
 
-                    String targetMessage = LANG.moneyadmin_rm_target
-                            .replace(TAG_VALUE, formattedAmount);
+                    String targetMessage = Language.LANG.moneyadmin_rm_target.replace(TAG_VALUE, formattedAmount);
 
                     target.message(targetMessage);
                 } else {
-                    String errorMessage = LANG.moneyadmin_rm_error
-                            .replace(TAG_VALUE, formattedAmount)
-                            .replace(TAG_PLAYER, targetAccount);
+                    String errorMessage = Language.LANG.moneyadmin_rm_error.replace(TAG_VALUE, formattedAmount).replace(TAG_PLAYER, targetAccount);
 
                     sender.sendMessage(errorMessage);
                 }

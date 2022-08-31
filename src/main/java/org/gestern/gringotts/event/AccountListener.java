@@ -5,14 +5,12 @@ import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.gestern.gringotts.Configuration;
 import org.gestern.gringotts.Util;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.gestern.gringotts.Configuration.CONF;
-import static org.gestern.gringotts.event.VaultCreationEvent.Type;
 
 /**
  * Listens for chest creation and destruction events.
@@ -21,9 +19,7 @@ import static org.gestern.gringotts.event.VaultCreationEvent.Type;
  */
 public class AccountListener implements Listener {
 
-    private final Pattern vaultPattern = Pattern.compile(
-            CONF.vaultPattern,
-            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private final Pattern vaultPattern = Pattern.compile(Configuration.CONF.vaultPattern, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     /**
      * Create an account chest by adding a sign marker over it.
@@ -47,13 +43,14 @@ public class AccountListener implements Listener {
 
         String typeStr = match.group(1).toUpperCase();
 
-        Type type;
+        VaultCreationEvent.Type type;
+
         // default vault is player
         if (typeStr.isEmpty()) {
-            type = Type.PLAYER;
+            type = VaultCreationEvent.Type.PLAYER;
         } else {
             try {
-                type = Type.valueOf(typeStr);
+                type = VaultCreationEvent.Type.valueOf(typeStr);
             } catch (IllegalArgumentException notFound) {
                 return;
             }

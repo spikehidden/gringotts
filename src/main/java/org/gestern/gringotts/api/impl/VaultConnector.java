@@ -22,17 +22,16 @@ import static org.gestern.gringotts.Language.LANG;
  * @author jast
  */
 public class VaultConnector implements Economy {
-    private static final Gringotts GRINGOTTS = Gringotts.getInstance();
-    private final Eco eco = GRINGOTTS.getEco();
+    private final Eco eco = Gringotts.instance.getEco();
 
     @Override
     public boolean isEnabled() {
-        return GRINGOTTS != null && GRINGOTTS.isEnabled();
+        return Gringotts.instance != null && Gringotts.instance.isEnabled();
     }
 
     @Override
     public String getName() {
-        return GRINGOTTS.getName();
+        return Gringotts.instance.getName();
     }
 
     @Override
@@ -267,7 +266,7 @@ public class VaultConnector implements Economy {
     public EconomyResponse bankBalance(String name) {
         return new EconomyResponse(0, 0, ResponseType.NOT_IMPLEMENTED, LANG.plugin_vault_notImplemented);
         //    	double balance = eco.bank(name).balance();
-        //        return new EconomyResponse(0, balance, 
+        //        return new EconomyResponse(0, balance,
         //        		ResponseType.SUCCESS, "Balance of bank "+ name +": "+ balance);
     }
 
@@ -292,7 +291,7 @@ public class VaultConnector implements Economy {
         //    	if (result == TransactionResult.SUCCESS)
         //    		return new EconomyResponse(amount, bank.balance(), ResponseType.SUCCESS, "Removed " + amount + "
         // from bank " + name);
-        //    	else 
+        //    	else
         //    		return new EconomyResponse(0, bank.balance(), ResponseType.SUCCESS, "Failed to remove " + amount +
         // " from bank " + name);
     }
@@ -305,7 +304,7 @@ public class VaultConnector implements Economy {
         //    	if (result == TransactionResult.SUCCESS)
         //    		return new EconomyResponse(amount, bank.balance(), ResponseType.SUCCESS, "Added " + amount + " to
         // bank " + name);
-        //    	else 
+        //    	else
         //    		return new EconomyResponse(0, bank.balance(), ResponseType.SUCCESS, "Failed to add " + amount + "
         // to bank " + name);
     }

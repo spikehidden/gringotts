@@ -5,7 +5,6 @@ import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
-import com.avaje.ebean.validation.NotNull;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
@@ -55,27 +54,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.gestern.gringotts.Configuration.CONF;
-import static org.gestern.gringotts.Language.LANG;
-
 /**
  * The type Gringotts.
  */
 public class Gringotts extends JavaPlugin {
+    // Make Gringotts instance publicly available, no need to be private!
+    public static Gringotts instance;
+
     private static final String MESSAGES_YML = "messages.yml";
-    private static Gringotts instance;
 
     private final AccountHolderFactory accountHolderFactory = new AccountHolderFactory();
-    private final DependencyProvider dependencies = new DependencyProviderImpl(this);
-    private final EbeanServer ebean;
-    private Accounting accounting;
-    private DAO dao;
-    private Eco eco;
+    private final DependencyProvider   dependencies         = new DependencyProviderImpl(this);
+    private final EbeanServer          ebean;
+    private       Accounting           accounting;
+    private       DAO                  dao;
+    private       Eco                  eco;
 
     /**
      * Instantiates a new Gringotts.
      */
     public Gringotts() {
+        // Set instance when class is being initialized
+        instance = this;
+
         ServerConfig dbConfig = new ServerConfig();
 
         dbConfig.setDefaultServer(false);
@@ -98,15 +99,6 @@ public class Gringotts extends JavaPlugin {
         Thread.currentThread().setContextClassLoader(previous);
     }
 
-    /**
-     * The Gringotts plugin instance.
-     *
-     * @return the instance
-     */
-    public static Gringotts getInstance() {
-        return instance;
-    }
-
     public String getVersion() {
         return getDescription().getVersion();
     }
@@ -116,8 +108,6 @@ public class Gringotts extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        instance = this;
-
         try {
             // just call DAO once to ensure it's loaded before startup is complete
             dao = getDAO();
@@ -127,7 +117,7 @@ public class Gringotts extends JavaPlugin {
             reloadConfig();
 
             accounting = new Accounting();
-            eco = new GringottsEco();
+            eco        = new GringottsEco();
 
             if (!(this.dependencies.hasDependency("vault") ||
                     this.dependencies.hasDependency("reserve"))) {
@@ -210,10 +200,7 @@ public class Gringotts extends JavaPlugin {
             );
 
             if (plugin != null) {
-                if (!this.dependencies.registerDependency(new PlaceholderAPIDependency(
-                        this,
-                        plugin
-                ))) {
+                if (!this.dependencies.registerDependency(new PlaceholderAPIDependency(plugin))) {
                     getLogger().warning("PlaceholderAPI plugin is already assigned into the dependencies.");
                 }
             }
@@ -310,7 +297,7 @@ public class Gringotts extends JavaPlugin {
         metrics.addCustomChart(new AdvancedPie("denominationsChart", () -> {
             Map<String, Integer> returned = new HashMap<>();
 
-            for (Denomination denomination : CONF.getCurrency().getDenominations()) {
+            for (Denomination denomination : Configuration.CONF.getCurrency().getDenominations()) {
                 String name = denomination.getKey().type.getType().name();
 
                 if (!returned.containsKey(name)) {
@@ -328,7 +315,7 @@ public class Gringotts extends JavaPlugin {
 
             for (Dependency dependency : this.dependencies) {
                 if (dependency.isEnabled()) {
-                    String name = dependency.getName();
+                    String name    = dependency.getName();
                     String version = dependency.getVersion();
 
                     if (name != null && version != null) {
@@ -410,10 +397,10 @@ public class Gringotts extends JavaPlugin {
      * @return the configured player interaction messages
      */
     public FileConfiguration getMessages() {
-        String langPath = String.format("i18n/messages_%s.yml", CONF.language);
+        String langPath = String.format("i18n/messages_%s.yml", Configuration.CONF.language);
 
         // try configured language first
-        InputStream langStream = getResource(langPath);
+        InputStream       langStream = getResource(langPath);
         FileConfiguration conf;
 
         if (langStream != null) {
@@ -436,8 +423,8 @@ public class Gringotts extends JavaPlugin {
     @Override
     public void reloadConfig() {
         super.reloadConfig();
-        CONF.readConfig(getConfig());
-        LANG.readLanguage(getMessages());
+        Configuration.CONF.readConfig(getConfig());
+        Language.LANG.readLanguage(getMessages());
     }
 
     /**
@@ -515,7 +502,7 @@ public class Gringotts extends JavaPlugin {
      * href="https://github.com/Bukkit/HomeBukkit">Bukkit's Homebukkit Plugin
      * </a></i>
      *
-     * @return ebean server instance or null if not enabled all EBean related methods has been removed with Minecraft 1.12 - see https://www.spigotmc.org/threads/194144/
+     * @return ebean server instance or null if not enabled all EBean related methods has been removed with Minecraft 1.12 - see <a href="https://www.spigotmc.org/threads/194144/">...</a>
      */
     public EbeanServer getDatabase() {
         return ebean;
@@ -526,7 +513,7 @@ public class Gringotts extends JavaPlugin {
      */
     protected void installDDL() {
         SpiEbeanServer server = (SpiEbeanServer) getDatabase();
-        DdlGenerator gen = server.getDdlGenerator();
+        DdlGenerator   gen    = server.getDdlGenerator();
 
         gen.runScript(false, gen.generateCreateDdl());
     }
