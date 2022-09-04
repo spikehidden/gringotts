@@ -33,8 +33,6 @@ public enum Configuration {
      * Subpattern 1 denotes the type of the vault.
      */
     public String vaultPattern        = "[^\\[]*\\[(\\w*) ?vault\\]";
-    public String townSignVaultName   = "town";
-    public String nationSignVaultName = "nation";
     /**
      * Language to be used for messages. Should be an ISO 639-1 (alpha-2) code.
      * If a language is not supported by Gringotts, use user-configured or default (English) messages.
@@ -176,8 +174,6 @@ public enum Configuration {
         CONF.language = savedConfig.getString("language", "custom");
 
         CONF.vaultPattern        = savedConfig.getString("vault_pattern", "[^\\[]*\\[(\\w*) ?vault\\]");
-        CONF.townSignVaultName   = savedConfig.getString("towny.town_sign_vault_name", "town");
-        CONF.nationSignVaultName = savedConfig.getString("towny.nation_sign_vault_name", "nation");
     }
 
     /**

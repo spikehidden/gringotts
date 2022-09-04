@@ -6,7 +6,7 @@
 # %player means either the player executing the command, the player you interact with or the player whose account you want to manipulate
 # %balance stands for the amount of money a player has
 #
-# sender stands for the message the one executing the command gets, target for the other person who is affected. 
+# sender stands for the message the one executing the command gets, target for the other person who is affected.
 # Errors and other messages are only displayed for the one executing the command
 
 
@@ -19,7 +19,7 @@ invalidaccount: "Invalid account: %player"
 reload: "Gringotts: Reloaded configuration!"
 
 pay:
-    success:   
+    success:
         tax: "Transaction tax deducted from your account: %value"
         sender: "Sent %value to %player. "
         target: "Received %value from %player."
@@ -39,7 +39,7 @@ withdraw:
 
 moneyadmin:
     b: "Balance of account %player: %balance"
-    add: 
+    add:
         sender: "Added %value to account %player"
         target: "Added to your account: %value"
         error: "Could not add %value to account %player"
@@ -54,11 +54,6 @@ vault:
     noVaultPerm: "You do not have permission to create vaults here."
 
 plugins:
-    towny:
-        noTownVaultPerm: "You do not have permission to create town vaults here."
-        noTownResident: "Cannot create town vault: You are not resident of a town."
-        noNationVaultPerm: "You do not have permission to create nation vaults here."
-        notInNation: "Cannot create nation vault: You do not belong to a nation."
     vault:
         insufficientFunds: "Insufficient funds."
         insufficientSpace: "Insufficient space."

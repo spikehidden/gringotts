@@ -616,7 +616,7 @@ public class DerbyDAO implements DAO {
      * @return the accounts
      */
     @Override
-    public List<String> getAccounts(VaultCreationEvent.Type type) {
+    public List<String> getAccounts(String type) {
         return null;
     }
 

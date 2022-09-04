@@ -7,10 +7,6 @@ language: custom
 # subpattern 1 denotes the type of the vault.
 vault_pattern: '[^\[]*\[(\w*) ?vault\]'
 
-towny:
-  town_sign_vault_name: 'town'
-  nation_sign_vault_name: 'nation'
-
 # If this is set to true, when the user receives an amount of money
 # exceeding the inventory capacity, drop items that didn't fit.
 drop-overflowing-item: false

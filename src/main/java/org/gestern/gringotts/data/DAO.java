@@ -96,7 +96,7 @@ public interface DAO {
      * @param type the type
      * @return the accounts
      */
-    List<String> getAccounts(VaultCreationEvent.Type type);
+    List<String> getAccounts(String type);
 
     /**
      * Store an amount of cents to a given account.

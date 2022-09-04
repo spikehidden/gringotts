@@ -117,16 +117,6 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
      * @param type the type
      * @return the provider
      */
-    public Optional<AccountHolderProvider> getProvider(VaultCreationEvent.Type type) {
-        return this.getProvider(type.getId());
-    }
-
-    /**
-     * Gets provider.
-     *
-     * @param type the type
-     * @return the provider
-     */
     public Optional<AccountHolderProvider> getProvider(String type) {
         return Optional.ofNullable(this.accountHolderProviders.getOrDefault(type, null));
     }
@@ -189,8 +179,8 @@ public class AccountHolderFactory implements Iterable<AccountHolderProvider> {
          * @return the type
          */
         @Override
-        public @NotNull VaultCreationEvent.Type getType() {
-            return VaultCreationEvent.Type.PLAYER;
+        public @NotNull String getType() {
+            return "player";
         }
 
         /**

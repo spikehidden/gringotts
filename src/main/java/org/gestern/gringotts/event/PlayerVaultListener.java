@@ -25,7 +25,7 @@ public class PlayerVaultListener implements Listener {
         }
 
         // only interested in player vaults
-        if (event.getType() != VaultCreationEvent.Type.PLAYER) {
+        if (!event.getType().equals("player")) {
             return;
         }
 

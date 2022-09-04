@@ -329,12 +329,10 @@ public class EBeanDAO implements DAO {
      * @return the accounts
      */
     @Override
-    public List<String> getAccounts(VaultCreationEvent.Type type) {
+    public List<String> getAccounts(String type) {
         SqlQuery getAccounts = db.createSqlQuery("SELECT owner FROM gringotts_account WHERE type = :type");
 
-        String typeId = type.getId();
-
-        getAccounts.setParameter("type", typeId);
+        getAccounts.setParameter("type", type);
 
         List<String> returned = new LinkedList<>();
 
@@ -342,7 +340,7 @@ public class EBeanDAO implements DAO {
             String owner = result.getString("owner");
 
             if (owner != null) {
-                returned.add(typeId + ":" + owner);
+                returned.add(type + ":" + owner);
             }
         }
 

@@ -47,7 +47,7 @@ public interface AccountHolderProvider {
      *
      * @return the type
      */
-    @NotNull VaultCreationEvent.Type getType();
+    @NotNull String getType();
 
     /**
      * Gets account names.

@@ -43,23 +43,13 @@ public class AccountListener implements Listener {
 
         String typeStr = match.group(1).toUpperCase();
 
-        VaultCreationEvent.Type type;
+        String type;
 
         // default vault is player
         if (typeStr.isEmpty()) {
-            type = VaultCreationEvent.Type.PLAYER;
+            type = "player";
         } else {
-            if (Configuration.CONF.townSignVaultName.equals(typeStr)) {
-                type = VaultCreationEvent.Type.TOWN;
-            } else if (Configuration.CONF.nationSignVaultName.equals(typeStr)) {
-                type = VaultCreationEvent.Type.NATION;
-            } else {
-                try {
-                    type = VaultCreationEvent.Type.valueOf(typeStr);
-                } catch (IllegalArgumentException notFound) {
-                    return;
-                }
-            }
+            type = typeStr.toLowerCase();
         }
 
         Optional<Sign> optionalSign = Util.getBlockStateAs(

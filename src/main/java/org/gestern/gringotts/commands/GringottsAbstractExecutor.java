@@ -215,14 +215,14 @@ public abstract class GringottsAbstractExecutor implements TabExecutor {
         }
 
         try {
-            VaultCreationEvent.Type type = VaultCreationEvent.Type.valueOf(steps[0].toUpperCase());
+            String type = steps[0].toUpperCase();
 
             Optional<AccountHolderProvider> providerOptional = Gringotts.instance.getAccountHolderFactory().getProvider(type);
 
             if (providerOptional.isPresent()) {
                 return providerOptional.get().getAccountNames().stream()
                         .filter(Objects::nonNull)
-                        .map(s -> type.getId() + ":" + s)
+                        .map(s -> type + ":" + s)
                         .filter(name -> startsWithIgnoreCase(name, arg))
                         .collect(Collectors.toList());
             }

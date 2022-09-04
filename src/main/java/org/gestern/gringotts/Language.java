@@ -50,11 +50,6 @@ public enum Language {
     public String vault_created;
     public String vault_error;
     public String vault_noVaultPerm;
-    //towny plugin
-    public String plugin_towny_noTownVaultPerm;
-    public String plugin_towny_noTownResident;
-    public String plugin_towny_noNationVaultPerm;
-    public String plugin_towny_notInNation;
     //faction plugin
     public String plugin_faction_noVaultPerm;
     public String plugin_faction_notInFaction;
@@ -165,20 +160,6 @@ public enum Language {
         LANG.vault_error = translator.apply(
                 "vault.error",
                 "Failed to create vault.");
-
-        //towny plugin
-        LANG.plugin_towny_noTownVaultPerm = translator.apply(
-                "plugins.towny.noTownPerm",
-                "You do not have permission to create town vaults here.");
-        LANG.plugin_towny_noTownResident = translator.apply(
-                "plugins.towny.noTownResident",
-                "Cannot create town vault: You are not resident of a town.");
-        LANG.plugin_towny_noNationVaultPerm = translator.apply(
-                "plugins.towny.NoNationVaultPerm",
-                "You do not have permission to create nation vaults here.");
-        LANG.plugin_towny_notInNation = translator.apply(
-                "plugins.towny.notInNation",
-                "Cannot create nation vault: You do not belong to a nation.");
 
         //faction plugin
         LANG.plugin_faction_noVaultPerm = translator.apply(
