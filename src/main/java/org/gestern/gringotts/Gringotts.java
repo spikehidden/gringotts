@@ -225,18 +225,11 @@ public class Gringotts extends JavaPlugin {
                     ),
                     id
             ))) {
-                getLogger().warning(
-                        name + " plugin is already assigned into the dependencies."
-                );
+                getLogger().warning(name + " plugin is already assigned into the dependencies.");
             }
         } catch (IllegalArgumentException e) {
-            getLogger().warning(
-                    String.format(
-                            "Looks like %1$s plugin is not compatible with Gringotts's code.",
-                            name
-                    )
-            );
-        }
+            getLogger().warning(String.format("Looks like %1$s plugin is not compatible with Gringotts's code.", name));
+        } catch (NullPointerException ignored) {}
     }
 
     /**
