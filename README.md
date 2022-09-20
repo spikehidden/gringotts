@@ -74,6 +74,14 @@ Metrics
 -------
 [![Gringotts Metrics](https://bstats.org/signatures/bukkit/Gringotts.svg)](https://bstats.org/plugin/bukkit/Gringotts/4998)
 
+## Contributors
+
+<a href="https://github.com/nikosgram/gringotts/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=nikosgram/gringotts"  alt="Gringotts contributors"/>
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
+
 License
 -------
 All code within Gringotts is licensed under the BSD 2-clause license. See `license.txt` for details.
