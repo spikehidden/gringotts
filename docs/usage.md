@@ -6,7 +6,7 @@ Storing money in an account requires a Gringotts vault. A vault consists of a co
 Vaults
 ------
 
-Gringotts supports vaults for players as well as other plugins: currently Factions, Towny and WorldGuard. All vaults are created by placing a sign onto or above a container and writing the vault type on first line the sign. When a vault is successfully created, you will receive a message.
+Gringotts supports vaults for players as well as other plugins: currently Factions and Towny. All vaults are created by placing a sign onto or above a container and writing the vault type on first line the sign. When a vault is successfully created, you will receive a message. For Towny you will have to use this [plugin](https://www.spigotmc.org/resources/gringotts-towny.105074/).
 
 ### Player vaults ###
 
@@ -19,13 +19,6 @@ Third line: will display your name on successful creation.
 * Nation vaults first line: `[nation vault]`
 
 If it was created correctly, the sign will display your town's or nation's tag on the third line.
-
-### WorldGuard vaults ###
-
-First line: `[region vault]`
-Third line: region's id
-
-Writing the region id manually is required because a player may be part of several regions. If the vault has been created correctly, you will receive a message that the vault has been created.
 
 ### Creating vaults for other players/accounts ###
 
